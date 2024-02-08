@@ -1,0 +1,54 @@
+{{- if (.Values.folio).tenantId }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-create-foliouser
+spec:
+  template:
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      ttlSecondsAfterFinished: {{ (.Values.job).ttlSecondsAfterFinished | default "300" }}
+      containers:
+      - name: {{ $.Release.Name }}-create-foliouser
+        image: "gitlab.bib-bvb.de:5050/folio/okapiclient:v0.17"
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: FOLIO_ADMIN_PASSWORD
+          {{- if (lookup "v1" "Secret" $.Release.Namespace (printf "%s-admin-pwd" .Values.folio.tenantId) ) }}
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.folio.tenantId }}-admin-pwd
+              key: password
+          {{- else }}
+          value: {{ .Values.folio.folioadminpassword | default "no-password-set" }}
+          {{- end }}
+        - name: FOLIO_ADMIN_USERNAME
+          value: {{ .Values.folio.folioadminusername | default "admin" }}
+        - name: FOLIO_TENANTID
+          value: {{ .Values.folio.tenantId | default "diku" }}
+        - name: OKAPI_URL
+          value: {{ include "vufind.okapiurl" . }}
+        - name: FOLIO_VUFIND_EMAIL
+          value: {{ .Values.folio.vufindemail | default "vufind@localhost" }}
+        command:
+          - /scripts/createFolioUser.sh
+        volumeMounts:
+        - name: scripts
+          mountPath: "/scripts"
+        - name: foliousersecret
+          mountPath: "/foliousersecret"
+      restartPolicy: Never
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      - name: foliousersecret
+        secret:
+          secretName: {{ $.Release.Name }}-foliouser
+  backoffLimit: 10
+{{- end }}

@@ -1,0 +1,99 @@
+{{- $dbpasswd := include "vufind.dbpassword" . -}}
+{{- $foliopasswd := include "vufind.foliopassword" . -}}
+{{- $encryptionsecret := include "vufind.encryptionsecret" . -}}
+
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-kube-vufind-config
+data:
+  config.ini: |
+    [System]
+    autoConfigure = false
+
+    [Site]
+    ; Todo: check http/https
+
+    {{- with (first .Values.ingress.hosts) }}
+    url = "https://{{ .host | default "localhost" }}/vufind"
+    {{- end }}
+
+    [Catalog]
+    driver = "Folio"
+
+    [Index]
+
+    url = "{{ include "vufind.solrurl" . }}"
+    default_core = "{{ (.Values.global).solrcollection |default "biblio" }}"
+
+    [Mail]
+    host = "{{ (.Values.mail).host | default "localhost" }}"
+    port = "{{ (.Values.mail).port | default "25" }}"
+
+    ; Todo: Mail Login auch noch konfigurieren
+
+    [Database]
+    database = "pgsql://{{ include "vufind.dbusername" . | b64dec }}:{{ $dbpasswd | b64dec }}@{{ include "vufind.dbhostname" . }}/{{ include "vufind.dbname" . }}"
+
+    [Authentication]
+    ils_encryption_key = "{{ $encryptionsecret }}"
+
+    [Parent_Config]
+    relative_path = ../../kubernetes_configs/config/vufind/config.ini
+
+  
+  Folio.ini: |
+    [API]
+    base_url = "{{ include "vufind.okapiurl" . }}"
+    username = "{{ include "vufind.foliousername" . }}"
+    password = "{{ $foliopasswd }}"
+    tenant = "{{ .Values.folio.tenantId }}"
+
+    [Parent_Config]
+    relative_path = ../../kubernetes_configs/config/vufind/Folio.ini
+
+---
+
+{{- if not (lookup "v1" "Secret" $.Release.Namespace "{{ $.Release.Name }}-db-secret" ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-db-secret
+  annotations:
+    "helm.sh/resource-policy": "keep"
+type: Opaque
+data:
+  username: {{ include "vufind.dbusername" . }}
+  password: {{ $dbpasswd }}
+{{- end }}
+
+---
+
+{{- if not (lookup "v1" "Secret" $.Release.Namespace (printf "%s-foliouser" $.Release.Name ) ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-foliouser
+  annotations:
+    "helm.sh/resource-policy": "keep"
+type: Opaque
+stringData:
+  username: {{ .Values.folio.username | default "vufinduser" }}
+  password: {{ $foliopasswd }}
+{{- end }}
+
+{{- if not (lookup "v1" "Secret" $.Release.Namespace (printf "%s-encryptionsecret" $.Release.Name ) ) }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ $.Release.Name }}-encryptionsecret
+  annotations:
+    "helm.sh/resource-policy": "keep"
+type: Opaque
+stringData:
+  secret: {{ $encryptionsecret }}
+{{- end }}
+
+    
+

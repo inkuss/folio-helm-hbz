@@ -1,0 +1,209 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "vufind.fullname" . }}
+  labels:
+    {{- include "vufind.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "vufind.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "vufind.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "vufind.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      initContainers:
+        - name: dbinit-{{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          volumeMounts:
+          - name: scripts
+            mountPath: "/usr/local/kube-scripts"
+          command:
+            - /bin/bash
+          args:
+            - '-ec'
+            - '/usr/local/kube-scripts/vufind-db-init.sh'
+          env:
+          - name: SOLR_URL
+            value: "{{ include "vufind.solrurl" . }}"
+          - name: SOLR_COLLECTION
+            value: "{{ .Values.global.solrcollection | default "biblio" }}"
+          - name: VUFIND_DB_HOST
+            value: "{{ include "vufind.dbhostname" . }}"
+          - name: VUFIND_DB_NAME
+            value: "{{ include "vufind.dbname" . }}"
+          - name: VUFIND_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Release.Name }}-db-secret
+                key: username
+          - name: VUFIND_DB_TYPE
+            value: "{{ .Values.database.type | default "pgsql" }}"
+          - name: VUFIND_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Release.Name }}-db-secret
+                key: password
+          - name: POSTGRES_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: postgres.{{ include "vufind.dbhostname" . }}.credentials.postgresql.acid.zalan.do 
+                key: username
+          - name: POSTGRES_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: postgres.{{ include "vufind.dbhostname" . }}.credentials.postgresql.acid.zalan.do 
+                key: password
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+          - name: SOLR_URL
+            value: "{{ include "vufind.solrurl" . }}"
+          - name: SOLR_COLLECTION
+            value: "{{ .Values.global.solrcollection | default "biblio" }}"
+          - name: VUFIND_DB_HOST
+            value: "{{ include "vufind.dbhostname" . }}"
+          - name: VUFIND_DB_NAME
+            value: "{{ include "vufind.dbname" . }}"
+          - name: VUFIND_DB_USER
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Release.Name }}-db-secret
+                key: username
+          - name: VUFIND_DB_TYPE
+            value: "{{ .Values.database.type | default "pgsql" }}"
+          - name: VUFIND_DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Release.Name }}-db-secret
+                key: password
+          - name: VUFIND_LOCAL_DIR
+            value: "/usr/local/vufind/local"
+          - name: VUFIND_HOME
+            value: "/usr/local/vufind"
+          - name: VUFIND_ENV
+            value: "{{ .Values.vufindenv | default "production" }}"
+          
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+ 
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          volumeMounts:
+          - name: kube-vufind-configs
+            mountPath: "/usr/local/vufind/local/config/vufind"
+          - name: vufind-local-configs
+            mountPath: "/usr/local/vufind/local/kubernetes_configs/config/vufind"
+          - name: vufind-local-themes
+            mountPath: "/usr/local/vufind/themes/{{ .Values.themesFilePullerName | default "custom_theme" }}"
+        - name: configs-file-puller
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if eq .Values.configsFilePullerMode "s3" }}
+          image: minio/mc
+          {{- else if eq .Values.configsFilePullerMode "git" }}
+          image: bitnami/git
+          {{- end }}
+          command:
+            - /bin/bash
+          args:
+            - '-ec'
+            - '/usr/local/kube-scripts/{{ .Values.configsFilePullerMode }}-mirror.sh'
+          env:
+          - name: FILEPULLERURL
+            value: "{{ .Values.configsFilePullerUrl }}"
+          - name: FILEPULLERPATH
+            value: "{{ .Values.configsFilePullerPath }}"
+          - name: FILEPULLERBRANCH
+            value: "{{ .Values.configsFilePullerBranch | default "master" }}"
+          - name: FILEPULLERUSER
+            value: "{{ .Values.configsFilePullerUsername }}"
+          - name: FILEPULLERPASS
+            value: "{{ .Values.configsFilePullerPassword }}"
+          volumeMounts:
+          - name: vufind-local-configs
+            mountPath: "/data"
+          - name: scripts
+            mountPath: "/usr/local/kube-scripts"
+        - name: themes-file-puller
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          {{- if eq .Values.themesFilePullerMode "s3" }}
+          image: minio/mc
+          {{- else if eq .Values.themesFilePullerMode "git" }}
+          image: bitnami/git
+          {{- end }}
+          command:
+            - /bin/bash
+          args:
+            - '-ec'
+            - '/usr/local/kube-scripts/{{ .Values.themesFilePullerMode }}-mirror.sh'
+          env:
+          - name: FILEPULLERURL
+            value: "{{ .Values.themesFilePullerUrl }}"
+          - name: FILEPULLERPATH
+            value: "{{ .Values.themesFilePullerPath }}"
+          - name: FILEPULLERBRANCH
+            value: "{{ .Values.themesFilePullerBranch | default "master" }}"
+          - name: FILEPULLERUSER
+            value: "{{ .Values.themesFilePullerUsername }}"
+          - name: FILEPULLERPASS
+            value: "{{ .Values.themesFilePullerPassword }}"
+          volumeMounts:
+          - name: vufind-local-themes
+            mountPath: "/data"
+          - name: scripts
+            mountPath: "/usr/local/kube-scripts"
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      - name: kube-vufind-configs
+        configMap:
+          name: {{ $.Release.Name }}-kube-vufind-config
+          defaultMode: 0644
+          optional: false
+      - name: vufind-local-configs
+        emptyDir: {}
+      - name: vufind-local-themes
+        emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

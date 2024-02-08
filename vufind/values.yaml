@@ -1,0 +1,151 @@
+# global values used by other charts too
+
+global:
+  # you can define solr parameters here. If there is a solrclouds.solr.apache.org in the same namespace, 
+  # the solr connection is automatically configured
+  #solrhost: "solr"
+  #solrport: 8983
+  #solrhttp: 'http'
+  #solrcollection: "biblio"
+  mailhost: "localhost"
+  mailport: 25
+
+
+# Default values for vufind.
+folio:
+  # setup folio access for vufind.
+  # 
+  # If Folio is installed with our helm charts in the same namespace, 
+  # then a vufind user can be automatically generated in Folio for vufind access.
+  # Also the access to Folio and the URL to okapi can be detected automatically.
+  # In this case, only the tenantId has to be set here
+  #
+  # username: "vufinduser"
+  # password: "secretPassword"
+  ## If the Folio Admin user can not be determined automatically, you can set it here
+  # adminusername: "admin"
+  # adminpassword: "adminpassword" 
+  # okapiurl: "http://okapi:9130"
+  tenantId: "diku"
+
+
+database: {}
+  # setup database access and type. Defaults are below
+  # Database hostname is generated from teamId-host
+  # This assumes that you use the zalando-vufind-pg chart to install the
+  # database
+  #
+  # teamId: vufind
+  # host: postgres
+  # username: vufind
+  # password: password
+  # name: vufind
+  # existingSecret: test
+  #
+  # else default values are genereated from the Release name.
+
+mail:
+  host: localhost
+  port: "25"
+
+replicaCount: 1
+
+image:
+  repository: gitlab.bib-bvb.de:5050/vufind/vufind-ci/vufind
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  # tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+# filePuller Container loads local config and theme data from remote storage
+# two puller modes are implemented: s3 Storage or pulling from a git repository
+# Mode: "s3" or "git"
+configsFilePullerMode: "s3"
+# Base URL of S3 or Git Repo. For git only http(s) is supportet
+configsFilePullerUrl: "http://localhost"
+# Path to the Bucket / Repository
+configsFilePullerPath: "/bucket/configs"
+# the *Branch Setting is only used when Mode is "git"
+configsFilePullerBranch: "master"
+# User and Password for accessing S3 / git
+configsFilePullerUsername: "filePullerUser"
+configsFilePullerPassword: "filePullerPassword"
+# same for themes
+themesFilePullerMode: "s3"
+themesFilePullerUrl: "http://localhost"
+themesFilePullerPath: "/bucket/themes"
+themesFilePullerBranch: "master"
+themesFilePullerUsername: "filePullerUser"
+themesFilePullerPassword: "filePullerPassword"
+# the name of the custom theme can be configured here. The name will be used as directory here /usr/local/vufind/themes/<name>
+# themesFilePullerName: custom_theme
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: true
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+  # fsGroup: 2000
+
+securityContext: {}
+  # capabilities:
+  #   drop:
+  #   - ALL
+  # readOnlyRootFilesystem: true
+  # runAsNonRoot: true
+  # runAsUser: 1000
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: vufind.local
+      paths:
+        - path: /vufind
+          pathType: ImplementationSpecific
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}

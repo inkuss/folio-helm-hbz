@@ -1,0 +1,49 @@
+{{- if $.Values.database.initDb }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-vufinddb-init-job
+  annotations:
+    "helm.sh/hook": "post-install"
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ .Release.Name }}-create-vufind-db
+        image: {{ $.Values.global.image.repositoryBaseUrl }}folio-tools:{{ $.Values.global.image.folioToolsTag }} 
+        imagePullPolicy:  "IfNotPresent"
+        env:
+        - name: PG_HOST
+          value: {{ $.Values.global.vufinddb.host | quote }}
+        - name: PG_PORT
+          value: {{ $.Values.global.vufinddb.port | default "5432" | quote }}
+        - name: PG_USER
+          value: postgres
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres.{{ .Values.teamId }}-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do 
+              key: password
+        envFrom:
+        - secretRef:
+            name: {{ $.Values.global.vufinddb.adminSecret }}
+        envFrom:
+        - secretRef:
+            name: {{ $.Values.global.vufinddb.vufindSecret }}
+        args: ["kube-scripts/vufind-db-init.sh"]
+        volumeMounts:
+        - name: scriptvolume
+          mountPath: "/usr/src/app/kube-scripts"
+      volumes:
+      - name: scriptvolume
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 3600
+---
+{{- end }}
