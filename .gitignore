@@ -1,0 +1,10 @@
+*.log
+*.swp
+*.bak
+*.bak.yaml
+
+edge/renders/
+logs/
+kubegres/tmp/
+kubegres/renders/
+tmp/

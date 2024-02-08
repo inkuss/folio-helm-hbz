@@ -1,0 +1,83 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "b3katimport.fullname" . }}
+  labels:
+    {{- include "b3katimport.labels" . | nindent 4 }}
+spec:
+  parallelism: {{ .Values.parallelism }}
+  completions: 1
+  backoffLimit: {{ .Values.backoffLimit }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "b3katimport.labels" . | nindent 8 }}
+        {{- with .Values.podLabels }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+    spec:
+      restartPolicy: "OnFailure"
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "b3katimport.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          {{- with .Values.volumeMounts }}
+          volumeMounts:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          command:
+            - /usr/local/vufind/vufind-solr-import/scripts/kube-b3katimport.sh
+          env:
+          - name: SOLR_URL
+            value: "{{ include "vufind.solrurl" . }}"
+          - name: COLLECTION_NAME
+            value: "{{ (.Values.global).solrcollection | default "biblio" }}"
+          - name: ZK_HOST
+            value: "{{ include "vufind.zkhost" . }}"
+          - name: CONFIG_NAME
+            value: "{{ (.Values.global).solrconfig | default "vufind" }}"
+          - name: CONFIG_DIR
+            value: "{{ (.Values.global).solrconfigdir | default "solrconfig" }}"
+          - name: NUMSHARDS
+            value: "{{ (.Values.global).solrnumshards | default "3" }}"
+          - name: NUMREPLICAS
+            value: "{{ (.Values.global).solrnumreplicas | default "2" }}"
+          - name: VERBUNDINDEX_FILENAME
+            value: "{{ (.Values.global).verbundindexfilename | default "b3kat_export_2023_11_teil" }}"
+          - name: VERBUNDINDEX_LASTINDEX
+            value: "{{ (.Values.global).verbundindexlastindex | default "35" }}"
+          - name: VUFIND_LOCAL_DIR
+            value: "/usr/local/vufind/local"
+          - name: VUFIND_DIR
+            value: "/usr/local/vufind"
+      {{- with .Values.volumes }}
+      volumes:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

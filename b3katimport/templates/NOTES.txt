@@ -1,0 +1,1 @@
+1. This helm install created a job to import B3Kat data into solr.

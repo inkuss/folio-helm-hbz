@@ -1,93 +1,339 @@
 Kopiert aus bvb gitlab-Repo folio-public/folio-helm
+# BVB/LRZ Folio/vufind Helm Repository
+
+
+## Introduction
+
+
+These Helm repositories and sample files are intended to enable an installation of Folio and vufind in a Kubernetes cluster
+
+
+### Prerequisites and reference environment
+
+
+The following is a brief description of the necessary prerequisites and how the environment was configured at the LRZ.
+
+* Kubernetes Cluster - LRZ: Installation via kubespray, 3 smaller nodes as control planes, min. 4 large servers (128GB Ram) with local fast storage (2TB SSDs each)
+* StorageClass - LRZ: Longhorn. Multiple configurations, depending on hard disk type and replication
+* Ingress Controller - LRZ: nginx-ingress controller
+* Load balancer - LRZ: metallb in layer 2 mode
+* Firewall - LRZ: Checkpoint or pfsense. Must provide the ability to NAT to the metallb load balancer IPs
+* certmanager or manually created certificates - LRZ: Jetstack certmanager with LetsEncrypt and Sectigo clusterissuern
+* DNS - LRZ: manually set wildcard addresses *.folio.bib-bvb.de to the corresponding load balancer IPs
+* S3 Storage - LRZ: minio - may be integrated into the Folio helmet chart in the future
+* Container Registry - LRZ: gitlab CE, access may be granted for the images created by the LRZ, alternatively the LRZ plans to provide the images in Dockerhub.
+* Zalando Postgres Operator or external DB - LRZ: Zalando Postgres Operator
+* Solr Operator or external Solr (cloud) installation for vufind - LRZ: Solr Operator
+* Minio Operator or other S3 access - LRZ: Minio Operator
+
+And of course access to the Kubernetes cluster via kubectl and helm (installation on client/admin PC)
+
+
+The following repo must be included for the installation:
+
+    helm repo add bvb-repo https://gitlab.bib-bvb.de/api/v4/projects/128/packages/helm/stable
+
+
+The following Helm repositories are also used for the above-mentioned components:
+
+    helm repo list
+
+    NAME URL                                                                         
+    bitnami https://charts.bitnami.com/bitnami                                          
+    longhorn https://charts.longhorn.io                                                  
+    metallb https://metallb.github.io/metallb                                           
+    jetstack https://charts.jetstack.io                                                  
+    ingress-nginx https://kubernetes.github.io/ingress-nginx                     
+    apache-solr https://solr.apache.org/charts                                              
+    postgres-operator-charts https://opensource.zalando.com/postgres-operator/charts/postgres-operator                    
+    bvb-repo https://gitlab.bib-bvb.de/api/v4/projects/128/packages/helm/stable
+         
+
+
+### Concept
+
+* all applications come in one namespace:
+  * Folio, vufind, Postgres, Kafka, Elasticsearch, Solr, Minio
+* Operators for Postgres, Sor and Minio once per Kubernetes cluster
+* Access from outside via firewall NAT to load balancer IP and further to ingress-controller and thus to the ingress.
+* There are two ingresses for each Folio tenant: one for Stripes and one for Okapi
+* vufind Deployment pro
+
+
+## FOLIO installation
+
+
+### Preparations
+
+
+#### Kubernetes namespace
+
+
+The other commands each require the specification of a Kubernetes namespace. This can only be set temporarily in the current shell, for example, so that the wrong namespace is not used later by mistake.
+
+    FOLIONS=<NEW_NAMESPACE>
+    kubectl create namespace ${FOLIONS:-undefined}
+>>>>>>> 593a550 (Start moving to public repo)
 
 
 
-## Getting started
+Create/copy #### Secrets
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+Disclaimer: LRZ is trying to make their container registry public avalible. Stay tuned!
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+Two secrets are at the moment required to access the LRZ container registry and the central S3 store.
 
-## Add your files
+If there are already other folio installations in the cluster, you can copy some secrets:
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/ee/gitlab-basics/add-file.html#add-a-file-using-the-command-line) or push an existing Git repository with the following command:
+    gitlab-folio-group 
+    s3storage-access
 
-```
-cd existing_repo
-git remote add origin https://gitlab.bib-bvb.de/folio-public/folio-helm.git
-git branch -M main
-git push -uf origin main
-```
 
-## Integrate with your tools
+Manually e.g. like this (cleaning up the yamls is necessary, see example in `other/gitlab.secret.example.yaml`, especially remove line `namespace:`):
 
-- [ ] [Set up project integrations](https://gitlab.bib-bvb.de/folio-public/folio-helm/-/settings/integrations)
 
-## Collaborate with your team
+    kubectl -n <source-namespace> get secret gitlab-folio-group -o yaml > other/gitlab-folio-group.secret.yaml
+    vi other/gitlab-folio-group.secret.yaml
+    kubectl -n ${FOLIONS:-undefined} apply -f other/gitlab-folio-group.secret.yaml
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/ee/user/project/merge_requests/merge_when_pipeline_succeeds.html)
 
-## Test and Deploy
+Or via script: `other/copy-secret.sh`
 
-Use the built-in continuous integration in GitLab.
+For a new secret (after creation in gitlab with registry-read authorization):
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/index.html)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
 
-***
+    kubectl -n ${FOLIONS:-undefined} create secret docker-registry gitlab-folio-group --docker-server=gitlab.bib-bvb.de:5050/folio --docker-username=k8s-read --docker-password=<token>
 
-# Editing this README
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+s3storage (e.g. per minio) must be available and the values in s3stroage-access must be adjusted accordingly.
 
-## Suggestions for a good README
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
 
-## Name
-Choose a self-explaining name for your project.
+#### adjust global-values.yaml
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+Settings that are relevant in several Helm repositories are made in the `global-values.yaml` file.
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+Database example: 
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+Required accounts are specified here in order to be created during the installation of Postgres. 
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+The same data is then used when installing Okapi and Folio modules.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+This means that there is only one central location where the corresponding variables have to be set.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+### Installation of basic components
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
 
-## License
-For open source projects, say how it is licensed.
+#### Elasticsearch and Kafka from bitnami-repo
 
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Once per client PC: add bitnami repo:
+
+
+    helm repo add bitnami https://charts.bitnami.com/bitnami
+
+
+Install Elasticsearch, the `NOTES.txt` output is saved with the following command under `logs/` and contains all important information:
+
+
+    helm -n ${FOLIONS:-undefined} install elasticsearch bitnami/elasticsearch -f bitnami/elastic-values.yml
+
+
+Important: check the output log to see under which internal service elasticsearch can be reached and compare it with the values of mod-search!
+
+There have been changes here with bitnami chart upgrades in the past.
+
+
+As with the last point, also install Kafka:
+
+
+    helm -n ${FOLIONS:-undefined} install kafka bitnami/kafka -f bitnami/kafka-values.yml
+
+
+Then wait until all pods are green in the dashboard.
+
+
+
+#### postgres 
+
+
+postgres is installed via the zalando-postgres-operator, more at `https://github.com/zalando/postgres-operator`
+
+
+    helm -n ${FOLIONS:-undefined} install zal-pg bvb-repo/zalando-pg -f global-values.yaml
+
+
+
+
+### Installation Folio components
+
+
+
+#### okapi
+
+
+On the topic of Docker containers and CI, see `https://gitlab.bib-bvb.de/folio/okapi`.
+
+
+    helm -n ${FOLIONS:-undefined} install okapi bvb-repo/okapi -f global-values.yaiml
+
+
+
+#### auth-modules
+
+You need at least 2 value files to install the Folio modules:
+
+- `<RELEASE_TAG>-auth.yaml` for the mod-users, mod-authtoken, mod-permissions and mod-login modules required for security.
+- `<RELEASE_TAG>-no-auth.yaml>` for all other modules of a Folio release.
+
+
+Additional modules can also be included in a separate Helm release.
+
+
+For a new Folio release, the script `modules/script/update-helm-module-values.py` can be used.
+
+
+The modules required for authentication are installed in a separate Helm release to avoid complications when upgrading:
+
+    helm -n ${FOLIONS:-undefined} install mods-auth bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-auth.yaml
+
+
+
+#### secure supertenant
+
+
+Use a script to supply Folio-supertenant with the modules required for authorization and secure it. The job is created via Helm template, no configuration should be necessary (with the same `global-values.yaml`).
+
+
+    helm -n ${FOLIONS:-undefined} template secure bvb-repo/secure-supertenant -f global-values.yaml > secure-supertenant/renders/secure-supertenant.yaml
+
+    kubectl -n ${FOLIONS:-undefined} apply -f secure-supertenant/renders/secure-supertenant.yaml
+
+
+
+#### other modules
+
+
+The remaining modules are installed sperately in the already secured system. 
+
+This makes it relatively easy to add further modules to this installation using `helm upgrade` and to change the module settings.
+
+
+    helm -n ${FOLIONS:-undefined} install mods bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-no-auth.yaml --debug > logs/mods-install-${FOLIONS:-undefined}.yaml
+
+
+
+#### create tenant and stripes deployment
+
+
+Before installing the tenant, check that all modules are registered with Okapi. This should be the case if all init jobs from the previous step have been successfully completed.
+
+
+- create new stripes branch in gitlab ( https://gitlab.bib-bvb.de/folio/platform-complete ) from branch with correct version (e.g. lotus-base) and adjust values:
+  - under docker/Dockerfile set the ARGS to: OKAPI\_URL to desired ingress and TENANT\_ID
+  - in `stripes.config.js` adjust logo/favicon and description. URL/tenant in this file are overwritten by the ARGS of the Dockerfile.
+  - build docker image (manually on your own workstation and then push, or assign a git tag and push)
+- Copy and adapt tenant/values-example.yaml, important: 
+  - tenantId
+  - stripes.imageVersion (to branch name)
+  - the following 3 variables can be the same, and should match the ingress specified in the stripes Dockerfile:
+    - ingress.host
+    - ingress.tls.secretName
+    - ingress.tls.host
+- Install in new Helm release, with only one tenant its id can be used 
+
+
+Command example:
+
+
+    helm -n ${FOLIONS:-undefined} install <RELEASENAME> bvb-repo/tenant -f global-values.yaml -f tenant/values-<RELEASENAME>.yaml -f modules/valuesd/<RELEASE_TAG>-all.yaml --debug > tenant/install-debug-${FOLIONS:-undefined}.yml
+
+    current example for lotus instances:
+
+    helm -n folio-lotus install ubt bvb-repo/tenant -f global-values-lotus-h1.yaml -f tenant/values-lotus-ubt.yaml -f modules/valuesd/2022-r1-all-reduced.yaml
+
+
+
+#### Notes for uninstalling
+
+Use `helm -n ${FOLIONS:-undefined} list` to check installed releases
+
+
+Use `helm -n ${FOLIONS:-undefined} uninstall <RELEASENAME>` to uninstall
+
+
+Please note: 
+
+- Persistent volume claims of Elasticsearch, Kafka and Kubegres are not deleted automatically, must be done manually.
+- Secrets with Kubegres and Supertenant passwords are not deleted automatically and are reused when reinstalling. If this is not desired, uninstall manually or delete the namespace.
+
+
+
+## Installation vufind
+
+
+### Installation of basic components
+
+
+#### Installation DB Cluster
+
+
+Once per installation, a Postgres DB cluster should be created for all vufind instances/tenants. As with Folio, there is a Helm chart that creates a custom rosource for the Zalando Postgres operator. Installation:
+
+
+    helm -n ${FOLIONS:-undefined} install vufind-postgres bvb-repo/zalando-vufind-pg -f values.yaml
+
+
+For possible values in values.yaml see values.yaml in the chart. 
+
+
+#### Installation Solr Cloud
+
+
+Example values for the Solr Helm chart are provided in solr-vufind for the installation of the Solr cloud using the Solr cloud operator. It is important that the image from gitlab.bib-bvb.de:5050/vufind/vufind-ci/vufind is used for Solr. The extensions for vufind are included there.
+
+
+Installation:
+
+
+    helm -n ${FOLIONS:-undefined} install solr apache-solr/solr -f solr-vufind/solr-vufind.yaml
+
+
+### Installation vufind
+
+One vufind installation is made per tenant. The database is also created in the Postgres cluster in an init container. Solr is accessed via the shared index.
+
+
+The connection to Folio is configured automatically (another todo), the tenant name must match a Folio tenant.
+
+
+Installation (example tenant name bvb):
+
+
+    helm -n ${FOLIONS:-undefined} install bvb-opac bvb-repo/vufind -f values.yaml
+
+
+The tenant name must then be specified in values.yaml:
+
+    global:
+      foliotenant: "bvb"
+
+To manage the configuration and the themes, there are two methods that retrieve the files from a network-accessible location:
+
+
+* S3 Storage
+* git repository
+
+
+Both can be configured in the values.
+
+
+
+### Special: Import data from B3Kat
+
+
+
+

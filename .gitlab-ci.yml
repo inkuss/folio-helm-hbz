@@ -1,0 +1,15 @@
+image: debian:latest
+
+stages:
+  - upload-helm-charts
+
+upload-helm-charts:
+  stage: upload-helm-charts
+  script:
+    - 'echo "debconf debconf/frontend select Noninteractive" | debconf-set-selections'
+    - 'apt update'
+    - 'apt -y install curl'
+    - 'curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3'
+    - 'chmod 700 get_helm.sh'
+    - './get_helm.sh'
+    - 'cd $CI_PROJECT_DIR/repo_tools && ./upload_to_helm_repo.sh'
