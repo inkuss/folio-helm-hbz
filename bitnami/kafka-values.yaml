@@ -1,0 +1,46 @@
+clusterDomain: < your kubernetes cluster domain >
+autoCreateTopicsEnable: true
+defaultReplicationFactor: "3"
+listeners:
+  client:
+    containerPort: 9092
+    protocol: PLAINTEXT
+    name: CLIENT
+    sslClientAuth: ""
+sasl.interbroker.password: "< insert a generated password here >"
+externalAccess: 
+  enabled: false
+global: 
+  storageClass: "< your storageclass >"
+heapOpts: "-Xmx2048m -Xms2048m"
+logFlushIntervalMs: "3600000"
+logRetentionHours: "24"
+numIoThreads: "8"
+numNetworkThreads: "5"
+numPartitions: "1"
+persistence: 
+  accessMode: "ReadWriteOnce"
+  enabled: true
+  size: "10Gi"
+  storageClass: "< your storageclass >"
+replicaCount: "3"
+socketReceiveBufferBytes: "102400"
+socketRequestMaxBytes: "104857600"
+socketSendBufferBytes: "102400"
+affinity:
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key:  node-role.kubernetes.io/control-plane
+          operator: DoesNotExist
+livenessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  timeoutSeconds: 10
+readinessProbe:
+  enabled: true
+  initialDelaySeconds: 120
+  timeoutSeconds: 10
+zookeeper: 
+  enabled: false
