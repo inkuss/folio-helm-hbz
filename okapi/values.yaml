@@ -1,0 +1,32 @@
+okapi:
+  # needed for this:
+  # - okapiVersion in .Values.global.image
+  useGlobalValues: true
+  # needed for this in .Values.global in addition to .global.image.okapiVersion:
+  # - repositoryBasUrl
+  # - okapiTag
+  useCustomRepo: true
+  # only used if global.image.okapiVersion is not set
+  imageTag: 5.2.0
+  # Todo: Use Chart.appVersion as default
+  mode: cluster
+  replicaCount: 3
+# overwrite these defaults in global values files, which should be used 
+# with other helm installation (modules, secure-suptertenant, tenant)
+global:
+  db:
+    host: folio-zal-pg
+    folioSecret: folioSecret                        
+    okapiPwKey: okapiDbKey
+  okapi:
+    port: 9130
+    repositoryName: okapi
+    secureSupertenant: true
+    serviceName: okapi
+    version: v5.2.0
+  image:
+    okapiTag: okapi
+    okapiVersion: v5.2.0
+    pullsecret: gitlab-folio-group
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+

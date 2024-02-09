@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Values.global.okapi.serviceName | default "okapi" }}
+  labels:
+    app: {{ template "folio.name" . }}
+    chart: {{ template "folio.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+spec:
+  type: {{ .Values.okapi.serviceType | default "ClusterIP"}}
+  ports:
+    - port: {{ .Values.global.okapi.servicePort | default "9130"}}
+      targetPort: 9130
+      protocol: TCP
+      name: okapi
+    - port: 5701
+      targetPort: 5701
+      protocol: TCP
+      name: hazelcast1
+    - port: 5702
+      targetPort: 5702
+      protocol: TCP
+      name: hazelcast2
+    - port: 5703
+      targetPort: 5703
+      protocol: TCP
+      name: hazelcast3
+    - port: 5704
+      targetPort: 5704
+      protocol: TCP
+      name: hazelcast4
+    - port: 5705
+      targetPort: 5705
+      protocol: TCP
+      name: hazelcast5
+    - port: 5706
+      targetPort: 5706
+      protocol: TCP
+      name: hazelcast6
+    - port: 54327
+      targetPort: 54327
+      protocol: TCP
+      name: hazelcastmulticast
+  selector:
+    app: okapi
+    release: {{ .Release.Name }}

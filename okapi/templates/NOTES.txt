@@ -1,0 +1,2 @@
+Okapi version {{ .Values.global.okapi.imageVersion }} installed to Namespace {{ .Release.Namespace }}
+Okapi service: {{ .Values.global.okapi.serviceName | default "okapi" }}

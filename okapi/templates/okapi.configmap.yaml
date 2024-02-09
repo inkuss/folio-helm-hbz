@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Release.Name }}-env
+data:
+  OKAPI_URL: http://{{ .Values.global.okapi.serviceName | default "okapi" }}:{{ .Values.global.okapi.port | default 9130 }}
+  OKAPI_HOST: okapi
+  OKAPI_PORT: "9130"
+  OKAPI_CONFIG_FILE: /etc/okapi/okapi-config.json
+  OKAPI_NODENAME: $(hostname)
+  OKAPI_LOGLEVEL: INFO
+  OKAPI_CLUSTERHOST: {{ .Values.global.okapi.serviceName | default "okapi"}}
+  OKAPI_STORAGE: postgres
+  # KUBE_SERVER_URL: https://kubernetes.default
+  # KUBE_SERVER_PEM: /etc/kubernetes/ssl/ca.crt
+  # KUBE_NAMESPACE: {{ .Release.Namespace }}
+{{- if eq $.Values.okapi.mode "cluster" }}
+  OKAPI_COMMAND: "cluster"
+  HAZELCAST_FILE: /etc/hazelcast/hazelcast.xml
+  HAZELCAST_VERTX_PORT: "5702"
+  HAZELCAST_PORT: "5701"
+  HAZELCAST_IP: {{ .Values.global.okapi.serviceName | default "okapi" }}
+{{- end }}
+
+{{- with .Values.okapi.environment }}
+{{- toYaml . | indent 2 }}
+{{- end }}
