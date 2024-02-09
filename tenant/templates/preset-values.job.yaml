@@ -1,0 +1,36 @@
+{{range .Values.tenants}}
+{{- if .register }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-preset-values-{{ .tenantId }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "10" 
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ $.Chart.Name }}-preset-values-{{ .tenantId }}
+        {{- with $.Values.global.image }}
+        image: {{ .repositoryBaseUrl }}{{ .okapicliRepo }}:{{ .okapicliTag }}
+        {{- end }}
+        imagePullPolicy: IfNotPresent
+        envFrom:
+        - configMapRef:
+            name: {{ $.Release.Name }}-preset-{{.tenantId}}-env
+        env:
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .tenantId }}-admin-pwd
+              key: password
+        command:
+          - scripts/Preset_values.sh
+      restartPolicy: Never
+  backoffLimit: 10
+{{- end }}
+---
+{{- end }}

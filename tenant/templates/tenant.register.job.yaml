@@ -1,0 +1,73 @@
+{{range .Values.tenants}}
+{{- if .register }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-register-{{ .tenantId }}
+  annotations:
+    "helm.sh/hook": post-install
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ $.Chart.Name }}-register-{{ .tenantId }}
+        {{- with $.Values.global.image }}
+        image: {{ .repositoryBaseUrl }}folio-tools:{{ .folioToolsTag }}
+        {{- end }}
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: scripts
+          mountPath: "/usr/src/app/kube-scripts"
+        envFrom:
+        - configMapRef:
+            name: {{ $.Release.Name }}-register-{{ .tenantId }}-env
+        env:
+        - name: SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: supertenant-secret
+              key: password
+        - name: ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .tenantId }}-admin-pwd
+              key: password
+        command: ["kube-scripts/register-tenant.sh"]
+        args:
+        - --id
+        - {{ .tenantId }}
+        - --name
+        - {{ .name | quote}}
+        - --description
+        - {{ .description | default $.Release.Name | quote}}
+{{- if .loadSample }}
+        - --loadSample
+{{- end }}
+{{- if .loadReference }}
+        - --loadReference
+{{- end }}
+{{- range $.Values.backend_modules }}
+        - --install-backend-module
+        - {{ .name }}-{{ .version }}
+{{- end }}
+{{- range $.Values.frontend_modules }}
+        - --install-frontend-module
+        - {{ . }}
+{{- end }}
+{{- range .frontendmodulesExtras }}
+        - --install-frontend-module
+        - {{ . }}
+{{- end }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 10
+{{- end }}
+---
+{{- end }}

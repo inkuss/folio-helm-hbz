@@ -1,0 +1,15 @@
+e8b311a6-3b21-43f2-a269-dd9310cb2d0e  verkürzt ausleihbar / Course reserves
+2b94c631-fca9-4892-a730-03ee529ffe27  Normal / Can circulate
+2e48e713-17f3-4c13-a9f8-23845bb210a4  Lesesaal / Reading room
+a1dc1ce3-d56f-4d8a-b498-d5d674ccc845  Sonderausleihe / Selected
+a8cacfd0-b284-47ae-b5fa-235d768411e7  ausleihbar/Fernleihe
+633f22c8-b189-4dc9-b2f0-25eb10f4739e  verkürzt ausleihbar/Fernleihe
+f961ec82-65c0-4755-ad24-90bbf87b67d5  ausleihbar/keine Fernleihe
+7141f5a0-05ef-4869-89ab-9f0b5e3cecf3  mit Zustimmung ausleihbar/nur Kopie in die Fernleihe
+74084609-eb79-4133-b8fc-81d3f5105cab  mit Zustimmung ausleihbar/Fernleihe
+3ef6d652-2e02-4561-8f7b-720cbccde87f  Lesesaalausleihe/keine Fernleihe
+1c2b89cb-4776-4a70-8f0e-f939833a2f4a  Lesesaalausleihe/nur Kopie in die Fernleihe
+68000e5a-6d82-4473-bc71-983bb6fcab4c  für die Ausleihe gesperrt/keine Fernleihe
+19f3659e-389d-49b4-9b26-f64ebf980445  bestellt/keine Fernleihe
+19eede99-dc4c-4d8c-a7c3-0370d63ffd3c  keine Angabe/keine Fernleihe
+ceb42d94-de4a-49b4-97e4-c32d11a0d5fc  Verlust/keine Fernleihe

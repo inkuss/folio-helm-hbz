@@ -1,0 +1,43 @@
+{{- range .Values.tenants }}
+{{- if .ingress.enable }}
+kind: Ingress
+apiVersion: networking.k8s.io/v1
+metadata:
+  name: stripes-{{.tenantId}}
+  labels:
+    app: {{ template "folio.name" $ }}
+    chart: {{ template "folio.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    {{- with .ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  ingressClassName: {{ .ingress.classname | default "nginx" }}
+  tls:
+{{- range .ingress.tls }}
+  - hosts:
+  {{- if .hosts }}
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
+  {{- else }}
+    - {{ .host }}
+  {{- end }}
+    secretName: {{ .secretName }}
+{{- end }}
+  rules:
+  - host: {{ .ingress.host }}
+    http:
+      paths:
+        - path: {{ .ingress.path | default "/" }}
+          pathType: Prefix
+          backend:
+            service:
+              name: {{ $.Release.Name }}-{{.tenantId}}
+              port:
+                number: {{ .stripes.port | default "80" }}
+---
+{{- end }}
+{{- end }}

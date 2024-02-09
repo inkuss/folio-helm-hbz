@@ -1,0 +1,15 @@
+Installed Chart: {{ .Chart.Name }}
+Releasename: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+Tenants installed:
+{{- range .Values.tenants }}
+--- {{ .tenantId }}
+Es steht jetzt eine Testinstanz zur Verfügung:
+https://{{ .ingress.host }}
+Nutzername:
+{{ .adminUsername | default "admin" }}
+Password:
+{{ .adminPassword | default "Not Set, check secret"}}
+{{- end }}
+
+

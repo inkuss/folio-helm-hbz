@@ -1,0 +1,21 @@
+1a54b431-2e4f-452d-9cae-9cee66c9a892  Buch
+615b8413-82d5-4203-aa6e-e37984cb5ac3  E-Ressource
+fd6c6515-d470-4561-9c32-3e3290d4ca98  Mikroform
+5ee11d91-f7e8-481d-b079-65d708582ccc  Film (DVD/Video)
+9030eb8b-4450-46f4-9297-63100d5e69aa  Zeitschrift
+4c0e4f9c-4f57-4307-9ea0-ddacd5626876  Karte(nwerk)
+ee6e0c3f-975b-419a-9728-049566f9f1ec  Loseblattwerk
+27f76b9f-ddc4-4e29-b1d7-80d43c43fabd  Musiknote
+0e8e0c57-697b-4ba3-beeb-99fc1d6a76d5  Zeitung
+dd0bf600-dbd9-44ab-9ff2-e2a61a6539f1  Tonträger
+82a25aae-1c10-4da2-896f-b0dc0feb59d9  Blindenschriftträger
+8b7dead4-9ebf-497c-8f55-8beb89544b8e  Handschrift
+8893c631-b898-4254-b104-25fa19e68321  E-Ressource auf Datenträger
+41d6b1e7-2eda-4a79-83fc-78fa067c982f  Objekt
+bbf8cd4a-80ce-479d-92b8-1d4f26c162a7  Lax
+71fbd940-1027-40a6-8a48-49b44d795e46  Nicht spezifiziert
+778666c8-e79b-4b62-a17a-2f350e165908  Bild(ersammlung)
+d9acad2f-2aac-4b48-9097-e6ab85906b25  text (to be deleted)
+0b8a8d0b-767e-4b1e-89b8-c3192dd906b0  Aufsatz
+32dd9d91-be93-4e48-bd9e-e3e0f08f7d85  Mehrteilige Monografie
+1ef6a0f9-6cc6-4da2-816e-9e674a9c5358  Serie

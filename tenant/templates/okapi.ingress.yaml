@@ -1,0 +1,48 @@
+{{- range .Values.tenants }}
+{{- if .ingress.enable }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: okapi-{{ .tenantId }}
+  labels:
+    app: {{ template "folio.name" $ }}
+    chart: {{ template "folio.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    {{- with .ingress.annotations }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+    {{- if .ingress.secureOkapi }}
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      proxy_set_header X-Okapi-Tenant {{ .tenantId }};
+    {{- end}}
+spec:
+  ingressClassName: {{ .ingress.classname | default "nginx" }}
+  tls:
+{{- range .ingress.tls }}
+  - hosts:
+  {{- if .hosts }}
+    {{- range .hosts }}
+    - {{ . }}
+    {{- end }}
+  {{- else }}
+    - {{ .host }}
+  {{- end }}
+    secretName: {{ .secretName }}
+{{- end }}
+  rules:
+    - host: {{ .ingress.host }}
+      http:
+        paths:
+          - path: {{ $.Values.global.okapi.ingressPath | default "/okapi/(.*)" }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $.Values.global.okapi.serviceName | default "okapi" }}
+                port:
+                  number: {{ $.Values.global.okapi.port | default "9130" }}
+---
+{{- end }}
+{{- end }}

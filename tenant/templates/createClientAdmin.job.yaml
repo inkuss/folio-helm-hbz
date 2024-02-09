@@ -1,0 +1,57 @@
+{{ range .Values.tenants }}
+{{ if .clientAdminAccount }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-create-adminaccount-{{ .clientAdminAccount }}
+  annotations:
+    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook-weight": "5" 
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ .stripes.pullsecret | default $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ $.Release.Name }}-create-adminaccount-{{ .clientAdminAccount }}
+        {{- with $.Values.global.image }}
+        image: {{ .repositoryBaseUrl }}{{ .okapicliRepo }}:{{ .okapicliTag }}
+        {{- end }}
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: FOLIO_ADMIN_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .tenantId }}-admin-pwd
+              key: password
+        - name: FOLIO_ADMIN_USERNAME
+          value: {{ .adminUsername | default "admin" }}
+        - name: FOLIO_TENANTID
+          value: {{ .tenantId | default "diku" }}
+        - name: OKAPI_URL
+          value: {{ .okapiURL | default ( printf "http://okapi.%s:9130" $.Release.Namespace ) | quote }}
+        - name: USERNAME
+          value: {{ .clientAdminAccount }}
+        - name: NEW_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .tenantId }}-{{ .clientAdminAccount }}-password
+              key: password
+        emvFrom:
+        - configMapRef:
+            name: clientaccount-{{ .clientAdminAccount }}-env
+        command:
+          - /scripts/createFolioUser.sh
+        volumeMounts:
+        - name: scripts
+          mountPath: "/scripts"
+      restartPolicy: Never
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+  backoffLimit: 10
+{{- end }}
+{{- end }}

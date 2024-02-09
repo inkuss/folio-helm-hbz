@@ -1,0 +1,14 @@
+{{range .Values.tenants}}
+{{- if .register }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-register-{{ .tenantId }}-env
+data:
+  OKAPI_URL: http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}
+  ADMIN_USERNAME: {{ .adminUsername | default "admin" }}
+  ADMIN_ID: {{ .adminId | default "99999999-9999-4999-9999-999999999999" }}
+
+{{- end }}
+---
+{{- end }}

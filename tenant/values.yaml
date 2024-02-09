@@ -1,0 +1,72 @@
+---
+# List of Folio Tenants to install
+tenants:
+- description: My Folio tenant
+  # add extra frontend modules
+  frontendmodulesExtras: []
+  # ingress definition
+  ingress:
+    annotations: []
+      # cert-manager.io/cluster-issuer: letsencrypt
+      # nginx.ingress.kubernetes.io/whitelist-source-range: 10.0.0.0/24,172.10.0.1
+    # 
+    # enable ingress for okapi and stripes
+    enable: false
+    #
+    # define ingres Class name. Defaults to "nginx"
+    # classname: nginx
+    # 
+    # this makes it impossible to manipulate X-Okapi-Tenant HTTP headers.
+    # only works with ingress-nginx controller with the option 
+    # https://kubernetes.github.io/ingress-nginx/user-guide/nginx-configuration/configmap/#allow-snippet-annotations
+    # set to true
+    secureOkapi: false
+    #
+    # Hostname fpr stripes
+    # host: folio.example.com
+    #
+    path: /
+    # 
+    # If you want to use tls with certmanager
+    #tls:
+    #  - host: folio.example.com
+    #    secretName: folio-tls-secret
+  #
+  # wether to load reference and sample data
+  loadReference: true
+  loadSample: false
+  name: MyTenant
+  tenantId: mytenant
+  # register tenant in Okapi
+  register: true
+  # email configuration
+  email: {}
+  #  port: 25
+  #  loginOption: DISABLED
+  #  username: folio
+  #  password: password
+  #  trustAll: true
+  #  smtpHost: smtp.example.com
+  #  from: folio@example.com
+  # Deploy stripes nginx container
+  stripes:
+    enable: true
+    imageBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    imagePullPolicy: IfNotPresent
+    imageRepository: stripes-build    
+    # imageTag: orchid-csp4-branding
+    # pullsecret: gitlab-folio-group
+    # where image and favicon shall be downloaded
+    logoUrl: "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png"
+    faviconUrl: "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png"
+    nodeSelector: {}
+    affinity: {}   
+    replicaCount: 1
+    resources:
+      limits:
+        memory: 512Mi
+      requests:
+        memory: 50Mi
+    serviceType: ClusterIP
+    tolerations: []
+  

@@ -1,0 +1,23 @@
+{{range .Values.tenants}}
+{{- if .stripes.enable }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-stripes-{{ .tenantId }}-env
+data:
+  OKAPI_URL: "http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}"
+  TENANT: {{ .tenantId }}
+  BASE_PATH: {{ .ingress.path }}
+  OKAPI_URL_INGRESS: "https://{{ .ingress.host }}/okapi"
+  LOG_PREFIX: {{ .stripes.logPrefix | default "--" | quote }}
+  WELCOME_MESSAGE: "Welcome to FOLIO! Tenant: {{ .tenantId }}"
+  PLATFORM_NAME: {{ .stripes.platformName | default "FOLIO" | quote }}
+  LOGIN_BACKGROUND_COLOR: {{ .stripes.loginBackgroundColor | default "#f6e7ef" | quote }}
+  NAV_BACKGROUND_COLOR: {{ .stripes.navBackgroundColor | default "#d55e00" | quote }}
+  LOGO_ALT_TXT: "Welcome to FOLIO! Tenant: {{ .tenantId }}"
+  LOGO_URL: {{ .stripes.logoUrl | default "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png" |quote }}
+  FAVICON_URL: {{ .stripes.faviconUrl | default "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png" | quote }}
+---
+{{- end }}
+{{- end }}
+

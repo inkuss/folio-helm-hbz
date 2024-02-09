@@ -1,0 +1,24 @@
+{{ range .Values.tenants }}
+{{- if .stripes.enable }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ $.Release.Name }}-{{.tenantId}}
+  labels:
+    app: {{ template "folio.name" $ }}
+    chart: {{ template "folio.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  type: {{ include "folio.stripes.service.type" . | default "ClusterIP" }}
+  ports:
+    - port: {{ .stripes.port | default "80" }}
+      protocol: TCP
+      name: stripes-{{.tenantId}}
+  selector:
+    app: {{ template "folio.name" $ }}
+    tier: stripes-{{.tenantId}}
+    release: {{ $.Release.Name }}
+---
+{{- end }}
+{{- end }}

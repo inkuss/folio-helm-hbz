@@ -1,0 +1,67 @@
+{{ range .Values.tenants}}
+{{- if .stripes.enable }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ $.Release.Name }}-stripes-{{.tenantId}}
+  labels:
+    app: {{ template "folio.name" $ }}
+    chart: {{ template "folio.chart" $ }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+spec:
+  replicas: {{ .stripes.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "folio.name" $ }}
+      tier: stripes-{{.tenantId}}
+      release: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "folio.name" $ }}
+        tier: stripes-{{.tenantId}}
+        release: {{ $.Release.Name }}
+    spec:
+      imagePullSecrets:
+      - name: {{ .stripes.pullsecret | default $.Values.global.image.pullsecret }}
+      volumes:
+        - name: kube-scripts
+          configMap:
+            name: {{ $.Release.Name }}-scripts
+            defaultMode: 0555
+            optional: false
+      containers:
+        - name: {{ $.Release.Name }}-stripes-{{.tenantId}}
+          image: {{ .stripes.imageBaseUrl | default $.Values.global.image.repositoryBaseUrl }}{{ .stripes.imageRepository }}:{{ .stripes.imageTag }}
+          imagePullPolicy: {{ .stripes.imagePullPolicy | default "IfNotPresent" }}
+          envFrom:
+          - configMapRef:
+              name: {{ $.Release.Name }}-stripes-{{.tenantId}}-env
+          readinessProbe:
+            httpGet:
+              path: {{ .ingress.path | default "/" }}
+              port: {{ .ingress.port | default "80" }}
+            periodSeconds: 1
+            initialDelaySeconds: 7
+          resources:
+            {{- .stripes.resources | toYaml | nindent 12 }}
+          volumeMounts:
+          - mountPath: "/kube-scripts"
+            name: kube-scripts
+      {{- with .stripes.nodeSelector }}
+      nodeSelector:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .stripes.affinity }}
+      affinity:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+      {{- with .stripes.tolerations }}
+      tolerations:
+        {{- . | toYaml | nindent 8 }}
+      {{- end }}
+---
+{{- end }}
+{{- end }}
+

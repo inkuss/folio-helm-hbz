@@ -1,0 +1,24 @@
+{{range .Values.tenants}}
+{{- if .stripes.enable }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-preset-{{.tenantId}}-env
+data:
+  OKAPI_URL: "http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}"
+  OKAPI_URL_INGRESS: "https://{{ .ingress.host }}"
+  TENANT: {{ .tenantId }}
+  EMAIL_SETUP: "{{- if .email }}true{{- else }}false{{- end }}"
+  EMAIL_SMTP_PORT: {{ (.email).port | default "25" |quote }}
+  EMAIL_LOGIN_OPTION: {{ (.email).loginOption | default "DISABLED" |quote }}
+  EMAIL_TRUST_ALL: {{ (.email).trustAll | default "true" |quote }}
+  EMAIL_USERNAME: {{ (.email).username | default "folio" |quote }}
+  EMAIL_PASSWORD: {{ (.email).password | default "folio" |quote }}
+  EMAIL_FROM: {{ (.email).from | default "folio@localhost" |quote }}
+  EMAIL_SMTP_HOST: {{ (.email).smtpHost | default "localhost" |quote }}
+  FOLIO_LOCALE: '{\"locale\":\"de-DE\",\"numberingSystem\":\"latn\",\"timezone\":\"Europe/Berlin\",\"currency\":\"EUR\"}'
+  ADMIN_USERNAME: {{ .adminUsername | default "admin" }}
+---
+{{- end }}
+{{- end }}
+

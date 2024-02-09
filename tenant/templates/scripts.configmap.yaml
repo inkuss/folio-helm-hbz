@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-scripts
+data:
+{{ ( tpl (.Files.Glob "files/**.sh").AsConfig . ) | indent 2 }}
+{{ ( tpl (.Files.Glob "files/**.txt").AsConfig . ) | indent 2 }}
