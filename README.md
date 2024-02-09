@@ -68,14 +68,12 @@ The following Helm repositories are also used for the above-mentioned components
 
 #### Kubernetes namespace
 
+The current design tries to install most of the relevant Components needed for FOLIO in one Namespace. In the following example helm commands, this would be 'default', but it is better to create an explicit namespace only for FOLIO for logical seperation to other Services in the Cluster.
 
 The other commands each require the specification of a Kubernetes namespace. This can only be set temporarily in the current shell, for example, so that the wrong namespace is not used later by mistake.
 
     FOLIONS=<NEW_NAMESPACE>
     kubectl create namespace ${FOLIONS:-undefined}
->>>>>>> 593a550 (Start moving to public repo)
-
-
 
 #### Create/copy Secrets
 
@@ -88,22 +86,19 @@ If there are already other folio installations in the cluster, you can copy some
     gitlab-folio-group 
     s3storage-access
 
-
 Manually e.g. like this (cleaning up the yamls is necessary, see example in `other/gitlab.secret.example.yaml`, especially remove line `namespace:`):
 
 
     kubectl -n <source-namespace> get secret gitlab-folio-group -o yaml > other/gitlab-folio-group.secret.yaml
     vi other/gitlab-folio-group.secret.yaml
-    kubectl -n ${FOLIONS:-undefined} apply -f other/gitlab-folio-group.secret.yaml
+    kubectl -n folio-testing apply -f other/gitlab-folio-group.secret.yaml
 
 
 Or via script: `other/copy-secret.sh`
 
 For a new secret (after creation in gitlab with registry-read authorization):
 
-
     kubectl -n ${FOLIONS:-undefined} create secret docker-registry gitlab-folio-group --docker-server=gitlab.bib-bvb.de:5050/folio --docker-username=k8s-read --docker-password=<token>
-
 
 s3storage (e.g. per minio) must be available and the values in s3stroage-access must be adjusted accordingly.
 
@@ -132,38 +127,28 @@ This means that there is only one central location where the corresponding varia
 
 Once per client PC: add bitnami repo:
 
-
     helm repo add bitnami https://charts.bitnami.com/bitnami
-
 
 Install Elasticsearch, the `NOTES.txt` output is saved with the following command under `logs/` and contains all important information:
 
-
-    helm -n ${FOLIONS:-undefined} install elasticsearch bitnami/elasticsearch -f bitnami/elastic-values.yml
-
+    helm install elasticsearch bitnami/elasticsearch -f bitnami/elastic-values.yml
 
 Important: check the output log to see under which internal service elasticsearch can be reached and compare it with the values of mod-search!
 
 There have been changes here with bitnami chart upgrades in the past.
 
-
 As with the last point, also install Kafka:
 
-
-    helm -n ${FOLIONS:-undefined} install kafka bitnami/kafka -f bitnami/kafka-values.yml
-
+    helm install kafka bitnami/kafka -f bitnami/kafka-values.yml
 
 Then wait until all pods are green in the dashboard.
 
 
-
 #### postgres 
-
 
 postgres is installed via the zalando-postgres-operator, more at `https://github.com/zalando/postgres-operator`
 
-
-    helm -n ${FOLIONS:-undefined} install zal-pg bvb-repo/zalando-pg -f global-values.yaml
+    helm install zal-pg bvb-repo/zalando-pg -f global-values.yaml
 
 
 
@@ -178,7 +163,7 @@ postgres is installed via the zalando-postgres-operator, more at `https://github
 On the topic of Docker containers and CI, see `https://gitlab.bib-bvb.de/folio/okapi`.
 
 
-    helm -n ${FOLIONS:-undefined} install okapi bvb-repo/okapi -f global-values.yaiml
+    helm install okapi bvb-repo/okapi -f global-values.yaiml
 
 
 
