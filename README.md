@@ -148,95 +148,77 @@ Then wait until all pods are green in the dashboard.
 
 postgres is installed via the zalando-postgres-operator, more at `https://github.com/zalando/postgres-operator`
 
+With the configured global-values.yaml, simply execute the following:
+
     helm install zal-pg bvb-repo/zalando-pg -f global-values.yaml
-
-
 
 
 ### Installation Folio components
 
-
-
 #### okapi
 
+Currently, we still use our own, self built container for okapi, see https://gitlab.bib-bvb.de/folio-public/okapi-build :
+TODO: Use official container and adjust configuration accordingly.
 
-On the topic of Docker containers and CI, see `https://gitlab.bib-bvb.de/folio/okapi`.
-
-
-    helm install okapi bvb-repo/okapi -f global-values.yaiml
-
+    helm install okapi bvb-repo/okapi -f global-values.yaml
 
 
 #### auth-modules
+
+Currently, it makes sense to install the Modules needed for authentificatio first (mod-users, mod-permissions, mod-authtoken, mod-login), and then secure the supertenant with those.
 
 You need at least 2 value files to install the Folio modules:
 
 - `<RELEASE_TAG>-auth.yaml` for the mod-users, mod-authtoken, mod-permissions and mod-login modules required for security.
 - `<RELEASE_TAG>-no-auth.yaml>` for all other modules of a Folio release.
 
-
 Additional modules can also be included in a separate Helm release.
-
 
 For a new Folio release, the script `modules/script/update-helm-module-values.py` can be used.
 
-
 The modules required for authentication are installed in a separate Helm release to avoid complications when upgrading:
 
-    helm -n ${FOLIONS:-undefined} install mods-auth bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-auth.yaml
-
+    helm install mods-auth bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-auth.yaml
 
 
 #### secure supertenant
 
-
 Use a script to supply Folio-supertenant with the modules required for authorization and secure it. The job is created via Helm template, no configuration should be necessary (with the same `global-values.yaml`).
 
-
-    helm -n ${FOLIONS:-undefined} template secure bvb-repo/secure-supertenant -f global-values.yaml > secure-supertenant/renders/secure-supertenant.yaml
-
-    kubectl -n ${FOLIONS:-undefined} apply -f secure-supertenant/renders/secure-supertenant.yaml
-
+    helm install secure-st bvb-repo/secure-supertenant -f global-values.yaml
 
 
 #### other modules
-
 
 The remaining modules are installed sperately in the already secured system. 
 
 This makes it relatively easy to add further modules to this installation using `helm upgrade` and to change the module settings.
 
-
-    helm -n ${FOLIONS:-undefined} install mods bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-no-auth.yaml --debug > logs/mods-install-${FOLIONS:-undefined}.yaml
-
+    helm install mods bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-no-auth.yaml
 
 
 #### create tenant and stripes deployment
 
-
 Before installing the tenant, check that all modules are registered with Okapi. This should be the case if all init jobs from the previous step have been successfully completed.
 
+Currently, we build one stripes container per release, and have several template variables which are set during Helm install. For more details, see: https://gitlab.bib-bvb.de/folio-public/stripes-build
 
 - create new stripes branch in gitlab ( https://gitlab.bib-bvb.de/folio/platform-complete ) from branch with correct version (e.g. lotus-base) and adjust values:
-  - under docker/Dockerfile set the ARGS to: OKAPI\_URL to desired ingress and TENANT\_ID
-  - in `stripes.config.js` adjust logo/favicon and description. URL/tenant in this file are overwritten by the ARGS of the Dockerfile.
-  - build docker image (manually on your own workstation and then push, or assign a git tag and push)
-- Copy and adapt tenant/values-example.yaml, important: 
+- Copy and adapt tenant/values.yaml, important: 
   - tenantId
   - stripes.imageVersion (to branch name)
   - the following 3 variables can be the same, and should match the ingress specified in the stripes Dockerfile:
     - ingress.host
     - ingress.tls.secretName
     - ingress.tls.host
+  - adjust logo/favicon and description. URL/tenant in this file are overwritten by the ARGS of the Dockerfile.
 - Install in new Helm release, with only one tenant its id can be used 
-
 
 Command example:
 
+    helm install <RELEASENAME> bvb-repo/tenant -f global-values.yaml -f tenant/values-<RELEASENAME>.yaml -f modules/valuesd/<RELEASE_TAG>-all.yaml 
 
-    helm -n ${FOLIONS:-undefined} install <RELEASENAME> bvb-repo/tenant -f global-values.yaml -f tenant/values-<RELEASENAME>.yaml -f modules/valuesd/<RELEASE_TAG>-all.yaml --debug > tenant/install-debug-${FOLIONS:-undefined}.yml
-
-    current example for lotus instances:
+    LRZ specific example for lotus instances:
 
     helm -n folio-lotus install ubt bvb-repo/tenant -f global-values-lotus-h1.yaml -f tenant/values-lotus-ubt.yaml -f modules/valuesd/2022-r1-all-reduced.yaml
 
@@ -244,45 +226,35 @@ Command example:
 
 #### Notes for uninstalling
 
-Use `helm -n ${FOLIONS:-undefined} list` to check installed releases
+Use `helm -n undefined list` to check installed releases
 
-
-Use `helm -n ${FOLIONS:-undefined} uninstall <RELEASENAME>` to uninstall
-
+Use `helm -n undefined uninstall <RELEASENAME>` to uninstall
 
 Please note: 
 
 - Persistent volume claims of Elasticsearch, Kafka and Kubegres are not deleted automatically, must be done manually.
-- Secrets with Kubegres and Supertenant passwords are not deleted automatically and are reused when reinstalling. If this is not desired, uninstall manually or delete the namespace.
+- Some Secrets, e.g. with Postgres and Supertenant passwords, are not deleted automatically and are reused when reinstalling. If this is not desired, uninstall manually or delete the namespace.
 
 
 
 ## Installation vufind
 
-
 ### Installation of basic components
-
 
 #### Installation DB Cluster
 
-
 Once per installation, a Postgres DB cluster should be created for all vufind instances/tenants. As with Folio, there is a Helm chart that creates a custom rosource for the Zalando Postgres operator. Installation:
-
 
     helm -n ${FOLIONS:-undefined} install vufind-postgres bvb-repo/zalando-vufind-pg -f values.yaml
 
-
 For possible values in values.yaml see values.yaml in the chart. 
-
 
 #### Installation Solr Cloud
 
 
 Example values for the Solr Helm chart are provided in solr-vufind for the installation of the Solr cloud using the Solr cloud operator. It is important that the image from gitlab.bib-bvb.de:5050/vufind/vufind-ci/vufind is used for Solr. The extensions for vufind are included there.
 
-
 Installation:
-
 
     helm -n ${FOLIONS:-undefined} install solr apache-solr/solr -f solr-vufind/solr-vufind.yaml
 
