@@ -1,0 +1,73 @@
+## teamid needs to be unique in a namespace
+# teamId: "vufind"
+
+## storage parameters
+# volumeSize: "10Gi"
+# storageClass: "myStorageClass"
+
+## number of instances. 3 Instances: one master DB and 2 replicas
+# numberOfInstances: 3
+
+## Postgres Version
+# version: 15
+
+backup:
+  logicalEnable: false
+  # logicalSchedule: "30 00 * * *"
+  customWalS3Bucket: false
+parameters:
+  # change or add Postgresql parameters
+  listen_addresses: "*"
+  # max_wal_senders: "10"
+  # max_wal_size: 4GB
+  max_connections: "100"
+  # shared_buffers: "128MB"
+  db_user_namespace: "off"
+  # password_encryption: "md5"
+  effective_io_concurrency: "2"
+  max_locks_per_transaction: "64"
+  max_prepared_transactions: "0"
+  max_replication_slots: "10"
+  wal_keep_segments: "32"
+  wal_level: "replica"
+  wal_log_hints: "true" 
+  archive_mode: "on"
+  archive_timeout: "120"
+  checkpoint_timeout: "3000"
+  effective_cache_size: "2GB"
+  maintenance_work_mem: "256MB"
+  max_wal_senders: "10"
+  max_wal_size: "10GB"
+  max_worker_processes: "12"
+  shared_buffers: "1GB"
+  temp_buffers: "256MB"
+  # wal_level: "minimal"
+  work_mem: "256MB"
+nodeAffinity: {}
+# here you can add a custom node affinity
+#  requiredDuringSchedulingIgnoredDuringExecution:
+#    nodeSelectorTerms:
+#      - matchExpressions:
+#          - key: "disk"
+#            operator: In
+#            values:
+#              - "ssd"
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
