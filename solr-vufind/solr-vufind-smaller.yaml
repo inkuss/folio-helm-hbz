@@ -1,0 +1,91 @@
+# If you want to use autoScaling, do not set this field
+replicas: 4
+global:
+  clusterDomain: "<your cluster domain>"
+image:
+  repository: "gitlab.bib-bvb.de:5050/vufind/vufind-ci/solr"
+  imagePullSecret: "vufind-ci"
+  tag: "9.3.0.15"
+solrOptions:
+  javaMemory: "-Xms1g -Xmx15g"
+  solrModules: []
+# - analysis-extras
+# - analysis-extras/lucene-libs
+  additionalLibs:
+  - /opt/solr/contrib/vufind/lib
+  - /opt/solr/contrib/analysis-extras/lib
+  - /opt/solr/contrib/analysis-extras/lucene-libs
+
+
+  # Enable authentication for the Solr Cloud
+  # More information can be found at:
+  # https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#authentication-and-authorization
+  security: {}
+    # authenticationType: Basic
+    # basicAuthSecret: secret-name
+    # probesRequireAuth: false
+    # bootstrapSecurityJson:
+    #   name: my-custom-security-json-secret
+    #   key: security.json
+
+
+# Specify how the SolrCloud should be addressable
+# https://apache.github.io/solr-operator/docs/solr-cloud/solr-cloud-crd.html#addressability
+addressability:
+  # Use external to provide endpoint(s) for your SolrCloud outside of Kubernetes
+  external:
+    method: "Ingress"
+    domainName: "<your domainname>"
+    ingressTLSTermination:
+      tlsSecret: "solr-vufind.tls"
+
+ingressOptions:
+  # annotations: 
+  #  cert-manager.io/cluster-issuer: "letsencrypt-dns"
+  ingressClassName: "nginx"
+
+dataStorage:
+  # Either persistent or ephemeral
+  type: "persistent"
+
+  # Specify a capacity for your data storage.
+  # This effects both ephemeral and persistent storage.
+  capacity: "20Gi"
+
+  # Options for persistent storage. Only used if type = "persistent"
+  persistent:
+    reclaimPolicy: "Delete"
+    pvc:
+      storageClassName: "<your storageclass>"
+
+
+
+zk:
+  provided:
+    persistence:
+      spec:
+        storageClassName: "<your storageclass>"
+
+
+# Customize the Solr Pod for your needs
+# podOptions:
+#   topologySpreadConstraints:
+#     - maxSkew: 1
+#       topologyKey: site
+#       whenUnsatisfiable: DoNotSchedule
+podOptions:
+  topologySpreadConstraints:
+     - maxSkew: 1
+       topologyKey: topology.kubernetes.io/zone
+# Notwendig, weil wir 3 Zonen haben, aber in der 3. Zone keine Pods starten können/sollen
+       whenUnsatisfiable: ScheduleAnyway
+     - maxSkew: 1
+       topologyKey: kubernetes.io/hostname
+       whenUnsatisfiable: DoNotSchedule
+  resources:
+    limits:
+      memory: 20G
+    requests:
+      cpu: 1
+      memory: 1G
+
