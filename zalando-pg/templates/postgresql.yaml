@@ -1,0 +1,54 @@
+
+{{- $ramLimit := $.Values.resources.memoryLimit | default "48Gi" }}
+apiVersion: "acid.zalan.do/v1"
+kind: postgresql
+metadata:
+  name: {{ $.Values.global.db.host | quote }}
+spec:
+  teamId: {{ $.Values.teamId }}
+{{- with .Values.global.db }}
+  volume:
+    size: {{ .size | default $.Values.volumeSize | default "5Gi" }}
+    storageClass: {{ .storageClass | default "" | quote }}
+  resources:
+    {{- toYaml $.Values.resources | nindent 4 }}
+  numberOfInstances: {{ $.Values.numberOfInstances | default "3"  }}
+  enableShmVolume: true
+  users:
+    clustersuperuser:
+    - superuser
+    - login
+    - createdb
+  {{- if and .backup .backup.logicalEnable }}
+  enableLogicalBackup: true
+  logicalBackupSchedule: {{ .backup.logicalSchedule | default "30 00 * * *" | quote }}
+  {{- end }}
+  {{- if and .backup .backup.wal_s3_bucket }} 
+  env:
+  - name: WAL_S3_BUCKET
+    value: {{ .backup.wal_s3_bucket | quote }}
+  {{- end }}
+  postgresql:
+    version: {{ .version | default "13" | quote }}
+    parameters:
+      {{- toYaml $.Values.parameters | nindent 6 }}
+  patroni:
+    pg_hba:
+      - local   replication    standby            trust
+      - local   all            all                trust
+      - host    replication    standby  all       md5
+      - hostssl all all 0.0.0.0/0 md5
+      - host    all            all      all       md5
+
+{{- end }} 
+
+{{- if .Values.affinityEnabled }} 
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+        - matchExpressions:
+            - key: {{ .Values.affinityKey | default "disk" }}
+              operator: In
+              values:
+                - {{ .Values.affinityValue | default "ssd" }}
+{{- end }}

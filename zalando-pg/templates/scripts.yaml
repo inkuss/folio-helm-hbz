@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-scripts
+data:
+  create-pgsuperuser.sh: |
+    #!/bin/bash
+    set -e
+
+    log() { date | xargs -IDATE echo DATE $1 ;}
+
+    log "Creating SUPERUSER pgsuperuser ..."
+
+    psql -w -v ON_ERROR_STOP=1 -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" <<-EOSQL
+    CREATE ROLE pgsuperuser WITH PASSWORD '$PGSU_PASSWORD' SUPERUSER LOGIN CREATEDB;
+    EOSQL
+
+    log "User created!";
+
+  folio-db-init.sh: |
+    #!/bin/bash
+    set -e
+
+    log() { date | xargs -IDATE echo DATE $1 ;}
+
+    log "Creating databases okapi and folio ..."
+    log "Running: psql -w -v ON_ERROR_STOP=1 -h $PG_HOST -p $PG_PORT -U $PG_USER  ...";
+
+    psql -w -v ON_ERROR_STOP=1 -h "$PG_HOST" -p "$PG_PORT" -U "$PG_USER" <<-EOSQL
+    CREATE ROLE okapi WITH PASSWORD '$OKAPI_PASSWORD' LOGIN CREATEDB;
+    CREATE DATABASE okapi WITH OWNER okapi;
+    CREATE ROLE folio WITH PASSWORD '$FOLIO_PASSWORD' LOGIN SUPERUSER;
+    CREATE DATABASE folio WITH OWNER folio;
+    EOSQL
+
+    log "Init script is completed";
+
+    
+

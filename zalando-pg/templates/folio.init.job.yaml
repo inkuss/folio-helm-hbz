@@ -1,0 +1,49 @@
+{{- if $.Values.global.db.initDb }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-folio-init-job
+  annotations:
+    "helm.sh/hook": "post-install"
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ .Release.Name }}-create-folio-dbs
+        image: {{ $.Values.global.image.repositoryBaseUrl }}folio-tools:{{ $.Values.global.image.folioToolsTag }} 
+        imagePullPolicy:  "IfNotPresent"
+        env:
+        - name: PG_HOST
+          value: {{ $.Values.global.db.host | quote }}
+        - name: PG_PORT
+          value: {{ $.Values.global.db.port | default "5432" | quote }}
+        - name: PG_USER
+          value: postgres
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres.{{ .Values.teamId }}-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do 
+              key: password
+        envFrom:
+        - secretRef:
+            name: pg-superuser-secret
+        envFrom:
+        - secretRef:
+            name: folio-db-secret
+        args: ["kube-scripts/folio-db-init.sh"]
+        volumeMounts:
+        - name: scriptvolume
+          mountPath: "/usr/src/app/kube-scripts"
+      volumes:
+      - name: scriptvolume
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 10
+  ttlSecondsAfterFinished: 3600
+---
+{{- end }}

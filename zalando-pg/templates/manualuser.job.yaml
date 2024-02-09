@@ -1,0 +1,46 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-pgsuperuser
+  annotations:
+    "helm.sh/hook": "post-install"
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: create-pg-superuser
+        image: {{ $.Values.global.image.repositoryBaseUrl }}folio-tools:{{ $.Values.global.image.folioToolsTag }} 
+        imagePullPolicy:  "IfNotPresent"
+        env:
+        - name: PG_HOST
+          value: {{ $.Values.global.db.host | quote }}
+        - name: PG_DB
+          value: {{ $.Values.global.db.dbname | quote }}
+        - name: PG_PORT
+          value: {{ $.Values.global.db.port | default "5432" | quote }}
+        - name: PG_USER
+          value: postgres
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres.{{ .Values.teamId }}-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do 
+              key: password
+        envFrom:
+        - secretRef:
+            name: {{ $.Values.global.db.adminSecret }}
+        args: ["kube-scripts/create-pgsuperuser.sh"]
+        volumeMounts:
+        - name: scriptvolume
+          mountPath: "/usr/src/app/kube-scripts"
+      volumes:
+      - name: scriptvolume
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 15
+  ttlSecondsAfterFinished: 300
+---
