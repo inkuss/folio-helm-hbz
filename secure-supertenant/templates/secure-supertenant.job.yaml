@@ -1,0 +1,37 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ $.Release.Name }}-supertenant
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: {{ $.Release.Name }}-supertenant
+        {{- with $.Values.global.image }}
+        image: {{ .repositoryBaseUrl }}folio-tools:{{ .folioToolsTag }}
+        {{- end }}
+        imagePullPolicy: Always
+        env:
+        - name: OKAPI_URL
+          value: http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}
+        - name: USER_ID
+          value: {{ .Values.global.okapi.supertenantId | default "99999999-9999-4999-9999-999999999999" }}
+        - name: SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: supertenant-secret
+              key: password
+        args: ["kube-scripts/secure.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: "/usr/src/app/kube-scripts"
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 10
