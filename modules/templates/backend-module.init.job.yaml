@@ -1,0 +1,55 @@
+{{- if not .Values.noInitJobs }}
+{{range .Values.backend_modules }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-{{ template "folio.backend.fullname" . }}
+spec:
+  template:
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      containers:
+      - name: init-{{ template "folio.backend.fullname" . }}
+        image: {{ $.Values.global.image.repositoryBaseUrl }}folio-tools:{{ $.Values.global.image.folioToolsTag }} 
+        imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
+        envFrom:
+        - configMapRef:
+            name: {{ template "folio.backend.fullname" . }}-env
+        env:
+        - name: DB_HOST
+          value: {{ $.Values.global.db.host | quote }}
+        - name: DB_PORT
+          value: {{ $.Values.global.db.port | default "5432" | quote }}
+        - name: DB_DATABASE
+          value: {{ $.Values.global.db.folioName | default "folio" | quote }}
+        - name: DB_USERNAME
+          value: {{ $.Values.global.db.folioUser | default "folio" | quote }}
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ $.Values.global.db.folioSecret }}
+              key: {{ $.Values.global.db.folioPwKey }}
+        {{- if $.Values.global.okapi.secureSupertenant }}
+        - name: SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: supertenant-secret
+              key: password
+        {{- end }}
+        args: ["kube-scripts/init-module.sh"]
+        volumeMounts:
+        - name: kube-scripts
+          mountPath: "/usr/src/app/kube-scripts"
+      volumes:
+      - name: kube-scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
+      restartPolicy: Never
+  backoffLimit: 6
+  ttlSecondsAfterFinished: 300
+---
+{{- end }}
+{{- end }}

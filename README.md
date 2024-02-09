@@ -77,7 +77,7 @@ The other commands each require the specification of a Kubernetes namespace. Thi
 
 
 
-Create/copy #### Secrets
+#### Create/copy Secrets
 
 Disclaimer: LRZ is trying to make their container registry public avalible. Stay tuned!
 

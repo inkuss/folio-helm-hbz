@@ -1,0 +1,154 @@
+backend_modules:
+- name: mod-users
+  version: 19.0.0
+  image:
+    repository: folioorg/mod-users:19.0.0
+    tag: 2022-r3-ga
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-permissions
+  version: 6.2.0
+  image:
+    repository: folioorg/mod-permissions:6.2.0
+    tag: 2022-r3-ga
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login
+  version: 7.8.0
+  image:
+    repository: folioorg/mod-login:7.8.0
+    tag: 2022-r3-ga
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-authtoken
+  version: 2.12.0
+  image:
+    repository: folioorg/mod-authtoken:2.12.0
+    tag: 2022-r3-ga
+  replicaCount: 1
+  customEnvSecret: true
+  customEntrypoint:
+    command: [ "java" ]
+    args: [ "-XX:MaxRAMPercentage=66.0", "-Dcache.permissions=true", "-Djwt.signing.key=$(JWT_SIGNING_KEY)", "-XX:+ExitOnOutOfMemoryError", "-cp", ".", "-jar", "/usr/verticles/mod-authtoken-fat.jar" ]
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+- name: mod-users
+  version: 18.3.1
+  image:
+    repository: folioorg/mod-users:18.3.1
+    tag: 2022-r2-1
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-users
+  version: 18.2.0
+  image:
+    repository: folioorg/mod-users:18.2.0
+    tag: 2022-r1
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login
+  version: 7.7.0
+  image:
+    repository: folioorg/mod-login:7.7.0
+    tag: 2022-r2-1
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login
+  version: 7.6.0
+  image:
+    repository: folioorg/mod-login:7.6.0
+    tag: 2022-r1
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-permissions
+  version: 6.1.0
+  image:
+    repository: folioorg/mod-permissions:6.1.0
+    tag: 2022-r2-1
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-permissions
+  version: 6.0.4
+  image:
+    repository: folioorg/mod-permissions:6.0.4
+    tag: 2022-r1
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-authtoken
+  version: 2.11.1
+  image:
+    repository: folioorg/mod-authtoken:2.11.1
+    tag: 2022-r2-1
+  replicaCount: 1
+  customEnvSecret: true
+  customEntrypoint:
+    command: [ "java" ]
+    args: [ "-XX:MaxRAMPercentage=66.0", "-Dcache.permissions=true", "-Djwt.signing.key=$(JWT_SIGNING_KEY)", "-XX:+ExitOnOutOfMemoryError", "-cp", ".", "-jar", "/usr/verticles/mod-authtoken-fat.jar" ]
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+- name: mod-authtoken
+  version: 2.9.1
+  image:
+    repository: folioorg/mod-authtoken:2.9.1
+    tag: 2022-r1
+  replicaCount: 1
+  customEnvSecret: true
+  customEntrypoint:
+    command: [ "java" ]
+    args: [ "-XX:MaxRAMPercentage=66.0", "-Dcache.permissions=true", "-Djwt.signing.key=$(JWT_SIGNING_KEY)", "-XX:+ExitOnOutOfMemoryError", "-cp", ".", "-jar", "/usr/verticles/mod-authtoken-fat.jar" ]
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'

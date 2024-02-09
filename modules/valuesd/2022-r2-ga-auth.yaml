@@ -1,0 +1,50 @@
+backend_modules:
+- name: mod-users
+  version: 18.3.1
+  image:
+    repository: folioorg/mod-users:18.3.1
+    tag: 2022-r2-ga
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login
+  version: 7.7.0
+  image:
+    repository: folioorg/mod-login:7.7.0
+    tag: 2022-r2-ga
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-permissions
+  version: 6.1.0
+  image:
+    repository: folioorg/mod-permissions:6.1.0
+    tag: 2022-r2-ga
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-authtoken
+  version: 2.11.0
+  image:
+    repository: folioorg/mod-authtoken:2.11.0
+    tag: 2022-r2-ga
+  replicaCount: 1
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dcache.permissions=true

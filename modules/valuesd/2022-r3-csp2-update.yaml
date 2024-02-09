@@ -1,0 +1,300 @@
+backend_modules:
+- name: mod-calendar
+  version: 2.3.2
+  image:
+    repository: folioorg/mod-calendar:2.3.2
+  tag: 2022-r3-csp2
+  resources:
+    requests: 
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-circulation
+  version: 23.3.5
+  image:
+    repository: folioorg/mod-circulation:23.3.5
+  tag: 2022-r3-csp2
+  pod:
+    port: '9801'
+  resources:
+    requests:
+      memory: '1073741824'
+    limits:
+      memory: '1073741824'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-configuration
+  version: 5.9.1
+  image:
+    repository: folioorg/mod-configuration:5.9.1
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-courses
+  version: 1.4.7
+  image:
+    repository: folioorg/mod-courses:1.4.7
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-email
+  version: 1.15.3
+  image:
+    repository: folioorg/mod-email:1.15.3
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-erm-usage
+  version: 4.5.3
+  image:
+    repository: folioorg/mod-erm-usage:4.5.3
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '715827882'
+    limits:
+      memory: '715827882'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-erm-usage-harvester
+  version: 4.2.1
+  image:
+    repository: folioorg/mod-erm-usage-harvester:4.2.1
+  tag: 2022-r3-csp2
+  useHazelcast: true
+  kafkaAccess: true
+  resources:
+    requests:
+      memory: '3145728000'
+    limits:
+      memory: '3145728000'
+- name: mod-inventory-storage
+  version: 25.0.4
+  image:
+    repository: folioorg/mod-inventory-storage:25.0.4
+  tag: 2022-r3-csp2
+  resources:
+    requests: 
+      memory: 5Gi
+    limits:
+      memory: 5Gi
+  kafkaAccess: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+    REPLICATION_FACTOR: 3
+- name: mod-invoice
+  version: 5.5.1
+  image:
+    repository: folioorg/mod-invoice:5.5.1
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '626349397'
+    limits:
+      memory: '626349397'
+  kafkaAccess: true
+  environment: 
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login-saml
+  version: 2.5.1
+  image:
+    repository: folioorg/mod-login-saml:2.5.1
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-ncip
+  version: 1.12.3
+  image:
+    repository: folioorg/mod-ncip:1.12.3
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-user-import
+  version: 3.7.2
+  image:
+    repository: folioorg/mod-user-import:3.7.2
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-remote-storage
+  version: 1.7.2
+  image:
+    repository: folioorg/mod-remote-storage:1.7.2
+  tag: 2022-r3-csp2
+  useHazelcast: true
+  resources:
+    requests:
+      memory: '712673984'
+    limits:
+      memory: '712673984'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=75.0
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+- name: mod-data-export-spring
+  version: 1.5.4
+  image:
+    repository: folioorg/mod-data-export-spring:1.5.4
+  tag: 2022-r3-csp2
+  resources:
+    requests:
+      memory: '542293850'
+    limits:
+      memory: '542293850'
+  kafkaAccess: true
+  s3storageAccess: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+- name: mod-source-record-storage
+  version: 5.5.4
+  image:
+    repository: folioorg/mod-source-record-storage:5.5.4
+  tag: 2022-r3-csp2
+  resources:
+    requests: 
+      memory: '603725575'
+    limits:
+      memory: '603725575'
+  kafkaAccess: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    test.mode: false
+    MAX_REQUEST_SIZE: '80000000'
+- name: mod-data-import-converter-storage
+  version: 1.15.3
+  image:
+    repository: folioorg/mod-data-import-converter-storage:1.15.3
+  tag: 2022-r3-csp2
+  resources:
+    requests: 
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+- name: mod-source-record-manager
+  version: 3.5.7
+  image:
+    repository: folioorg/mod-source-record-manager:3.5.7
+  tag: 2022-r3-csp2
+  resources:
+    requests: 
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  kafkaAccess: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0  -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    test.mode: false
+    MAX_REQUEST_SIZE: '80000000'
+- name: mod-agreements
+  version: 5.4.5
+  image:
+    repository: folioorg/mod-agreements:5.4.5
+  tag: 2022-r3-csp2
+  pod:
+    port: '8080'
+  resources:
+    requests:
+      memory: 1.5Gi
+    limits:
+      memory: 4Gi
+  environment:
+    JAVA_OPTIONS: -server -XX:+UseContainerSupport -XX:MaxRAMPercentage=55.0 -XX:+PrintFlagsFinal
+
+frontend_modules:
+- folio_acquisition-units-3.3.1
+- folio_agreements-8.3.3
+- folio_bulk-edit-2.1.3
+- folio_calendar-8.0.4
+- folio_checkin-7.2.0
+- folio_checkout-8.2.0
+- folio_circulation-7.2.1
+- folio_circulation-log-2.3.0
+- folio_courses-5.3.0
+- folio_dashboard-3.0.4
+- folio_data-export-5.3.1
+- folio_data-import-5.3.10
+- folio_developer-6.3.0
+- folio_eholdings-7.3.2
+- folio_erm-comparisons-4.3.0
+- folio_erm-usage-6.3.0
+- folio_export-manager-2.3.1
+- folio_finance-3.3.3
+- folio_gobi-settings-1.0.2
+- folio_handler-stripes-registry-1.3.0
+- folio_inventory-9.2.9
+- folio_invoice-3.3.1
+- folio_licenses-8.3.2
+- folio_local-kb-admin-5.3.0
+- folio_marc-authorities-2.0.1
+- folio_myprofile-7.2.0
+- folio_notes-7.0.0
+- folio_oai-pmh-3.3.0
+- folio_orders-3.3.3
+- folio_organizations-3.3.1
+- folio_plugin-bursar-export-2.3.0
+- folio_plugin-create-inventory-records-3.2.1
+- folio_plugin-eusage-reports-2.3.0
+- folio_plugin-find-agreement-8.3.0
+- folio_plugin-find-authority-1.0.1
+- folio_plugin-find-contact-3.3.0
+- folio_plugin-find-eresource-4.3.0
+- folio_plugin-find-erm-usage-data-provider-4.2.0
+- folio_plugin-find-fund-1.2.0
+- folio_plugin-find-import-profile-5.3.1
+- folio_plugin-find-instance-6.3.1
+- folio_plugin-find-interface-3.3.0
+- folio_plugin-find-license-8.3.0
+- folio_plugin-find-organization-3.3.0
+- folio_plugin-find-package-title-4.2.0
+- folio_plugin-find-po-line-3.3.0
+- folio_plugin-find-user-6.3.0
+- folio_quick-marc-5.2.0
+- folio_receiving-2.3.1
+- folio_remote-storage-3.3.2
+- folio_requests-7.2.4
+- folio_servicepoints-6.2.0
+- folio_stripes-authority-components-1.0.2
+- folio_stripes-core-8.3.2
+- folio_stripes-smart-components-7.3.3
+- folio_tags-6.3.0
+- folio_tenant-settings-7.3.0
+- folio_users-8.2.5
+- edge-connexion-1.0.6
+
+

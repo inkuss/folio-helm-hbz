@@ -1,0 +1,165 @@
+{{range .Values.backend_modules -}}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ template "folio.backend.fullname" . }}
+  labels:
+    app: {{ template "folio.backend.fullname" . }}
+    module: {{ .name }}
+    version: {{ .version }}
+    release: {{ $.Release.Name }}
+spec:
+  replicas: {{ .replicaCount | default $.Values.global.backend_modules.defaultReplicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "folio.backend.fullname" . }}
+      release: {{ $.Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ template "folio.backend.fullname" . }}
+        release: {{ $.Release.Name }}
+      annotations:
+        rollme: "1"
+    spec:
+      imagePullSecrets:
+      - name: {{ $.Values.global.image.pullsecret }}
+      volumes:
+      - name: log4j2-properties
+        configMap: 
+          name: log4j2-properties-{{ $.Release.Name }}
+      {{- if .customConfig }}
+      - name: custom-config
+        configMap:
+          name: {{ printf "%s-custom-%s" .name $.Release.Name }}
+      {{- end }}
+      {{- if .persistentVolume }}
+      - name: persistent-storage
+        persistentVolumeClaim:
+          claimName: {{ template "folio.backend.fullname" . }}-vc
+      {{- end }}
+      {{- if .useHazelcast }}
+      - name: hazelcast-config-yaml
+        configMap:
+          {{- $hazelcastService := ( include "folio.backend.fullname" . ) }}
+          name: {{ printf "hazelcast-%s" $hazelcastService }}
+      {{- end}}
+      {{- if .usePropertiesSecret}}
+      - name: properties-secret
+        secret:
+          name: {{ printf "properties-%s-%s-%s" $.Release.Name .name .version }}
+      {{- end}}  
+      containers:
+        - name: {{ template "folio.backend.fullname" . }}
+          image: {{ .image.repository }}
+          imagePullPolicy: {{ .image.pullPolicy | default "IfNotPresent" }}
+          volumeMounts:
+          - mountPath: /etc/log4j2
+            name: log4j2-properties
+          {{- if .customConfig }}
+          - mountPath: {{ .customConfig.mountPath }}
+            name: custom-config
+          {{- end }}
+          {{- if .persistentVolume }}
+          - mountPath: {{ .persistentVolume.mountPath }}
+            name: persistent-storage
+          {{- end }}
+          {{- if .useHazelcast }}
+          - mountPath: /etc/hazelcast
+            name: hazelcast-config-yaml
+          {{- end }}
+          {{- if .usePropertiesSecret }}
+          - mountPath: {{ .propertiesMountPath | default "/usr/vertices" }}
+            name: properties-secret
+          {{- end }}
+          env:
+          {{- if or ( eq .dbAccess  true ) ( eq $.Values.global.db.allModuleAccess true ) }} 
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Values.global.db.folioSecret }}
+                key: {{ $.Values.global.db.folioPwKey }}
+          {{- end }}
+          {{- if .elasticsearchAccess }}
+          {{- if $.Values.global.elasticsearch.secretName }}
+          - name: ELASTICSEARCH_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: {{ $.Values.global.elasticsearch.secretName | default "elasticsearch" }}
+                key: "elasticsearch-password"
+          {{- end }}
+          {{- end }}
+          envFrom:
+          {{- if .customEnvSecret }}
+          - secretRef:
+              name: {{ .name }}-env-{{ $.Release.Name }}
+          {{- end }}
+          {{- if .secretEnv }}
+          - secretRef:
+              name: {{ .name }}-env
+          {{- end }}
+          - configMapRef:
+              name: {{ template "folio.backend.fullname" . }}-env
+          {{- if .s3storageAccess }}
+          - secretRef:
+              name: {{ $.Values.global.s3storage.secretName }}
+          {{- end }}
+          {{- if .customEntrypoint }}
+          command: {{ .customEntrypoint.command | toJson }}
+          args: {{ .customEntrypoint.args | toJson }}
+          {{- end }}
+          readinessProbe:
+            tcpSocket:
+              port: {{ include "folio.backend.pod.port" . | default "8081" }}
+            periodSeconds: 15
+          resources:
+{{ .resources | default $.Values.defaultValues.backend_modules.resources | toYaml | indent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /admin/health
+              port: {{ include "folio.backend.pod.port" . | default "8081" }}
+            initialDelaySeconds: 10
+            failureThreshold: 3
+            periodSeconds: 30
+          startupProbe:
+            httpGet:
+              path: /admin/health
+              port: {{ include "folio.backend.pod.port" . | default "8081" }}
+            failureThreshold: 10
+            periodSeconds: 30
+      topologySpreadConstraints:
+      - topologyKey: site
+        maxSkew: 1
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: {{ template "folio.backend.fullname" . }}
+      - topologyKey: kubernetes.io/hostname
+        maxSkew: 1
+        whenUnsatisfiable: ScheduleAnyway
+        labelSelector:
+          matchLabels:
+            app: {{ template "folio.backend.fullname" . }}
+
+    {{- with .nodeSelector }}
+      nodeSelector:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key:  node-role.kubernetes.io/control-plane
+                operator: DoesNotExist
+#    {{- with .affinity }}
+#      affinity:
+#{{ toYaml . | indent 8 }}
+#    {{- end }}
+    {{- with .tolerations }}
+      tolerations:
+{{ toYaml . | indent 8 }}
+    {{- end }}
+---
+{{end}}

@@ -1,0 +1,66 @@
+{{range .Values.backend_modules}}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "folio.backend.fullname" . }}-env
+data:
+  SERVICE_URL: http://{{ template "folio.backend.fullname" . }}:{{ include "folio.backend.pod.port" . | default "8081" }}
+  OKAPI_SERVICE_HOST: {{ $.Values.global.okapi.serviceName | default "okapi" | quote }}
+  OKAPI_SERVICE_PORT: {{ $.Values.global.okapi.port | quote }}
+  OKAPI_URL: http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}
+  SELF_INTRODUCE: {{ $.Values.global.backend_modules.SELF_INTRODUCE | quote }}
+  MODULE: {{ .name }}
+  TAG: {{ .version }}
+  SERVICE_ID: {{ .name }}-{{ .version }}
+  INSTALL_ID: {{ .name }}-{{ .version }}
+  ENV: {{ $.Values.global.folio.env }}
+
+{{- if or ( eq .dbAccess  true ) ( eq $.Values.global.db.allModuleAccess true ) }}
+  {{- with $.Values.global.db }}
+  DB_HOST: {{ .host }}
+  DB_PORT: {{ .port | default "5432" | quote }}
+  DB_DATABASE: {{ .folioName | default "folio" | quote }}
+  DB_USERNAME: {{ .folioUser | default "folio" | quote }}
+  DB_CONNECTION_TIMEOUT: "40"
+  DB_MAX_POOLSIZE: {{ .maxpoolsize | quote }}
+  DB_CHARSET: UTF-8
+  DB_QUERYTIMEOUT: "120000"
+  {{- end }}
+{{- end }}
+
+{{- if or ( eq .kafkaAccess  true ) ( eq $.Values.global.kafka.allModuleAccess true ) }}
+  KAFKA_HOST: {{ $.Values.global.kafka.serviceName }}
+  KAFKA_PORT: {{ default "9092" $.Values.global.kafka.port | quote }}
+  {{- /*
+  TODO: set the password in secret 
+  */}}
+
+{{- end }}
+
+{{- if .elasticsearchAccess }}
+  {{- with $.Values.global.elasticsearch }}
+  {{- if $.Values.global.elasticsearch.secretName }}
+  ELASTICSEARCH_URL: https://{{ .serviceName }}:{{ .port }}
+  {{- else }}
+  ELASTICSEARCH_URL: http://{{ .serviceName }}:{{ .port }}
+  {{- end }}
+  ELASTICSEARCH_USERNAME: {{ .user | default "" | quote }}
+  {{- end }}
+{{- end }}
+
+{{- if .useHazelcast }}
+  HAZELCAST_PORT: "5701"
+  {{ $hazelcastConfigFile := "/etc/hazelcast/hazelcast.yaml" }}
+  HAZELCAST_FILE: {{ $hazelcastConfigFile }}
+  {{ $serviceName := include "folio.backend.fullname" . }}
+  JAVA_OPTIONS: {{ printf "-XX:MaxRAMPercentage=75.0 -Dlog4j2.formatMsgNoLookups=true -Dhazelcast.config=%s -Dhazelcast.ip=%s -Dhazelcast.port=5701 --add-modules java.se --add-exports java.base/jdk.internal.ref=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED --add-opens java.base/java.nio=ALL-UNNAMED --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.management/sun.management=ALL-UNNAMED --add-opens jdk.management/com.sun.management.internal=ALL-UNNAMED" $hazelcastConfigFile $serviceName }}
+{{- end }}
+
+  {{- with $.Values.environment }}
+{{ toYaml . | indent 2 }}
+  {{- end }}
+  {{- range $index, $element := .environment }}
+  {{ $index }}: '{{ $element }}'
+  {{- end }}
+---
+{{- end -}}

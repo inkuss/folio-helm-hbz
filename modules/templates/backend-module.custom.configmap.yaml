@@ -1,0 +1,21 @@
+{{- range .Values.backend_modules -}}
+
+{{- $moduleContext := . -}}
+
+{{- if .customConfig }}
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "folio.backend.fullname" $moduleContext }}-customenv
+data:
+  {{- range .customConfig.files }}
+    {{- $filePath := ( printf "files/%s" .name ) }}
+    {{- $okapiUrl := ( printf "https://%v:%v" $.Values.global.okapi.serviceName $.Values.global.okapi.port ) }}
+  {{ .name }}: |
+{{ ( tpl ($.Files.Get $filePath ) ( dict "tenants" .tenants "okapiUrl" $okapiUrl "Template" $.Template ) ) | indent 4 }}
+  {{- end }}
+
+{{- end }}
+
+{{- end }}

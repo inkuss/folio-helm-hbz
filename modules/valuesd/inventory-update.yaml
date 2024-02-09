@@ -1,0 +1,13 @@
+backend_modules:
+- name: mod-inventory-update
+  version: 2.0.0
+  image:
+    repository: folioorg/mod-inventory-update:2.0.0
+    tag: 2021-r1
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0

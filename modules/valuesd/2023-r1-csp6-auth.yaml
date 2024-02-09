@@ -1,0 +1,53 @@
+backend_modules:
+- name: mod-permissions
+  version: 6.3.2
+  image:
+    repository: folioorg/mod-permissions:6.3.2
+  tag: 2023r1csp6
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-users
+  version: 19.1.1
+  image:
+    repository: folioorg/mod-users:19.1.1
+  tag: 2023r1csp6
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-login
+  version: 7.9.0
+  image:
+    repository: folioorg/mod-login:7.9.0
+  tag: 2023r1csp6
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-authtoken
+  version: 2.13.0
+  image:
+    repository: folioorg/mod-authtoken:2.13.0
+  tag: 2023r1csp6
+  replicaCount: 1
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+#  secretEnv: 
+#  - key: JWT_SIGNING_KEY 
+  environment:
+#    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djwt.signing.key=$JWT_SIGNING_KEY  -Dcache.permissions=true
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dcache.permissions=true

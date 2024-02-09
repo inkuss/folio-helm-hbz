@@ -1,0 +1,18 @@
+{{- range .Values.backend_modules }}
+{{- if .persistentVolume }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ template "folio.backend.fullname" . }}-vc
+spec:
+  {{- if .persistentVolume.class }}
+  storageClassName: {{ .persistentVolume.class }}
+  {{- end }}
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+{{- end }}
+{{- end }}

@@ -1,0 +1,26 @@
+backend_modules:
+- name: edge-sip2
+  version: 2.1.4
+  image:
+    repository: folioorg/edge-sip2:2.1.4
+    tag: 2021-r3
+  pod:
+    port: '6443'
+  customConfig:
+    mountPath: "/sip2conf"
+    files:
+    - name: sip2.conf
+    - name: sip2-tenants.conf
+      tenants:
+      - tenantId: test
+        scSubnet: "255.255.255.255/0"
+  customEntrypoint:
+    command: ['java']
+    args: ['$(JAVA_OPTIONS)', '-cp', '.', '-jar', '/usr/verticles/edge-sip2-fat.jar', '-conf',  '/sip2conf/sip2.conf']
+  resources:
+    requests:
+      memory: '357913941'
+    limits:
+      memory: '357913941'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0

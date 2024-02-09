@@ -1,0 +1,16 @@
+hazelcast:
+  cluster-name: {{ $.Values.moduleHazelcast.namespace }}-{{ $.Values.moduleHazelcast.service }}
+  network:
+    join:
+      multicast:
+        enabled: false
+      kubernetes:
+        enabled: true
+        namespace: {{ $.Values.moduleHazelcast.namespace }}
+        service-name: {{ $.Values.moduleHazelcast.service }}
+  map:
+    default:
+      eviction:
+        eviction-policy: "LFU"
+        max-size-policy: "FREE_HEAP_PERCENTAGE"
+        size: 40

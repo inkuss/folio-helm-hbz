@@ -1,0 +1,140 @@
+backend_modules:
+- name: mod-di-converter-storage
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-di-converter-storage:2.0.5
+  version: 2.0.5
+  tag: 2023r1csp4
+- name: mod-data-export-worker
+  environment:
+    JAVA_OPTIONS: -XX:MetaspaceSize=384m -XX:MaxMetaspaceSize=512m -Xmx2048m
+  image:
+    repository: folioorg/mod-data-export-worker:3.0.13
+  tag: 2023r1csp4
+  kafkaAccess: true
+  resources:
+    limits:
+      memory: '3Gi'
+    requests:
+      memory: '2Gi'
+  s3storageAccess: true
+  version: 3.0.13
+- name: mod-source-record-manager
+  version: 3.6.4
+  tag: 2023r1csp4
+  image:
+    repository: folioorg/mod-source-record-manager:3.6.4
+  resources:
+    requests:
+      memory: '715827883'
+    limits:
+      memory: '715827883'
+  kafkaAccess: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0  -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    test.mode: false
+    MAX_REQUEST_SIZE: '80000000'
+- name: mod-inventory
+  version: 20.0.6
+  tag: 2023r1csp4
+  image:
+    repository: folioorg/mod-inventory:20.0.6
+  kafkaAccess: true
+  pod:
+    port: '9403'
+  resources:
+    requests:
+      memory: 1.5Gi
+    limits:
+      memory: 1.5Gi
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dorg.folio.metadata.inventory.storage.type=okapi
+    inventory.kafka.MarcBibInstanceHridSetConsumerVerticle.instancesNumber: 10
+    inventory.kafka.DataImportConsumerVerticle.instancesNumber: 10
+    kafka.consumer.max.poll.records: 10
+- name: mod-orders
+  version: 12.6.8
+  image:
+    repository: folioorg/mod-orders:12.6.8
+  tag: 2023r1csp4
+  resources:
+    requests:
+      memory: '536870912'
+    limits:
+      memory: '536870912'
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+- name: mod-invoice
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-invoice:5.6.5
+  tag: 2023r1csp4
+  kafkaAccess: true
+  resources:
+    limits:
+      memory: '626349397'
+    requests:
+      memory: '626349397'
+  version: 5.6.5
+frontend_modules:
+- folio_acquisition-units-4.0.0
+- folio_agreements-9.0.2
+- folio_bulk-edit-3.0.5
+- folio_calendar-9.2.1
+- folio_checkin-8.0.1
+- folio_checkout-9.0.1
+- folio_circulation-8.0.1
+- folio_circulation-log-3.0.0
+- folio_courses-5.4.0
+- folio_dashboard-4.0.1
+- folio_data-export-5.4.1
+- folio_data-import-6.0.9
+- folio_developer-7.0.0
+- folio_eholdings-8.0.3
+- folio_erm-comparisons-5.0.0
+- folio_erm-usage-7.0.0
+- folio_export-manager-2.4.3
+- folio_finance-4.0.4
+- folio_gobi-settings-2.0.0
+- folio_handler-stripes-registry-1.4.0
+- folio_inventory-9.4.10
+- folio_invoice-4.0.1
+- folio_ldp-1.10.0
+- folio_licenses-9.0.1
+- folio_local-kb-admin-6.0.0
+- folio_marc-authorities-3.0.2
+- folio_myprofile-8.0.0
+- folio_notes-8.0.0
+- folio_oai-pmh-4.0.1
+- folio_orders-4.0.3
+- folio_organizations-4.0.0
+- folio_plugin-bursar-export-2.4.0
+- folio_plugin-create-inventory-records-3.3.0
+- folio_plugin-eusage-reports-2.4.1
+- folio_plugin-find-agreement-9.0.2
+- folio_plugin-find-authority-2.0.0
+- folio_plugin-find-contact-4.0.0
+- folio_plugin-find-eresource-5.0.2
+- folio_plugin-find-erm-usage-data-provider-5.0.0
+- folio_plugin-find-fund-2.0.0
+- folio_plugin-find-import-profile-6.0.1
+- folio_plugin-find-instance-6.5.0
+- folio_plugin-find-interface-4.0.0
+- folio_plugin-find-license-9.0.2
+- folio_plugin-find-organization-4.0.0
+- folio_plugin-find-package-title-5.0.0
+- folio_plugin-find-po-line-4.0.0
+- folio_plugin-find-user-6.4.0
+- folio_quick-marc-6.0.2
+- folio_receiving-3.0.0
+- folio_remote-storage-4.0.0
+- folio_requests-8.0.2
+- folio_servicepoints-6.3.0
+- folio_stripes-authority-components-2.0.2
+- folio_stripes-core-9.0.8
+- folio_stripes-smart-components-8.0.3
+- folio_tags-7.0.0
+- folio_tenant-settings-7.4.0
+- folio_users-9.0.3

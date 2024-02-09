@@ -1,0 +1,36 @@
+{{range .Values.backend_modules }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "folio.backend.fullname" . }} 
+  labels:
+    app.kubernetes.io/name: {{ .name }}
+    app.kubernetes.io/version: {{ .version }}
+    release: {{ $.Release.Name }}
+spec:
+  type: {{ include "folio.backend.service.type" . | default "ClusterIP" }}
+  ports:
+    - port: {{ include "folio.backend.pod.port" . | default "8081" }}
+      targetPort: {{ include "folio.backend.pod.port" . | default "8081" }}
+      protocol: TCP
+      name: http
+    {{- if .useHazelcast }}
+    # maybe more ports needed if modules get scaled up
+    - port: 5701
+      targetPort: 5701
+      protocol: TCP
+      name: hazelcast1
+    - port: 5702
+      targetPort: 5702
+      protocol: TCP
+      name: hazelcast2
+    - port: 54327
+      targetPort: 54327
+      protocol: TCP
+      name: hazelcast-multicast
+    {{- end }}
+  selector:
+    app: {{ template "folio.backend.fullname" . }}
+    release: {{ $.Release.Name }}
+---
+{{end}}

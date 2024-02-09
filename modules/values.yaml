@@ -1,0 +1,51 @@
+# This default does not deploy anyything useful without adding values from one of the files in the valuesd directory
+# Example install:
+# helm install mods-auth bvb-repo/modules -f global-values.yaml -f modules/valuesd/<RELEASE_TAG>-auth.yaml
+noInitJobs: false
+defaultValues:
+  backend_modules: 
+    resources:
+      requests:
+        memory: "715827883"
+      limits:
+        memory: "715827883"
+# these are default global values. Overwrite as needed
+global:
+  db:
+    host: folio-zal-pg 
+    port: 5432
+    folioSecret: folio-db-secret
+    adminSecret: pg-superuser-secret
+    okapiPwKey: OKAPI_PASSWORD
+    folioPwKey: FOLIO_PASSWORD 
+    allModuleAccess: true
+  kafka:
+    serviceName: kafka
+    port: 9092
+    allModuleAccess: true
+  elasticsearch:
+    serviceName: elasticsearch 
+    port: 9200
+  s3storage:
+    secretName: s3storage-access
+  okapi:
+    serviceName: okapi
+    secureSupertenant: True
+    port: 9130
+    repositoryName: okapi
+  image:
+    pullsecret: gitlab-folio-group
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    folioToolsTag: "v1.1"
+    okapicliRepo: okapiclient
+    okapicliTag: "v0.15"
+  backend_modules:
+    defaultReplicaCount: "1"
+    SELF_INTRODUCE: "true"
+    shortNames: "false"
+  folio:
+    release: "poppy"
+    tag: "2023-2"
+    subtag: "GA"
+    env: "poppy-test"
+

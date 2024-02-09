@@ -1,0 +1,16 @@
+{{- range .Values.backend_modules }}
+# {{- if .useHazelcast }}
+{{- $fullname := include "folio.backend.fullname" .  }}
+{{- $configmapName := printf "hazelcast-%s" $fullname }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $configmapName }}
+data:
+# {{- $service := printf "%s-%s" .name .version | lower | replace "." "-" | trunc 57 | trimSuffix "-" }}
+{{- $hazelcastValues := dict "namespace" $.Release.Namespace "service" $fullname }}
+{{- $_ := set $.Values "moduleHazelcast" $hazelcastValues }}
+{{ ( tpl ($.Files.Glob "files/hazelcast.yaml").AsConfig $ ) | indent 2 }}
+---
+{{- end }}
+{{- end }}
