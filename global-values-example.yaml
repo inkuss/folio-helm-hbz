@@ -1,0 +1,53 @@
+# example of the  global values file at LRZ
+# TODO: integrate as much as possible into to subcharts, but for now, something like this makes configuration easier
+global:
+  db:
+    size: "50Gi"
+    storageClass: longhorn-one-replica
+    maxpoolsize: 10
+    host: folio-zal-pg 
+    port: 5432
+    folioSecret: folio-db-secret
+    adminSecret: pg-superuser-secret
+    okapiPwKey: OKAPI_PASSWORD
+    folioPwKey: FOLIO_PASSWORD 
+    allModuleAccess: true
+    initDb: true
+  # vufinddb is used to locate the database server used for vufind. If deployed with the zalando-vufind-pg chart, then the servicename is vufind-postgres (teamid-host) by default.
+  vufinddb:
+    host: postgres
+    port: 5432
+    # teamId is Zalando PGO specific
+    teamId: vufind
+  kafka:
+    serviceName: kafka
+    port: 9092
+    allModuleAccess: true
+  elasticsearch:
+    serviceName: elasticsearch 
+    port: 9200
+  s3storage:
+    secretName: s3storage-access
+  okapi:
+    serviceName: okapi
+    secureSupertenant: True
+    port: 9130
+    repositoryName: okapi
+    version: v5.2.0
+  image:
+    pullsecret: gitlab-folio-group
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    folioToolsTag: "v1.1"
+    okapiTag: okapi
+    okapiVersion: "v5.2.0"
+    okapicliRepo: okapiclient
+    okapicliTag: "v0.17"
+  backend_modules:
+    defaultReplicaCount: "1"
+    SELF_INTRODUCE: "true"
+    shortNames: "false"
+  folio:
+    release: "poppy"
+    tag: "2023-r2"
+    subtag: "GA"
+    env: "poppy-test"
