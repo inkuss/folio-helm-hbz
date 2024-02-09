@@ -20,7 +20,7 @@ The following is a brief description of the necessary prerequisites and how the 
 * Firewall - LRZ: Checkpoint or pfsense. Must provide the ability to NAT to the metallb load balancer IPs
 * certmanager or manually created certificates - LRZ: Jetstack certmanager with LetsEncrypt and Sectigo clusterissuern
 * DNS - LRZ: manually set wildcard addresses *.folio.bib-bvb.de to the corresponding load balancer IPs
-* S3 Storage - LRZ: minio - may be integrated into the Folio helmet chart in the future
+* S3 Storage - LRZ: minio - may be integrated into the Folio helm chart in the future
 * Container Registry - LRZ: gitlab CE, access may be granted for the images created by the LRZ, alternatively the LRZ plans to provide the images in Dockerhub.
 * Zalando Postgres Operator or external DB - LRZ: Zalando Postgres Operator
 * Solr Operator or external Solr (cloud) installation for vufind - LRZ: Solr Operator
