@@ -49,6 +49,14 @@ if $OKAPICLI -v raw -r "/material-types" ; then
   # update_reference_data instance-statuses
   update_reference_data identifier-types
   update_reference_data holdings-types
+  # Vorbelegungen Inventory App Incident 211320
+  update_reference_data classification-types
+  update_reference_data electronic-access-relationships
+  update_reference_data holdings-note-types
+  
+
+
+
 else
   exit 1
 fi

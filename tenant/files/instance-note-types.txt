@@ -51,3 +51,6 @@ c6340b85-d048-426a-89aa-163cfb801a56  Location of Originals / Duplicates note
 06489647-c7b7-4b6c-878a-cb7c1178e9ca  Study Program Information note
 49475f04-35ef-4f8a-aa7f-92773594ca76  Issuing Body note
 b73cc9c2-c9fa-49aa-964f-5ae1aa754ecd  Dissertation note
+8557fbb9-814a-50a5-ba5a-ba901173a4ee  SISIS_Bemerkung (Kat.1125)
+9cd63820-9e37-5255-b5c3-d74e9fb435c3  SISIS_Fussnote (Kat.1130)
+71b064f6-76df-576e-8a19-7cd3c86263d3  SISIS_Schlüssel (Kat.1145)
