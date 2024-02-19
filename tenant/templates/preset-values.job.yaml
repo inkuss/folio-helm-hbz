@@ -18,6 +18,9 @@ spec:
         image: {{ .repositoryBaseUrl }}{{ .okapicliRepo }}:{{ .okapicliTag }}
         {{- end }}
         imagePullPolicy: IfNotPresent
+        volumeMounts:
+        - name: scripts
+          mountPath: "/usr/src/app/kube-scripts"
         envFrom:
         - configMapRef:
             name: {{ $.Release.Name }}-preset-{{.tenantId}}-env
@@ -28,8 +31,14 @@ spec:
               name: {{ .tenantId }}-admin-pwd
               key: password
         command:
-          - scripts/Preset_values.sh
+          - kube-scripts/Preset_values.sh
       restartPolicy: Never
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ $.Release.Name }}-scripts
+          defaultMode: 0555
+          optional: false
   backoffLimit: 10
 {{- end }}
 ---
