@@ -37,7 +37,7 @@ spec:
             secretKeyRef:
               name: {{ .tenantId }}-{{ .clientAdminAccount }}-password
               key: password
-        emvFrom:
+        envFrom:
         - configMapRef:
             name: clientaccount-{{ .clientAdminAccount }}-env
         command:
