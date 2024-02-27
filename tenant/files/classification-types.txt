@@ -3,5 +3,5 @@
 61b37557-83d4-5aa7-9565-dc6fa5259097 RVK
 02e66d33-b496-534e-8ea5-25db0495ce0c IFZ-Notation
 c2eea2a2-8d9b-5b39-bc9c-2813ca83174d Systematik der Bayerischen Bibliographie
-7c83db33-69d1-55a3-af0d-3c3ff74648d3 Systematik der TUB München
+7c83db33-69d1-55a3-af0d-3c3ff74648d3 TUB-Systematik
 05ad7722-143a-5c3a-8501-03354a359d59 ZDB-Systematik
