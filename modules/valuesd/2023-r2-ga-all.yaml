@@ -185,9 +185,10 @@ backend_modules:
       memory: '1073741824'
     requests:
       memory: '1073741824'
-  secretEnv:                                                                                                                                                                                                                                              
+  secretEnv:                                                      
     - key: SYSTEM_USER_PASSWORD
     - key: SYSTEM_USER_NAME
+      value: systemuser-pubsub 
   tag: 2023r2ga
   version: 2.11.3
 - image:
@@ -555,10 +556,14 @@ backend_modules:
   version: 3.0.7
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+    DB_CONNECTION_TIMEOUT: 30000
+  kafkaAccess: true
   image:
     repository: folioorg/mod-entities-links:2.0.4
-  secretEnv:                                                                                                                                                                                                                                              
+  secretEnv:                                                         
     - key: SYSTEM_USER_PASSWORD
+    - key: SYSTEM_USER_NAME
+      value: systemuser-entities-links
   name: mod-entities-links
   tag: 2023r2ga
   version: 2.0.4
@@ -619,7 +624,7 @@ backend_modules:
       memory: 5Gi
     requests:
       memory: 5Gi
-  secretEnv:                                                                                                                                                                                                                                              
+  secretEnv:
     - key: SYSTEM_USER_PASSWORD
   tag: 2023r2ga
   version: 3.0.5
@@ -781,9 +786,9 @@ backend_modules:
   name: mod-data-export-worker
   resources:
     limits:
-      memory: '542293850'
+      memory: '1Gi'
     requests:
-      memory: '542293850'
+      memory: '1Gi'
   s3storageAccess: true
   tag: 2023r2ga
   version: 3.1.2
