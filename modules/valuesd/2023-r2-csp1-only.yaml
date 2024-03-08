@@ -1,0 +1,76 @@
+backend_modules:
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    MAX_REQUEST_SIZE: '80000000'
+    test.mode: false
+  image:
+    repository: folioorg/mod-source-record-storage:5.7.6
+  kafkaAccess: true
+  name: mod-source-record-storage
+  resources:
+    limits:
+      memory: '603725575'
+    requests:
+      memory: '603725575'
+  tag: 2023r2csp1
+  version: 5.7.6
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-di-converter-storage:2.1.6
+  name: mod-di-converter-storage
+  tag: 2023r2csp1
+  version: 2.1.6
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-service-interaction:3.0.3
+  name: mod-service-interaction
+  pod:
+    port: '8080'
+  resources:
+    limits:
+      memory: 1.5Gi
+    requests:
+      memory: 1Gi
+  tag: 2023r2csp1
+  version: 3.0.3
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0  -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    MAX_REQUEST_SIZE: '80000000'
+    test.mode: false
+  image:
+    repository: folioorg/mod-source-record-manager:3.7.9
+  kafkaAccess: true
+  name: mod-source-record-manager
+  resources:
+    limits:
+      memory: '715827883'
+    requests:
+      memory: '715827883'
+  tag: 2023r2csp1
+  version: 3.7.9
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dorg.folio.metadata.inventory.storage.type=okapi
+    inventory.kafka.DataImportConsumerVerticle.instancesNumber: 10
+    inventory.kafka.MarcBibInstanceHridSetConsumerVerticle.instancesNumber: 10
+    kafka.consumer.max.poll.records: 10
+  image:
+    repository: folioorg/mod-inventory:20.1.8
+  kafkaAccess: true
+  name: mod-inventory
+  pod:
+    port: '9403'
+  resources:
+    limits:
+      memory: 1.5Gi
+    requests:
+      memory: 1.5Gi
+  tag: 2023r2csp1
+  version: 20.1.8
+frontend_modules:
+- folio_inventory-10.0.10
+- folio_invoice-5.0.2
+- folio_orders-5.0.2
+- folio_plugin-find-instance-7.0.4
+

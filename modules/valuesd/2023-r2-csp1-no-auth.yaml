@@ -10,7 +10,7 @@ backend_modules:
       memory: '402653184'
     requests:
       memory: '402653184'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.12.0
 - environment:
     JAVA_OPTIONS: -server -XX:+UseContainerSupport -XX:MaxRAMPercentage=50.0 -XX:+PrintFlagsFinal
@@ -24,7 +24,7 @@ backend_modules:
       memory: 4Gi
     requests:
       memory: 1.5Gi
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.0.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -36,14 +36,14 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.6.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
     MAX_REQUEST_SIZE: '80000000'
     test.mode: false
   image:
-    repository: folioorg/mod-source-record-storage:5.7.5
+    repository: folioorg/mod-source-record-storage:5.7.6
   kafkaAccess: true
   name: mod-source-record-storage
   resources:
@@ -51,8 +51,8 @@ backend_modules:
       memory: '603725575'
     requests:
       memory: '603725575'
-  tag: 2023r2ga
-  version: 5.7.5
+  tag: 2023r2csp1
+  version: 5.7.6
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=85.0
   image:
@@ -63,7 +63,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.1.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -75,7 +75,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.1.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -87,7 +87,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 8.5.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -99,7 +99,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 4.6.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -111,7 +111,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 13.6.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -124,7 +124,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.7.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -136,7 +136,7 @@ backend_modules:
       memory: '715827882'
     requests:
       memory: '715827882'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 4.6.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -XX:+HeapDumpOnOutOfMemoryError
@@ -151,8 +151,8 @@ backend_modules:
   secretEnv:
   - key: SYSTEM_USER_PASSWORD
   - key: SYSTEM_USER_NAME
-    value: systemuser-pubsub 
-  tag: 2023r2ga
+    value: systemuser-pubsub
+  tag: 2023r2csp1
   version: 2.11.3
 - image:
     repository: folioorg/mod-erm-usage-harvester:4.4.1
@@ -163,7 +163,7 @@ backend_modules:
       memory: '3145728000'
     requests:
       memory: '3145728000'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   useHazelcast: true
   version: 4.4.1
 - environment:
@@ -176,19 +176,19 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.8.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
-    repository: folioorg/mod-di-converter-storage:2.1.5
+    repository: folioorg/mod-di-converter-storage:2.1.6
   name: mod-di-converter-storage
-  tag: 2023r2ga
-  version: 2.1.5
+  tag: 2023r2csp1
+  version: 2.1.6
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
-    repository: folioorg/mod-service-interaction:3.0.2
+    repository: folioorg/mod-service-interaction:3.0.3
   name: mod-service-interaction
   pod:
     port: '8080'
@@ -197,8 +197,8 @@ backend_modules:
       memory: 1.5Gi
     requests:
       memory: 1Gi
-  tag: 2023r2ga
-  version: 3.0.2
+  tag: 2023r2csp1
+  version: 3.0.3
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
     REPLICATION_FACTOR: 3
@@ -211,7 +211,7 @@ backend_modules:
       memory: 5Gi
     requests:
       memory: 5Gi
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 27.0.4
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -225,7 +225,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.2.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -238,7 +238,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 17.1.7
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -250,7 +250,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.9.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -262,7 +262,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.5.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -274,7 +274,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.8.0
 - environment:
     JAVA_OPTIONS: -server -XX:+UseContainerSupport -XX:MaxRAMPercentage=55.0 -XX:+PrintFlagsFinal
@@ -288,7 +288,7 @@ backend_modules:
       memory: 4Gi
     requests:
       memory: 1.5Gi
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 6.0.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -300,7 +300,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.5.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -312,7 +312,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.9.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -324,7 +324,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.19.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -336,7 +336,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.16.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -348,7 +348,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 7.6.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -360,7 +360,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.11.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -372,7 +372,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.1.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -384,7 +384,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 19.0.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -396,7 +396,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.1.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -408,7 +408,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.7.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -420,7 +420,7 @@ backend_modules:
       memory: '603725575'
     requests:
       memory: '603725575'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.12.8
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -432,14 +432,14 @@ backend_modules:
       memory: '469762048'
     requests:
       memory: '469762048'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 4.8.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0  -Djava.util.logging.config.file=vertx-default-jul-logging.properties
     MAX_REQUEST_SIZE: '80000000'
     test.mode: false
   image:
-    repository: folioorg/mod-source-record-manager:3.7.7
+    repository: folioorg/mod-source-record-manager:3.7.9
   kafkaAccess: true
   name: mod-source-record-manager
   resources:
@@ -447,8 +447,8 @@ backend_modules:
       memory: '715827883'
     requests:
       memory: '715827883'
-  tag: 2023r2ga
-  version: 3.7.7
+  tag: 2023r2csp1
+  version: 3.7.9
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
@@ -459,7 +459,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.5.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -471,8 +471,15 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.4.8
+- name: mod-ldp
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-ldp:1.1.2
+  tag: 2023r2csp1
+  version: 1.1.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
@@ -483,7 +490,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 4.0.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
@@ -502,20 +509,20 @@ backend_modules:
       memory: '542293850'
     requests:
       memory: '542293850'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.0.7
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
     DB_CONNECTION_TIMEOUT: 30000
+  kafkaAccess: true
   image:
     repository: folioorg/mod-entities-links:2.0.4
-  name: mod-entities-links
-  kafkaAccess: true
   secretEnv:
   - key: SYSTEM_USER_PASSWORD
   - key: SYSTEM_USER_NAME
     value: systemuser-entities-links
-  tag: 2023r2ga
+  name: mod-entities-links
+  tag: 2023r2csp1
   version: 2.0.4
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dorg.folio.metadata.inventory.storage.type=okapi
@@ -523,7 +530,7 @@ backend_modules:
     inventory.kafka.MarcBibInstanceHridSetConsumerVerticle.instancesNumber: 10
     kafka.consumer.max.poll.records: 10
   image:
-    repository: folioorg/mod-inventory:20.1.6
+    repository: folioorg/mod-inventory:20.1.8
   kafkaAccess: true
   name: mod-inventory
   pod:
@@ -533,8 +540,8 @@ backend_modules:
       memory: 1.5Gi
     requests:
       memory: 1.5Gi
-  tag: 2023r2ga
-  version: 20.1.6
+  tag: 2023r2csp1
+  version: 20.1.8
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
@@ -545,7 +552,7 @@ backend_modules:
       memory: '715827883'
     requests:
       memory: '715827883'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.8.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=85.0
@@ -557,7 +564,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.0.1
 - dbAccess: true
   elasticsearchAccess: true
@@ -568,15 +575,15 @@ backend_modules:
     repository: folioorg/mod-search:3.0.5
   kafkaAccess: true
   name: mod-search
-  secretEnv:
-    - key: SYSTEM_USER_PASSWORD
   replicaCount: 1
   resources:
     limits:
       memory: 5Gi
     requests:
       memory: 5Gi
-  tag: 2023r2ga
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  tag: 2023r2csp1
   version: 3.0.5
 - environment: {}
   image:
@@ -589,7 +596,7 @@ backend_modules:
       memory: '402653184'
     requests:
       memory: '402653184'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.3.5
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -602,14 +609,14 @@ backend_modules:
     requests:
       memory: '542293850'
   s3storageAccess: true
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 4.8.7
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-settings:1.0.2
   name: mod-settings
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.0.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -623,7 +630,7 @@ backend_modules:
       memory: '1073741824'
     requests:
       memory: '1073741824'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 24.0.11
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -635,7 +642,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 6.0.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -647,7 +654,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.14.4
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=75.0
@@ -661,7 +668,7 @@ backend_modules:
       memory: '712673984'
   secretEnv:
   - key: SYSTEM_USER_PASSWORD
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.0.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -673,7 +680,7 @@ backend_modules:
       memory: '536870912'
     requests:
       memory: '536870912'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 12.7.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -689,7 +696,7 @@ backend_modules:
   s3storageAccess: true
   secretEnv:
   - key: SYSTEM_USER_PASSWORD
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.0.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -702,7 +709,7 @@ backend_modules:
       memory: '626349397'
     requests:
       memory: '626349397'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 5.7.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -714,7 +721,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.7.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=80.0
@@ -726,7 +733,7 @@ backend_modules:
       memory: '357913941'
     requests:
       memory: '357913941'
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.1.1
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -736,39 +743,39 @@ backend_modules:
   name: mod-data-export-worker
   resources:
     limits:
-      memory: '1Gi'
+      memory: 1Gi
     requests:
-      memory: '1Gi'
+      memory: 1Gi
   s3storageAccess: true
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 3.1.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-eusage-reports:2.0.0
   name: mod-eusage-reports
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 2.0.0
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-bulk-operations:1.1.9
   name: mod-bulk-operations
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.1.9
 - name: mod-fqm-manager
   environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-fqm-manager:1.0.3
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.0.3
 - name: mod-lists
   environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-lists:1.0.5
-  tag: 2023r2ga
+  tag: 2023r2csp1
   version: 1.0.5
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
@@ -806,8 +813,9 @@ frontend_modules:
 - folio_finance-5.0.0
 - folio_gobi-settings-3.0.0
 - folio_handler-stripes-registry-2.0.1
-- folio_inventory-10.0.8
-- folio_invoice-5.0.1
+- folio_inventory-10.0.10
+- folio_invoice-5.0.2
+- folio_ldp-2.0.1
 - folio_licenses-10.0.0
 - folio_lists-2.0.6
 - folio_local-kb-admin-7.0.0
@@ -815,7 +823,7 @@ frontend_modules:
 - folio_myprofile-9.0.0
 - folio_notes-9.0.0
 - folio_oai-pmh-5.0.0
-- folio_orders-5.0.1
+- folio_orders-5.0.2
 - folio_organizations-5.0.0
 - folio_plugin-bursar-export-3.0.0
 - folio_plugin-create-inventory-records-4.0.0
@@ -827,7 +835,7 @@ frontend_modules:
 - folio_plugin-find-erm-usage-data-provider-6.0.0
 - folio_plugin-find-fund-3.0.0
 - folio_plugin-find-import-profile-7.0.0
-- folio_plugin-find-instance-7.0.1
+- folio_plugin-find-instance-7.0.4
 - folio_plugin-find-interface-5.0.0
 - folio_plugin-find-license-10.0.0
 - folio_plugin-find-organization-5.0.0
