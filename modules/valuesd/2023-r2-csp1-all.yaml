@@ -523,13 +523,6 @@ backend_modules:
       memory: '357913941'
   tag: 2023r2csp1
   version: 1.4.8
-- name: mod-ldp
-  environment:
-    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
-  image:
-    repository: folioorg/mod-ldp:1.1.2
-  tag: 2023r2csp1
-  version: 1.1.2
 - environment:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
@@ -865,7 +858,6 @@ frontend_modules:
 - folio_handler-stripes-registry-2.0.1
 - folio_inventory-10.0.10
 - folio_invoice-5.0.2
-- folio_ldp-2.0.1
 - folio_licenses-10.0.0
 - folio_lists-2.0.6
 - folio_local-kb-admin-7.0.0
