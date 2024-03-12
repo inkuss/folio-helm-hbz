@@ -63,8 +63,8 @@ spec:
           value: {{ .Values.global.db.maxpoolsize | default 10 | quote }}
         - name: OKAPI_URL
           {{- $okapiService := .Values.global.okapi.serviceName | default "okapi" }}
-          {{- $okapiPort := .Values.global.okapi.port | default 9130 | quote }}
-          value: {{ printf "http://%s:%s" $okapiService $okapiPort | quote }}
+          {{- $okapiPort := .Values.global.okapi.port | default 9130 }}
+          value: {{ printf "http://%s:%v" $okapiService $okapiPort | quote }}
         envFrom:
         - configMapRef:
             name: {{ .Release.Name }}-env
