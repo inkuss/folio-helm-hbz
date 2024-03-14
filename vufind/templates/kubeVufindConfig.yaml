@@ -83,6 +83,8 @@ stringData:
   password: {{ $foliopasswd }}
 {{- end }}
 
+---
+
 {{- if not (lookup "v1" "Secret" $.Release.Namespace (printf "%s-encryptionsecret" $.Release.Name ) ) }}
 apiVersion: v1
 kind: Secret
