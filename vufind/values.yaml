@@ -10,6 +10,13 @@ global:
   mailhost: "localhost"
   mailport: 25
 
+# vufind environment variables
+# This defines VUFIND_ENV
+#vufindenv: "production"
+# This defines VUFIND_LOCAL_MODULES
+# the local modules have to be present in the container image. If more than one local module shall be active, 
+# separate them with komma (,)
+#vufindmodules: ""
 
 # Default values for vufind.
 folio:
