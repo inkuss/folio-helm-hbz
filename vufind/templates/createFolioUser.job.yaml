@@ -4,13 +4,13 @@ kind: Job
 metadata:
   name: {{ $.Release.Name }}-create-foliouser
 spec:
+  ttlSecondsAfterFinished: {{ (.Values.job).ttlSecondsAfterFinished | default "300" }}
   template:
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      ttlSecondsAfterFinished: {{ (.Values.job).ttlSecondsAfterFinished | default "300" }}
       containers:
       - name: {{ $.Release.Name }}-create-foliouser
         image: "gitlab.bib-bvb.de:5050/folio/okapiclient:v0.17"

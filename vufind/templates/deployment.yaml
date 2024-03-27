@@ -105,8 +105,8 @@ spec:
             value: "/usr/local/vufind"
           - name: VUFIND_ENV
             value: "{{ .Values.vufindenv | default "production" }}"
-          - name: VUFIND_MODULES
-            value: "{{ .Values.vufindmodules | default '' }}"
+          - name: VUFIND_LOCAL_MODULES
+            value: "{{ .Values.vufindmodules | default "" }}"
           ports:
             - name: http
               containerPort: {{ .Values.service.port }}
