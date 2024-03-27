@@ -6,6 +6,7 @@ metadata:
   annotations:
     "helm.sh/hook": "post-install"
 spec:
+  ttlSecondsAfterFinished: {{ (.Values.job).ttlSecondsAfterFinished | default "300" }}
   template:
     spec:
       imagePullSecrets:
@@ -44,6 +45,5 @@ spec:
           optional: false
       restartPolicy: Never
   backoffLimit: 10
-  ttlSecondsAfterFinished: 3600
 ---
 {{- end }}
