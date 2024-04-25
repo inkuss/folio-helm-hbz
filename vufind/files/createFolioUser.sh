@@ -47,47 +47,67 @@ if [ "$?" != 0 ] ; then
   echo "Error setting password. Already set? Continuing."
 fi
 
-echo "Setting permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
-echo '{
-  "userId": "'$FOLIO_VUFIND_USERID'",
-  "permissions": [
-    "accounts.collection.get",
-    "circulation.loans.collection.get",
-    "circulation.renew-by-barcode.post",
-    "circulation.renew-by-id.post",
-    "circulation.requests.item.get",
-    "circulation.requests.item.post",
-    "circulation.requests.item.put",
-    "circulation-storage.requests.collection.get",
-    "inventory.instances.item.get",
-    "inventory-storage.holdings.collection.get",
-    "inventory-storage.holdings.item.get",
-    "inventory-storage.instances.collection.get",
-    "inventory-storage.items.collection.get",
-    "inventory-storage.items.item.get",
-    "inventory-storage.locations.collection.get",
-    "inventory-storage.locations.item.get",
-    "inventory-storage.service-points.collection.get",
-    "manualblocks.collection.get",
-    "usergroups.collection.get",
-    "users.collection.get",
-    "course-reserves-storage.courselistings.collection.get",
-    "course-reserves-storage.courselistings.courses.collection.get",
-    "course-reserves-storage.courselistings.instructors.collection.get",
-    "course-reserves-storage.courselistings.item.get",
-    "course-reserves-storage.courselistings.reserves.collection.get",
-    "course-reserves-storage.courses.collection.get",
-    "course-reserves-storage.departments.collection.get",
-    "course-reserves-storage.reserves.collection.get",
-    "proxiesfor.collection.get",
-    "inventory-storage.loan-types.collection.get",
-    "inventory-storage.loan-types.item.get"
-  ]
-}' | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
+PERMS='{
+    "userId": "'$FOLIO_VUFIND_USERID'",
+    "permissions": [
+      "accounts.collection.get",
+      "circulation.loans.collection.get",
+      "circulation.renew-by-barcode.post",
+      "circulation.renew-by-id.post",
+      "circulation.requests.item.get",
+      "circulation.requests.item.post",
+      "circulation.requests.item.put",
+      "circulation-storage.requests.collection.get",
+      "inventory.instances.item.get",
+      "inventory-storage.holdings.collection.get",
+      "inventory-storage.holdings.item.get",
+      "inventory-storage.instances.collection.get",
+      "inventory-storage.items.collection.get",
+      "inventory-storage.items.item.get",
+      "inventory-storage.locations.collection.get",
+      "inventory-storage.locations.item.get",
+      "inventory-storage.service-points.collection.get",
+      "manualblocks.collection.get",
+      "usergroups.collection.get",
+      "users.collection.get",
+      "course-reserves-storage.courselistings.collection.get",
+      "course-reserves-storage.courselistings.courses.collection.get",
+      "course-reserves-storage.courselistings.instructors.collection.get",
+      "course-reserves-storage.courselistings.item.get",
+      "course-reserves-storage.courselistings.reserves.collection.get",
+      "course-reserves-storage.courses.collection.get",
+      "course-reserves-storage.departments.collection.get",
+      "course-reserves-storage.reserves.collection.get",
+      "proxiesfor.collection.get",
+      "inventory-storage.loan-types.collection.get",
+      "inventory-storage.loan-types.item.get"
+      ]
+    }'
 
-if [ "$?" != 0 ] ; then
-  echo "Error setting permissions. Already set?"
+echo "Getting PermissionId from UserId $FOLIO_VUFIND_USERID"
+FOLIO_VUFIND_PERMID=`./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --rawpath "/perms/users?query=userId=$FOLIO_VUFIND_USERID" |jq -r .permissionUsers[0].id`
+
+if [ -z "$FOLIO_VUFIND_PERMID" ] ; then
+  echo "Error ferching vufind permission id, creating permissions."
+  echo "Setting permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
+  echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
+
+  if [ "$?" != 0 ] ; then
+    echo "Error setting permissions. Sleepig for debugging?"
+    sleep 3600
+    exit 1
+  fi
+else
+  echo "PermissionId: $FOLIO_VUFIND_PERMID"
+  echo "Updating permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
+  echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method put --rawpath /perms/users/$FOLIO_VUFIND_PERMID
+  if [ "$?" != 0 ] ; then
+    echo "Error updating permissions. Sleepig for debugging?"
+    sleep 3600
+    exit 1
+  fi
 fi
+
 
 echo "done"
 # Todo: check if all is set up correctly and exit 1 when not.
