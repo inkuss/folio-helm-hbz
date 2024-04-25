@@ -79,7 +79,8 @@ echo '{
     "course-reserves-storage.courses.collection.get",
     "course-reserves-storage.departments.collection.get",
     "course-reserves-storage.reserves.collection.get",
-    "proxiesfor.collection.get"
+    "proxiesfor.collection.get",
+    "ui-inventory.settings.loantypes"
   ]
 }' | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
 
