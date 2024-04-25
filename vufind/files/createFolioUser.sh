@@ -80,7 +80,8 @@ echo '{
     "course-reserves-storage.departments.collection.get",
     "course-reserves-storage.reserves.collection.get",
     "proxiesfor.collection.get",
-    "ui-inventory.settings.loantypes"
+    "inventory-storage.loan-types.collection.get",
+    "inventory-storage.loan-types.item.get"
   ]
 }' | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
 
