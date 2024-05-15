@@ -625,7 +625,7 @@ get_permissions() {
     -H "Content-type: application/json" \
     -H "X-Okapi-Tenant: ${tenant_id}" \
     -H "X-Okapi-Token: ${okapi_token}" \
-    "${OKAPI_URL}/perms/permissions?query=childOf%3D%3D%5B%5D&length=1000" 2>&1`
+    "${OKAPI_URL}/perms/permissions?query=childOf%3D%3D%5B%5D&length=10000" 2>&1`
 
   case "${result##*|}" in
     200|201)
