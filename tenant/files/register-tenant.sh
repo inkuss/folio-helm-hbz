@@ -585,21 +585,18 @@ EOF
   while true ; do
     echo -ne " $TRY_COUNT tries left ... "
     if [ $TRY_COUNT = 0 ]; then break; fi
-    result=`echo "$payload" | curl \
-      -s \
-      -w '|%{http_code}' \
-      -D - \
+    result=$(echo "$payload" | curl \
+      -s -D headers.txt -w '|%{http_code}' \
       -X POST \
       -H "Content-type: application/json" \
       -H "X-Okapi-Tenant:${tenant_id}" \
       "${OKAPI_URL}/bl-users/login" \
-      -d @- 2>&1`
-
+      -d @- 2>&1)
     case "${result##*|}" in
       200|201)
         echo "done."
-        permission_id=`echo "${result%|*}" | grep "permissions" -A 1 | grep id | awk -F \" '{ print $4; }'`
-        token=`echo "${result%|*}" | grep -i x-okapi-token`
+        permission_id=$(echo "${result%|*}" |  jq -r '.permissions.id')
+        token=`grep -i x-okapi-token headers.txt`
         okapi_token=`expr "$token" : '[^:]\+:\s*\(.\+\)$'`
         return 0
         ;;
@@ -643,7 +640,7 @@ get_permissions() {
 assign_permission() {
   local permission=$1
 
-  echo -ne "Assigning permission ${permission} to ${ADMIN_USERNAME} ..."
+  echo -ne "Assigning permission ${permission} to ${ADMIN_USERNAME} at permission_id ${permission_id} ..."
 
   local payload
 
@@ -652,7 +649,6 @@ assign_permission() {
   "permissionName": "${permission}"
 }
 EOF
-
   result=`echo "$payload" | curl \
     -s \
     -w '|%{http_code}' \
@@ -662,7 +658,6 @@ EOF
     -H "X-Okapi-Token: ${okapi_token}" \
     "${OKAPI_URL}/perms/users/${permission_id}/permissions" \
     -d @- 2>&1`
-
   case "${result##*|}" in
     200|201)
       echo "done."
