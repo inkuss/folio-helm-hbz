@@ -5,7 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ $.Release.Name }}-preset-{{.tenantId}}-env
 data:
-  OKAPI_URL: "http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}"
+  OKAPI_URL: "{{ include "okapi.url" $ }}"
   OKAPI_URL_INGRESS: "https://{{ .ingress.host }}"
   TENANT: {{ .tenantId }}
   EMAIL_SETUP: "{{- if .email }}true{{- else }}false{{- end }}"

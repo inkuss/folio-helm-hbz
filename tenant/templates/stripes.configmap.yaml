@@ -5,10 +5,10 @@ kind: ConfigMap
 metadata:
   name: {{ $.Release.Name }}-stripes-{{ .tenantId }}-env
 data:
-  OKAPI_URL: "http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}"
+  OKAPI_URL: "{{ include "okapi.url" $ }}"
   TENANT: {{ .tenantId }}
   BASE_PATH: {{ .ingress.path }}
-  OKAPI_URL_INGRESS: "https://{{ .ingress.host }}/okapi"
+  OKAPI_URL_INGRESS: "https://{{ .ingress.host }}{{ $.Values.okapiIngessPath | default "/okapi" }}"
   LOG_PREFIX: {{ .stripes.logPrefix | default "--" | quote }}
   WELCOME_MESSAGE: "Welcome to FOLIO! Tenant: {{ .tenantId }}"
   PLATFORM_NAME: {{ .stripes.platformName | default "FOLIO" | quote }}

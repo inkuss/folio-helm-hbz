@@ -1,5 +1,11 @@
+{{- if (((.Values.global).image).pullsecret) }}
+{{- fail "Upgrade breaking change: Remove Imagepullsecrets from global.image.pullsecrets and move them to imagePullSecrets" -}}
+{{- end }}
 {{ range .Values.tenants}}
 {{- if .stripes.enable }}
+{{- if  (((.stripes).image).pullsecret) }}
+{{- fail "Upgrade breaking change: Remove Imagepullsecrets from tenant.stripes.image.pullsecrets and move them to imagePullSecrets" -}}
+{{- end }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,8 +29,10 @@ spec:
         tier: stripes-{{.tenantId}}
         release: {{ $.Release.Name }}
     spec:
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
-      - name: {{ .stripes.pullsecret | default $.Values.global.image.pullsecret }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       volumes:
         - name: kube-scripts
           configMap:
@@ -33,8 +41,10 @@ spec:
             optional: false
       containers:
         - name: {{ $.Release.Name }}-stripes-{{.tenantId}}
-          image: {{ .stripes.imageBaseUrl | default $.Values.global.image.repositoryBaseUrl }}{{ .stripes.imageRepository }}:{{ .stripes.imageTag }}
-          imagePullPolicy: {{ .stripes.imagePullPolicy | default "IfNotPresent" }}
+          {{- with $.Values.image }}
+          image: {{ .stripesBaseUrl | default .imageBaseUrl }}{{ .stripesImageRepository | default "stripes-build" }}:{{ .stripesTag | default $.Chart.AppVersion }}
+          imagePullPolicy: {{ .pullPolicy }}
+          {{- end }}
           envFrom:
           - configMapRef:
               name: {{ $.Release.Name }}-stripes-{{.tenantId}}-env

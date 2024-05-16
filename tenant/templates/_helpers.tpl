@@ -77,3 +77,65 @@ Create backend-module name and maybe version as label.
 	{{- end -}}
 {{- printf "%s" $retVal | lower | replace "." "-" | trunc 57 | trimSuffix "-" -}}
 {{- end -}}
+
+{{/*
+Get Okapi URL
+*/}}
+{{- define "okapi.url" }}
+	{{- $okapiport := $.Values.okapiport | default "9130" }}
+	{{- $okapihost := $.Values.okapihost | default "okapi" }}
+	{{- $okapihttp := $.Values.okapihttp | default "http" }}
+	{{- if not .Values.okapihost }}
+		{{- range $index, $okapiservice := (lookup "v1" "Service" $.Release.Namespace "").items }}
+			{{- if eq (get $okapiservice.metadata.labels "app") "okapi" }}
+				{{- $okapihost = $okapiservice.metadata.name }}
+				{{- range $pindex, $port := $okapiservice.spec.ports }}
+					{{- if eq (get $port "name") "okapi" }}
+						{{- $okapiport = print (get $port "port") }}
+					{{- end }}
+				{{- end }}
+			{{- end }}
+		{{- end }}
+	{{- end }}
+	{{- printf "%s://%s:%s" $okapihttp $okapihost $okapiport }}
+{{- end -}}
+
+
+{{/*
+Get Okapi Service/host name
+*/}}
+
+{{- define "okapi.host" }}
+	{{- $okapihost := $.Values.okapihost | default "okapi" }}
+	{{- if not .Values.okapihost }}
+		{{- range $index, $okapiservice := (lookup "v1" "Service" $.Release.Namespace "").items }}
+			{{- if eq (get $okapiservice.metadata.labels "app") "okapi" }}
+				{{- $okapihost = $okapiservice.metadata.name }}
+			{{- end }}
+		{{- end }}
+	{{- end }}
+	{{- $okapihost }}
+{{- end -}}
+
+
+{{/*
+Get Okapi port
+*/}}
+
+{{- define "okapi.port" }}
+	{{- $okapiport := $.Values.okapiport | default "9130" }}
+	{{- if not .Values.okapihost }}
+		{{- range $index, $okapiservice := (lookup "v1" "Service" $.Release.Namespace "").items }}
+			{{- if eq (get $okapiservice.metadata.labels "app") "okapi" }}
+				{{- range $pindex, $port := $okapiservice.spec.ports }}
+					{{- if eq (get $port "name") "okapi" }}
+						{{- $okapiport = print (get $port "port") }}
+					{{- end }}
+				{{- end }}
+			{{- end }}
+		{{- end }}
+	{{- end }}
+	{{- $okapiport }}
+{{- end -}}
+
+

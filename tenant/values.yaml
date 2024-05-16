@@ -1,4 +1,29 @@
 ---
+# if okapi is deployed in the same namespace, the url will be configured automatically
+# okapihost: "okapi"
+# okapiport: "9130"
+# okapihttp: "http"
+# this generates the url: http://okapi:9130
+
+# We usually define a path for accessing okapi within the same base URL where stripes is loaded.
+# So you load stripes from https://my-domain.tld , then Okapi API gateway will be accessible
+# on https://my-domain.tld/okapi
+# okapiIngressPath: "/okapi"
+
+imagePullSecrets: []
+
+image:
+  folioToolsTag: v1.3
+  okapicliRepo: okapiclient
+  okapicliTag: v0.18
+  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+  stripesBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
+  pullPolicy: IfNotPresent
+  # here you can overwrite the stripes image tag
+  # stripesTag: "poppy-csp2"
+
+
+#
 # List of Folio Tenants to install
 tenants:
 - description: My Folio tenant
@@ -51,12 +76,6 @@ tenants:
   # Deploy stripes nginx container
   stripes:
     enable: true
-    imageBaseUrl: gitlab.bib-bvb.de:5050/folio/
-    imagePullPolicy: IfNotPresent
-    imageRepository: stripes-build    
-    # imageTag: orchid-csp4-branding
-    # pullsecret: gitlab-folio-group
-    # where image and favicon shall be downloaded
     logoUrl: "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png"
     faviconUrl: "https://www.folio.org/wp-content/uploads/2018/09/FOLIO_Logo.png"
     nodeSelector: {}

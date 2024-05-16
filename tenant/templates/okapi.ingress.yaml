@@ -36,13 +36,13 @@ spec:
     - host: {{ .ingress.host }}
       http:
         paths:
-          - path: {{ $.Values.global.okapi.ingressPath | default "/okapi/(.*)" }}
+          - path: {{ $.Values.okapiIngressPath | default "/okapi" }}/(.*)
             pathType: Prefix
             backend:
               service:
-                name: {{ $.Values.global.okapi.serviceName | default "okapi" }}
+                name: {{ include "okapi.host" $ }}
                 port:
-                  number: {{ $.Values.global.okapi.port | default "9130" }}
+                  number: {{ include "okapi.port" $ }}
 ---
 {{- end }}
 {{- end }}

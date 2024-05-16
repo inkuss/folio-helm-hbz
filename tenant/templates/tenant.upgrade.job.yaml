@@ -9,14 +9,16 @@ metadata:
 spec:
   template:
     spec:
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
-      - name: {{ $.Values.global.image.pullsecret }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: {{ $.Chart.Name }}-upgrade-{{ .tenantId }}
-        {{- with $.Values.global.image }}
+        {{- with $.Values.image }}
         image: {{ .repositoryBaseUrl }}folio-tools:{{ .folioToolsTag }}
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
-        imagePullPolicy: IfNotPresent
         volumeMounts:
         - name: scripts
           mountPath: "/usr/src/app/kube-scripts"

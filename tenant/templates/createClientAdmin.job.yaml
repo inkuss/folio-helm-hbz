@@ -10,14 +10,16 @@ metadata:
 spec:
   template:
     spec:
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
-      - name: {{ .stripes.pullsecret | default $.Values.global.image.pullsecret }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: {{ $.Release.Name }}-create-adminaccount-{{ .clientAdminAccount }}
-        {{- with $.Values.global.image }}
+        {{- with $.Values.image }}
         image: {{ .repositoryBaseUrl }}{{ .okapicliRepo }}:{{ .okapicliTag }}
+        imagePullPolicy: {{ .pullPolicy }}
         {{- end }}
-        imagePullPolicy: IfNotPresent
         env:
         - name: FOLIO_ADMIN_PASSWORD
           valueFrom:

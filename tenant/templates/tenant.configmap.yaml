@@ -5,7 +5,7 @@ kind: ConfigMap
 metadata:
   name: {{ $.Release.Name }}-register-{{ .tenantId }}-env
 data:
-  OKAPI_URL: http://{{ $.Values.global.okapi.serviceName }}:{{ $.Values.global.okapi.port }}
+  OKAPI_URL: {{ include "okapi.url" $ }}
   ADMIN_USERNAME: {{ .adminUsername | default "admin" }}
   ADMIN_ID: {{ .adminId | default "99999999-9999-4999-9999-999999999999" }}
 
