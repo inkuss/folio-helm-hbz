@@ -530,9 +530,9 @@ backend_modules:
     port: '9403'
   resources:
     limits:
-      memory: 1.5Gi
+      memory: 3Gi
     requests:
-      memory: 1.5Gi
+      memory: 3Gi
   tag: 2023r2csp2
   version: 20.1.9
 - environment:
