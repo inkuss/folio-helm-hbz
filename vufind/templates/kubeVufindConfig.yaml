@@ -28,8 +28,12 @@ data:
     default_core = "{{ (.Values.global).solrcollection |default "biblio" }}"
 
     [Mail]
-    host = "{{ (.Values.mail).host | default "localhost" }}"
-    port = "{{ (.Values.mail).port | default "25" }}"
+    {{- if (.Values.mail).host }}
+    host = "{{ .Values.mail.host }}"
+    {{- end }}
+    {{- if (.Values.mail).port }}
+    port = "{{ .Values.mail.port }}"
+    {{- end }}
 
     ; Todo: Mail Login auch noch konfigurieren
 

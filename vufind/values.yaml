@@ -7,8 +7,6 @@ global:
   #solrport: 8983
   #solrhttp: 'http'
   #solrcollection: "biblio"
-  mailhost: "localhost"
-  mailport: 25
 
 # vufind environment variables
 # This defines VUFIND_ENV
@@ -51,9 +49,9 @@ database: {}
   #
   # else default values are genereated from the Release name.
 
-mail:
-  host: localhost
-  port: "25"
+#mail:
+#  host: localhost
+#  port: "25"
 
 replicaCount: 1
 
