@@ -87,14 +87,13 @@ PERMS='{
 echo "Getting PermissionId from UserId $FOLIO_VUFIND_USERID"
 FOLIO_VUFIND_PERMID=`./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --rawpath "/perms/users?query=userId=$FOLIO_VUFIND_USERID" |jq -r .permissionUsers[0].id`
 
-if [ -z "$FOLIO_VUFIND_PERMID" ] ; then
+if [ "$FOLIO_VUFIND_PERMID" == "null" ] ; then
   echo "Error ferching vufind permission id, creating permissions."
   echo "Setting permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
   echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
 
   if [ "$?" != 0 ] ; then
-    echo "Error setting permissions. Sleepig for debugging?"
-    sleep 3600
+    echo "Error setting permissions."
     exit 1
   fi
 else
@@ -102,8 +101,7 @@ else
   echo "Updating permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
   echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method put --rawpath /perms/users/$FOLIO_VUFIND_PERMID
   if [ "$?" != 0 ] ; then
-    echo "Error updating permissions. Sleepig for debugging?"
-    sleep 3600
+    echo "Error updating permissions."
     exit 1
   fi
 fi
