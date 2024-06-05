@@ -1,0 +1,52 @@
+backend_modules:
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-permissions:6.5.0
+  name: mod-permissions
+  resources:
+    limits:
+      memory: '715827883'
+    requests:
+      memory: '715827883'
+  tag: 2024r1ga
+  version: 6.5.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-users:19.3.1
+  kafkaAccess: true
+  name: mod-users
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 19.3.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-login:7.11.1
+  name: mod-login
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 7.11.1
+- customEnvSecret: true
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djwt.signing.key=$JWT_SIGNING_KEY -Dcache.permissions=true
+  image:
+    repository: folioorg/mod-authtoken:2.15.1
+  name: mod-authtoken
+  replicaCount: 1
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.15.1

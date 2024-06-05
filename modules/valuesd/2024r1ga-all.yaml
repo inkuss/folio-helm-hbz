@@ -1,0 +1,929 @@
+backend_modules:
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-permissions:6.5.0
+  name: mod-permissions
+  resources:
+    limits:
+      memory: '715827883'
+    requests:
+      memory: '715827883'
+  tag: 2024r1ga
+  version: 6.5.0
+- environment: {}
+  image:
+    repository: folioorg/mod-graphql:1.12.1
+  name: mod-graphql
+  pod:
+    port: '3001'
+  resources:
+    limits:
+      memory: '402653184'
+    requests:
+      memory: '402653184'
+  tag: 2024r1ga
+  version: 1.12.1
+- environment:
+    JAVA_OPTIONS: -server -XX:+UseContainerSupport -XX:MaxRAMPercentage=50.0 -XX:+PrintFlagsFinal
+  image:
+    repository: folioorg/mod-licenses:6.0.2
+  name: mod-licenses
+  pod:
+    port: '8080'
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      memory: 1.5Gi
+  tag: 2024r1ga
+  version: 6.0.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-event-config:2.7.1
+  name: mod-event-config
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.7.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-users:19.3.1
+  kafkaAccess: true
+  name: mod-users
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 19.3.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    MAX_REQUEST_SIZE: '80000000'
+    test.mode: false
+  image:
+    repository: folioorg/mod-source-record-storage:5.8.5
+  kafkaAccess: true
+  name: mod-source-record-storage
+  resources:
+    limits:
+      memory: '603725575'
+    requests:
+      memory: '603725575'
+  tag: 2024r1ga
+  version: 5.8.5
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=85.0
+  image:
+    repository: folioorg/mod-password-validator:3.2.0
+  name: mod-password-validator
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 3.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-tags:2.2.0
+  name: mod-tags
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-finance-storage:8.6.1
+  name: mod-finance-storage
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 8.6.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-organizations-storage:4.7.0
+  name: mod-organizations-storage
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 4.7.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-invoice-storage:5.8.1
+  kafkaAccess: true
+  name: mod-invoice-storage
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 5.8.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-erm-usage:4.8.0
+  name: mod-erm-usage
+  resources:
+    limits:
+      memory: '715827882'
+    requests:
+      memory: '715827882'
+  tag: 2024r1ga
+  version: 4.8.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-login:7.11.1
+  name: mod-login
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 7.11.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -XX:+HeapDumpOnOutOfMemoryError
+  image:
+    repository: folioorg/mod-pubsub:2.13.1
+  name: mod-pubsub
+  resources:
+    limits:
+      memory: '1073741824'
+    requests:
+      memory: '1073741824'
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  - key: SYSTEM_USER_NAME
+    value: systemuser-pubsub
+  tag: 2024r1ga
+  version: 2.13.1
+- image:
+    repository: folioorg/mod-erm-usage-harvester:4.5.0
+  kafkaAccess: true
+  name: mod-erm-usage-harvester
+  resources:
+    limits:
+      memory: '512Mi'
+    requests:
+      memory: '512Mi'
+  tag: 2024r1ga
+  useHazelcast: true
+  version: 4.5.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-di-converter-storage:2.2.2
+  name: mod-di-converter-storage
+  tag: 2024r1ga
+  version: 2.2.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-service-interaction:4.0.2
+  name: mod-service-interaction
+  pod:
+    port: '8080'
+  resources:
+    limits:
+      memory: 1.5Gi
+    requests:
+      memory: 1Gi
+  tag: 2024r1ga
+  version: 4.0.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+    REPLICATION_FACTOR: 3
+  image:
+    repository: folioorg/mod-inventory-storage:27.1.3
+  kafkaAccess: true
+  name: mod-inventory-storage
+  resources:
+    limits:
+      memory: 5Gi
+    requests:
+      memory: 5Gi
+  tag: 2024r1ga
+  version: 27.1.3
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-inventory-update:3.3.1
+  name: mod-inventory-update
+  pod:
+    port: '8080'
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 3.3.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-circulation-storage:17.2.1
+  kafkaAccess: true
+  name: mod-circulation-storage
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 17.2.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-patron-blocks:1.10.0
+  name: mod-patron-blocks
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.10.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-user-import:3.8.0
+  name: mod-user-import
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 3.8.0
+- environment:
+    JAVA_OPTIONS: -server -XX:+UseContainerSupport -XX:MaxRAMPercentage=55.0 -XX:+PrintFlagsFinal
+  image:
+    repository: folioorg/mod-agreements:7.0.5
+  name: mod-agreements
+  pod:
+    port: '8080'
+  resources:
+    limits:
+      memory: 4Gi
+    requests:
+      memory: 1.5Gi
+  tag: 2024r1ga
+  version: 7.0.5
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dcache.permissions=true
+  image:
+    repository: folioorg/mod-authtoken:2.15.1
+  name: mod-authtoken
+  replicaCount: 1
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.15.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-calendar:3.1.0
+  name: mod-calendar
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 3.1.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-configuration:5.10.0
+  name: mod-configuration
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 5.10.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-template-engine:1.20.0
+  name: mod-template-engine
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.20.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-email:1.17.0
+  name: mod-email
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.17.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-users-bl:7.7.3
+  name: mod-users-bl
+  resources:
+    limits:
+      memory: '512Mi'
+    requests:
+      memory: '512Mi'
+  tag: 2024r1ga
+  version: 7.7.3
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-notes:5.2.0
+  name: mod-notes
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 5.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-orders-storage:13.7.2
+  name: mod-orders-storage
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 13.7.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-login-saml:2.8.1
+  name: mod-login-saml
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.8.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-oai-pmh:3.13.2
+  name: mod-oai-pmh
+  resources:
+    limits:
+      memory: '603725575'
+    requests:
+      memory: '603725575'
+  tag: 2024r1ga
+  version: 3.13.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-organizations:1.9.2
+  name: mod-organizations
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.9.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-finance:4.9.0
+  name: mod-finance
+  resources:
+    limits:
+      memory: '469762048'
+    requests:
+      memory: '469762048'
+  tag: 2024r1ga
+  version: 4.9.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0  -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    MAX_REQUEST_SIZE: '80000000'
+    test.mode: false
+  image:
+    repository: folioorg/mod-source-record-manager:3.8.5
+  kafkaAccess: true
+  name: mod-source-record-manager
+  resources:
+    limits:
+      memory: '715827883'
+    requests:
+      memory: '715827883'
+  tag: 2024r1ga
+  version: 3.8.5
+- name: mod-circulation-item
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-circulation-item:1.0.0
+  tag: 2024r1ga
+  version: 1.0.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-copycat:1.6.0
+  name: mod-copycat
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 1.6.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-courses:1.4.10
+  name: mod-courses
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.4.10
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-kb-ebsco-java:4.0.0
+  name: mod-kb-ebsco-java
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 4.0.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Djava.util.logging.config.file=vertx-default-jul-logging.properties
+    data.import.storage.path: /usr/verticles/storage
+    data.import.storage.type: LOCAL_STORAGE
+    file.processing.buffer.chunk.size: '50'
+  image:
+    repository: folioorg/mod-data-import:3.1.1
+  kafkaAccess: true
+  name: mod-data-import
+  persistentVolume:
+    class: longhorn-tworep
+    mountPath: /usr/verticles/storage
+  resources:
+    limits:
+      memory: '542293850'
+    requests:
+      memory: '542293850'
+  tag: 2024r1ga
+  version: 3.1.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-settings:1.0.3
+  name: mod-settings
+  tag: 2024r1ga
+  version: 1.0.3
+- environment:
+    DB_CONNECTION_TIMEOUT: 30000
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-entities-links:3.0.1
+  kafkaAccess: true
+  name: mod-entities-links
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  - key: SYSTEM_USER_NAME
+    value: systemuser-entities-links
+  tag: 2024r1ga
+  version: 3.0.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0 -Dorg.folio.metadata.inventory.storage.type=okapi
+    inventory.kafka.DataImportConsumerVerticle.instancesNumber: 10
+    inventory.kafka.MarcBibInstanceHridSetConsumerVerticle.instancesNumber: 10
+    kafka.consumer.max.poll.records: 10
+  image:
+    repository: folioorg/mod-inventory:20.2.6
+  kafkaAccess: true
+  name: mod-inventory
+  pod:
+    port: '9403'
+  resources:
+    limits:
+      memory: 1.5Gi
+    requests:
+      memory: 1.5Gi
+  tag: 2024r1ga
+  version: 20.2.6
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-audit:2.9.0
+  name: mod-audit
+  resources:
+    limits:
+      memory: '715827883'
+    requests:
+      memory: '715827883'
+  tag: 2024r1ga
+  version: 2.9.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=85.0
+  image:
+    repository: folioorg/mod-quick-marc:5.1.1
+  name: mod-quick-marc
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 5.1.1
+- dbAccess: true
+  elasticsearchAccess: true
+  environment:
+    INITIAL_LANGUAGES: eng,spa,fre,ger
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-search:3.2.6
+  kafkaAccess: true
+  name: mod-search
+  replicaCount: 1
+  resources:
+    limits:
+      memory: 5Gi
+    requests:
+      memory: 5Gi
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  tag: 2024r1ga
+  version: 3.2.6
+- environment: {}
+  image:
+    repository: folioorg/mod-z3950:3.3.5
+  name: mod-z3950
+  pod:
+    port: '9997'
+  resources:
+    limits:
+      memory: '402653184'
+    requests:
+      memory: '402653184'
+  tag: 2024r1ga
+  version: 3.3.5
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-data-export:5.0.4
+  name: mod-data-export
+  resources:
+    limits:
+      memory: '542293850'
+    requests:
+      memory: '542293850'
+  s3storageAccess: true
+  tag: 2024r1ga
+  version: 5.0.4
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-fqm-manager:2.0.4
+  name: mod-fqm-manager
+  tag: 2024r1ga
+  version: 2.0.4
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-lists:2.0.6
+  name: mod-lists
+  tag: 2024r1ga
+  version: 2.0.6
+- name: mod-serials-management
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-serials-management:1.0.3
+  tag: 2024r1ga
+  version: 1.0.3
+- name: mod-batch-print
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-batch-print:1.1.0
+  tag: 2024r1ga
+  version: 1.1.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-sender:1.12.0
+  name: mod-sender
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 1.12.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-notify:3.2.0
+  name: mod-notify
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 3.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-feesfines:19.1.0
+  name: mod-feesfines
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 19.1.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-circulation:24.2.5
+  name: mod-circulation
+  pod:
+    port: '9801'
+  resources:
+    limits:
+      memory: '1073741824'
+    requests:
+      memory: '1073741824'
+  tag: 2024r1ga
+  version: 24.2.5
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-rtac:3.6.0
+  name: mod-rtac
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 3.6.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-patron:6.1.0
+  name: mod-patron
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 6.1.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-ncip:1.14.5
+  name: mod-ncip
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 1.14.5
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=75.0
+  image:
+    repository: folioorg/mod-remote-storage:3.2.0
+  name: mod-remote-storage
+  resources:
+    limits:
+      memory: '712673984'
+    requests:
+      memory: '712673984'
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  tag: 2024r1ga
+  version: 3.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-orders:12.8.8
+  name: mod-orders
+  resources:
+    limits:
+      memory: '536870912'
+    requests:
+      memory: '536870912'
+  tag: 2024r1ga
+  version: 12.8.8
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-data-export-spring:3.2.2
+  kafkaAccess: true
+  name: mod-data-export-spring
+  resources:
+    limits:
+      memory: '542293850'
+    requests:
+      memory: '542293850'
+  s3storageAccess: true
+  secretEnv:
+  - key: SYSTEM_USER_PASSWORD
+  tag: 2024r1ga
+  version: 3.2.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-eusage-reports:2.1.1
+  name: mod-eusage-reports
+  tag: 2024r1ga
+  version: 2.1.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-invoice:5.8.2
+  kafkaAccess: true
+  name: mod-invoice
+  resources:
+    limits:
+      memory: '626349397'
+    requests:
+      memory: '626349397'
+  tag: 2024r1ga
+  version: 5.8.2
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-gobi:2.8.1
+  name: mod-gobi
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.8.1
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=80.0
+  image:
+    repository: folioorg/mod-ebsconet:2.2.0
+  name: mod-ebsconet
+  resources:
+    limits:
+      memory: '357913941'
+    requests:
+      memory: '357913941'
+  tag: 2024r1ga
+  version: 2.2.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-data-export-worker:3.2.4
+  kafkaAccess: true
+  name: mod-data-export-worker
+  resources:
+    limits:
+      memory: 1Gi
+    requests:
+      memory: 1Gi
+  s3storageAccess: true
+  tag: 2024r1ga
+  version: 3.2.4
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-bulk-operations:2.0.2
+  name: mod-bulk-operations
+  tag: 2024r1ga
+  version: 2.0.2
+- name: mod-dcb
+  environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-dcb:1.1.0
+  tag: 2024r1ga
+  version: 1.1.0
+- environment:
+    JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
+  image:
+    repository: folioorg/mod-oa:2.0.0
+  name: mod-oa
+  pod:
+    port: "8080"
+  resources:
+    limits:
+      memory: 1.5Gi
+    requests:
+      memory: 1Gi
+  tag: 2023r2ga
+  version: 2.0.0
+frontend_modules:
+- folio_oa-2.0.0
+- folio_acquisition-units-5.1.0
+- folio_agreements-11.0.2
+- folio_bulk-edit-4.1.4
+- folio_calendar-11.0.1
+- folio_checkin-9.1.1
+- folio_checkout-10.1.0
+- folio_circulation-9.1.0
+- folio_circulation-log-4.1.0
+- folio_courses-6.0.3
+- folio_dashboard-6.0.0
+- folio_data-export-6.1.4
+- folio_data-import-7.1.8
+- folio_developer-8.0.1
+- folio_eholdings-9.1.1
+- folio_erm-comparisons-7.0.0
+- folio_erm-usage-9.0.0
+- folio_export-manager-3.1.2
+- folio_finance-6.0.0
+- folio_gobi-settings-3.1.0
+- folio_handler-stripes-registry-2.2.0
+- folio_inventory-11.0.4
+- folio_invoice-6.0.3
+- folio_licenses-11.0.1
+- folio_lists-3.0.1
+- folio_local-kb-admin-8.0.1
+- folio_marc-authorities-5.0.1
+- folio_myprofile-9.1.0
+- folio_notes-9.1.0
+- folio_oai-pmh-5.1.0
+- folio_orders-6.0.4
+- folio_organizations-5.1.1
+- folio_plugin-bursar-export-4.0.2
+- folio_plugin-create-inventory-records-4.1.0
+- folio_plugin-eusage-reports-3.1.0
+- folio_plugin-find-agreement-11.0.1
+- folio_plugin-find-authority-4.0.0
+- folio_plugin-find-contact-5.1.0
+- folio_plugin-find-eresource-7.0.1
+- folio_plugin-find-erm-usage-data-provider-6.1.0
+- folio_plugin-find-fund-3.1.0
+- folio_plugin-find-import-profile-7.1.0
+- folio_plugin-find-instance-7.1.1
+- folio_plugin-find-interface-5.1.0
+- folio_plugin-find-license-11.0.1
+- folio_plugin-find-organization-5.1.1
+- folio_plugin-find-package-title-6.1.0
+- folio_plugin-find-po-line-5.1.1
+- folio_plugin-find-user-7.1.1
+- folio_plugin-query-builder-1.1.5
+- folio_quick-marc-8.0.1
+- folio_receiving-5.0.4
+- folio_remote-storage-5.1.0
+- folio_requests-9.1.1
+- folio_serials-management-1.0.4
+- folio_service-interaction-3.0.1
+- folio_servicepoints-7.1.0
+- folio_stripes-authority-components-4.0.1
+- folio_stripes-core-10.1.1
+- folio_stripes-marc-components-1.0.1
+- folio_stripes-smart-components-9.1.3
+- folio_tags-8.1.0
+- folio_tenant-settings-8.1.0
+- folio_users-10.1.1
