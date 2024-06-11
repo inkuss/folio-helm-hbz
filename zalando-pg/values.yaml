@@ -1,5 +1,15 @@
-teamId: "folio"
-numberOfInstances: 3
+# provide image pull secret for folio-tools if needed
+imagePullSecrets: 
+- name: gitlab-folio-group
+
+image:
+  folioToolsTag: debian-v1.3
+  okapicliRepo: okapiclient
+  okapicliTag: v0.17
+  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+  stripesBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
+  pullPolicy: IfNotPresent
+
 # kubernetes resources. Note: adjust postgres parameters bellow accordingly!
 # (e.g. shared_buffers, effective_cache_size)
 resources:
@@ -16,6 +26,9 @@ resources:
   limits:
     cpu: "16"
     memory: "16Gi"
+
+teamId: "folio"
+numberOfInstances: 3
 
 # postgresql parameters
 parameters:

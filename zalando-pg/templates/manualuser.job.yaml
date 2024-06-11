@@ -3,15 +3,17 @@ kind: Job
 metadata:
   name: create-pgsuperuser
   annotations:
-    "helm.sh/hook": "post-install"
+    "helm.sh/hook": "post-install,post-upgrade"
 spec:
   template:
     spec:
+      {{- with $.Values.imagePullSecrets }}
       imagePullSecrets:
-      - name: {{ $.Values.global.image.pullsecret }}
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
       containers:
       - name: create-pg-superuser
-        image: {{ $.Values.global.image.repositoryBaseUrl }}folio-tools:{{ $.Values.global.image.folioToolsTag }} 
+        image: {{ $.Values.image.repositoryBaseUrl }}folio-tools:{{ $.Values.image.folioToolsTag }} 
         imagePullPolicy:  "IfNotPresent"
         env:
         - name: PG_HOST
