@@ -785,7 +785,7 @@ backend_modules:
   tag: 2023r2ga
   version: 2.0.0
 frontend_modules:
-- folio_oa-2.0.0
+- folio_oa-2.0.1
 - folio_acquisition-units-5.0.0
 - folio_agreements-10.0.1
 - folio_bulk-edit-4.0.2

@@ -371,9 +371,9 @@ backend_modules:
   name: mod-notes
   resources:
     limits:
-      memory: '357913941'
+      memory: '512m'
     requests:
-      memory: '357913941'
+      memory: '512m'
   tag: 2024r1ga
   version: 5.2.0
 - environment:
@@ -838,6 +838,7 @@ backend_modules:
     JAVA_OPTIONS: -XX:MaxRAMPercentage=66.0
   image:
     repository: folioorg/mod-bulk-operations:2.0.2
+  s3storageAccess: true
   name: mod-bulk-operations
   tag: 2024r1ga
   version: 2.0.2
@@ -863,10 +864,10 @@ backend_modules:
   tag: 2023r2ga
   version: 2.0.0
 frontend_modules:
-- folio_oa-2.0.0
+- folio_oa-2.0.1
 - folio_acquisition-units-5.1.0
 - folio_agreements-11.0.2
-- folio_bulk-edit-4.1.4
+# - folio_bulk-edit-4.1.4
 - folio_calendar-11.0.1
 - folio_checkin-9.1.1
 - folio_checkout-10.1.0

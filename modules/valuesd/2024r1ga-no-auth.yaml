@@ -326,9 +326,9 @@ backend_modules:
   name: mod-notes
   resources:
     limits:
-      memory: '357913941'
+      memory: '512m'
     requests:
-      memory: '357913941'
+      memory: '512m'
   tag: 2024r1ga
   version: 5.2.0
 - environment:
@@ -844,7 +844,7 @@ backend_modules:
   tag: 2023r2ga
   version: 2.0.0
 frontend_modules:
-- folio_oa-2.0.0
+- folio_oa-2.0.1
 - folio_acquisition-units-5.1.0
 - folio_agreements-11.0.2
 - folio_bulk-edit-4.1.4
