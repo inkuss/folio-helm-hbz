@@ -64,3 +64,4 @@ f3b48441-336e-46da-9d34-5a97a12dfb84  VD17-Nummer
 e0f6787d-a556-4d03-9850-e60c5a2baec1  Verlags-, Produktions- und Bestellnummer
 a6023a04-03ff-507b-ab0c-178d68ebcba1  SISIS-Katkey
 bbbfafeb-c490-5e26-9b89-b0996e139f50  BV-ID
+16ad0058-e900-4a5a-a860-6cebc7e6dcad  BV-ID der übergeordneten Aufnahme 
