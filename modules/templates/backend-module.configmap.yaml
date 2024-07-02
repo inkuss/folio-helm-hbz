@@ -31,6 +31,7 @@ data:
 {{- if or ( eq .kafkaAccess  true ) ( eq $.Values.global.kafka.allModuleAccess true ) }}
   KAFKA_HOST: {{ $.Values.global.kafka.serviceName }}
   KAFKA_PORT: {{ default "9092" $.Values.global.kafka.port | quote }}
+  REPLICATION_FACTOR: "3"
   {{- /*
   TODO: set the password in secret 
   */}}
