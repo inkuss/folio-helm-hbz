@@ -18,7 +18,7 @@ fi
 
 echo "Creating Helm Archives"
 
-for i in modules okapi okapicli secure-supertenant tenant zalando-pg vufind zalando-vufind-pg b3katimport; do
+for i in modules okapi okapicli secure-supertenant tenant zalando-pg vufind zalando-vufind-pg b3katimport lib-bvb-folio; do
   helm package ../$i
 done
 
