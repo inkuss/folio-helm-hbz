@@ -80,7 +80,8 @@ PERMS='{
       "course-reserves-storage.reserves.collection.get",
       "proxiesfor.collection.get",
       "inventory-storage.loan-types.collection.get",
-      "inventory-storage.loan-types.item.get"
+      "inventory-storage.loan-types.item.get",
+      "circulation.requests.allowed-service-points.get"
       ]
     }'
 
