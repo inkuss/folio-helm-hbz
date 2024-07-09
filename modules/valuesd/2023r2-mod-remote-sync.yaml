@@ -1,0 +1,18 @@
+backend_modules:
+- environment:
+    JAVA_OPTIONS: "-server -XX:+UseContainerSupport -XX:MaxRAMPercentage=55.0 -XX:+PrintFlagsFinal"
+  image:
+    repository: folioorg/mod-remote-sync:2.2.0
+  name: mod-remote-sync
+  replicaCount: 1
+  resources:
+    limits:
+      memory: '1Gi'
+    requests:
+      memory: '1Gi'
+  tag: mod-remote-sync
+  version: 2.2.0
+  pod:
+    port: "8080"
+frontend_modules:
+- folio_remote-sync-2.0.0
