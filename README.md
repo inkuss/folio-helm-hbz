@@ -275,8 +275,8 @@ Installation (example tenant name bvb):
 
 The tenant name must then be specified in values.yaml:
 
-    global:
-      foliotenant: "bvb"
+    folio:
+      tenantId: "bvb"
 
 To manage the configuration and the themes, there are two methods that retrieve the files from a network-accessible location:
 

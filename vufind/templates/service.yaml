@@ -11,5 +11,11 @@ spec:
       targetPort: http
       protocol: TCP
       name: http
+    {{- if .Values.shibboleth.enabled }}
+    - port: 443
+      targetPort: https
+      protocol: TCP
+      name: https
+    {{- end }}
   selector:
     {{- include "vufind.selectorLabels" . | nindent 4 }}

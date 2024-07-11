@@ -53,6 +53,8 @@ database: {}
 #  host: localhost
 #  port: "25"
 
+
+# replica count > 1 is not yet supported due to a lack of session synchronisation
 replicaCount: 1
 
 image:
@@ -87,6 +89,34 @@ themesFilePullerUsername: "filePullerUser"
 themesFilePullerPassword: "filePullerPassword"
 # the name of the custom theme can be configured here. The name will be used as directory here /usr/local/vufind/themes/<name>
 # themesFilePullerName: custom_theme
+
+shibboleth:
+  enabled: false
+  # If entityId is not set, it is generated from the first ingress host 
+  # entityId: "https://vufind.tld.com/shibboleth"
+  idpEntityId: "https://idp.tld.com/shibboleth"
+  remoteuser: "eduPersonPrincipalName upn persistent-id targeted-id"
+  supportContact: "support@cluster.local"
+  metadataProviderURL: "http://www.aai.dfn.de/metadata/dfn-aai-idp-metadata.xml"
+  credentialResolverCerts: []
+  # here you can add existing TLS secrets as certificates or use Jetstack Certmanagers Issuer or ClusterIssuer to generate certificates.
+  # 
+  # If you have to rollover the SP certificate, just add new certificates, then change the certificate in the IdP
+  # and after some time you can remove the old certificates from the list.
+  # Example configuration:
+  #
+  #- name: "sp-encryption"
+  #  use: "encryption"
+  #  generate: false
+  #- name: "sp-signing"
+  #  use: "signing"
+  #  generate: true
+  #  IssuerType: "ClusterIssuer"
+  #  Issuer: "selfsigned"
+
+
+
+
 
 serviceAccount:
   # Specifies whether a service account should be created
@@ -142,6 +172,7 @@ resources: {}
   #   cpu: 100m
   #   memory: 128Mi
 
+# Autoscaling does not yet work due to a lack of session synchrinisation.
 autoscaling:
   enabled: false
   minReplicas: 1

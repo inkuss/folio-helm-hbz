@@ -31,7 +31,7 @@ spec:
         - name: dbinit-{{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}{{- if .Values.shibboleth.enabled -}}-shib{{- end -}}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           volumeMounts:
           - name: scripts
@@ -76,7 +76,7 @@ spec:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          image: "{{ .Values.image.repository }}{{- if .Values.shibboleth.enabled -}}-shib{{- end -}}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
           - name: SOLR_URL
@@ -111,6 +111,11 @@ spec:
             - name: http
               containerPort: {{ .Values.service.port }}
               protocol: TCP
+            {{- if .Values.shibboleth.enabled }}
+            - name: https
+              containerPort: 443
+              protocol: TCP
+            {{- end }}
  
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
@@ -121,6 +126,31 @@ spec:
             mountPath: "/usr/local/vufind/local/kubernetes_configs/config/vufind"
           - name: vufind-local-themes
             mountPath: "/usr/local/vufind/themes/{{ .Values.themesFilePullerName | default "custom_theme" }}"
+          {{- if .Values.shibboleth.enabled }}
+          - name: shibboleth-configs
+            mountPath: /etc/shibboleth/shibboleth2.xml
+            subPath: shibboleth2.xml
+          - name: shibboleth-configs
+            mountPath: /etc/shibboleth/attribute-map.xml
+            subPath: attribute-map.xml
+          - name: shibboleth-configs
+            mountPath: /etc/apache2/sites-available/default-ssl.conf
+            subPath: default-ssl.conf
+            {{- range .Values.shibboleth.credentialResolverCerts }}
+          - name: {{ .name }}-secret
+            mountPath: /etc/shibboleth/{{ .name }}.crt
+            subPath: tls.crt
+          - name: {{ .name }}-secret
+            mountPath: /etc/shibboleth/{{ .name }}.key
+            subPath: tls.key
+            {{- end }}
+          - name: servercert-secret
+            mountPath: /etc/ssl/certs/servercert.pem
+            subPath: tls.crt
+          - name: servercert-secret
+            mountPath: /etc/ssl/private/servercert.key
+            subPath: tls.key
+          {{- end }}
         - name: configs-file-puller
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
@@ -192,6 +222,21 @@ spec:
           name: {{ $.Release.Name }}-kube-vufind-config
           defaultMode: 0644
           optional: false
+      {{- if .Values.shibboleth.enabled }}
+      - name: shibboleth-configs
+        configMap:
+          name: {{ $.Release.Name }}-shibboleth
+          defaultMode: 0644
+          optional: false
+        {{- range .Values.shibboleth.credentialResolverCerts }}
+      - name: {{ .name }}-secret
+        secret:
+          secretName: {{ if .generate }}{{ $.Release.Name | trunc 63 | trimSuffix "-" }}-{{ end }}{{ .name }}
+        {{- end }}
+      - name: servercert-secret
+        secret:
+          secretName: {{ (first .Values.ingress.tls).secretName }}
+      {{- end }}
       - name: vufind-local-configs
         emptyDir: {}
       - name: vufind-local-themes

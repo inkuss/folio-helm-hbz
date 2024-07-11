@@ -218,3 +218,9 @@ Get vufind encryption secret
 {{- end }}
 
 
+{{/*
+Get vufind shibboleth entityId
+*/}}
+{{- define "vufind.shib.entityId" -}}
+{{.Values.shibboleth.entityId | default (printf "%s%s%s" "https://" (first .Values.ingress.hosts).host "/shibboleth") }}
+{{- end }}
