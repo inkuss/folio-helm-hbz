@@ -114,8 +114,10 @@ shibboleth:
   #  IssuerType: "ClusterIssuer"
   #  Issuer: "selfsigned"
 
-
-
+phpSettings: {}
+# PHP Settings
+# https://vufind.org/wiki/administration:php_settings
+#  memory_limit: "256M"
 
 
 serviceAccount:

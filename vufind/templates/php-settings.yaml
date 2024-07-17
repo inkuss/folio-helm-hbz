@@ -1,0 +1,11 @@
+{{- if .Values.phpSettings }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $.Release.Name }}-php-settings
+data:
+  90-kubernetes-phpsettings.ini: |
+    {{- range $key, $value := .Values.phpSettings }}
+      {{ $key }} = {{ $value }}
+    {{- end }}
+{{- end }}

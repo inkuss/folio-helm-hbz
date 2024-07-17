@@ -151,6 +151,11 @@ spec:
             mountPath: /etc/ssl/private/servercert.key
             subPath: tls.key
           {{- end }}
+          {{- if .Values.phpSettings }}
+          - name: php-settings
+            mountPath: /etc/php/8.2/fpm/conf.d/90-kubernetes-phpsettings.ini
+            subPath: 90-kubernetes-phpsettings.ini
+          {{- end }}
         - name: configs-file-puller
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           securityContext:
@@ -236,6 +241,11 @@ spec:
       - name: servercert-secret
         secret:
           secretName: {{ (first .Values.ingress.tls).secretName }}
+      {{- end }}
+      {{- if .Values.phpSettings }}
+      - name: php-settings
+        configMap:
+          name: {{ $.Release.Name }}-php-settings
       {{- end }}
       - name: vufind-local-configs
         emptyDir: {}
