@@ -14,7 +14,10 @@
 backup:
   logicalEnable: false
   # logicalSchedule: "30 00 * * *"
-  customWalS3Bucket: false
+  # Values for pg_basebackups and WAL backups. If bucket is not set, backups will not run.
+  # walS3Bucket: bucketnnameForPGBasebackupAndWals
+  # backupSchedule: BACKUP_SCHEDULE: "10 17 * * MON"
+  # backupNumRetain: 4
 parameters:
   # change or add Postgresql parameters
   listen_addresses: "*"

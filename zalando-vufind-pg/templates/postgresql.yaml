@@ -24,7 +24,16 @@ spec:
   env:
   - name: WAL_S3_BUCKET
     value: {{ .Values.backup.wal_s3_bucket | default "" | quote }}
+    {{- if .Values.backup.backupSchedule }}
+  - name: BACKUP_SCHEDULE
+    value: {{ .Values.backup.backupSchedule | quote }}
+    {{- end }}
+    {{- if .Values.backup.backupNumRetain }}
+  - name: BACKUP_NUM_TO_RETAIN
+    value: {{ .Values.backup.backupNumRetain | quote}}
+    {{- end }}
   {{- end }}
+
   postgresql:
     version: {{ .Values.version | default "15" | quote }}
     parameters:
