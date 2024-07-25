@@ -67,6 +67,7 @@ PERMS='{
       "inventory-storage.locations.collection.get",
       "inventory-storage.locations.item.get",
       "inventory-storage.service-points.collection.get",
+      "inventory-storage.service-points.item.get",
       "manualblocks.collection.get",
       "usergroups.collection.get",
       "users.collection.get",
