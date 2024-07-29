@@ -9,7 +9,7 @@ FOLIO_VUFIND_PASSWORD=`cat /foliousersecret/password`
 # set this for debugging: VERBOSE="-v"
 VERBOSE=""
 
-echo "Creating vudind user $FOLIO_VUFIND_USERNAME in Folio"
+echo "Creating vufind user $FOLIO_VUFIND_USERNAME in Folio"
 
 echo '{
   "username": "'$FOLIO_VUFIND_USERNAME'",
@@ -47,8 +47,7 @@ if [ "$?" != 0 ] ; then
   echo "Error setting password. Already set? Continuing."
 fi
 
-PERMS='{
-    "userId": "'$FOLIO_VUFIND_USERID'",
+PERMS='
     "permissions": [
       "accounts.collection.get",
       "circulation.loans.collection.get",
@@ -83,16 +82,24 @@ PERMS='{
       "inventory-storage.loan-types.collection.get",
       "inventory-storage.loan-types.item.get",
       "circulation.requests.allowed-service-points.get"
-      ]
-    }'
+      ]'
+
+
+
+
+
 
 echo "Getting PermissionId from UserId $FOLIO_VUFIND_USERID"
 FOLIO_VUFIND_PERMID=`./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --rawpath "/perms/users?query=userId=$FOLIO_VUFIND_USERID" |jq -r .permissionUsers[0].id`
 
 if [ "$FOLIO_VUFIND_PERMID" == "null" ] ; then
-  echo "Error ferching vufind permission id, creating permissions."
+  echo "unable to fetch vufind permission id, creating permissions."
   echo "Setting permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
-  echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
+  PERMSINSERT='{
+    "userId": "'$FOLIO_VUFIND_USERID'",
+    '$PERMS'
+  }'
+  echo $PERMSINSERT | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method post --rawpath /perms/users
 
   if [ "$?" != 0 ] ; then
     echo "Error setting permissions."
@@ -101,7 +108,12 @@ if [ "$FOLIO_VUFIND_PERMID" == "null" ] ; then
 else
   echo "PermissionId: $FOLIO_VUFIND_PERMID"
   echo "Updating permissions for vufind user in folio. See https://vufind.org/wiki/configuration:ils:folio"
-  echo $PERMS | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method put --rawpath /perms/users/$FOLIO_VUFIND_PERMID
+  PERMSUPDATE='{
+    "userId": "'$FOLIO_VUFIND_USERID'",
+    "id": "'$FOLIO_VUFIND_PERMID'",
+    '$PERMS'
+    }'
+  echo $PERMSUPDATE | ./OkapiCLI.py $VERBOSE --url $OKAPI_URL --username $FOLIO_ADMIN_USERNAME --password $FOLIO_ADMIN_PASSWORD --tenant $FOLIO_TENANTID raw --method put --rawpath /perms/users/$FOLIO_VUFIND_PERMID
   if [ "$?" != 0 ] ; then
     echo "Error updating permissions."
     exit 1

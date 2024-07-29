@@ -15,7 +15,7 @@ imagePullSecrets: []
 image:
   folioToolsTag: v1.3
   okapicliRepo: okapiclient
-  okapicliTag: v0.18
+  okapicliTag: v0.20
   repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
   stripesBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
   pullPolicy: IfNotPresent

@@ -181,6 +181,8 @@ spec:
             value: "{{ .Values.configsFilePullerUsername }}"
           - name: FILEPULLERPASS
             value: "{{ .Values.configsFilePullerPassword }}"
+          - name: FILEPULLERSLEEP
+            value: "{{ .Values.configsFilePullerSleep }}"
           volumeMounts:
           - name: vufind-local-configs
             mountPath: "/data"
@@ -211,6 +213,8 @@ spec:
             value: "{{ .Values.themesFilePullerUsername }}"
           - name: FILEPULLERPASS
             value: "{{ .Values.themesFilePullerPassword }}"
+          - name: FILEPULLERSLEEP
+            value: "{{ .Values.themesFilePullerSleep }}"
           volumeMounts:
           - name: vufind-local-themes
             mountPath: "/data"

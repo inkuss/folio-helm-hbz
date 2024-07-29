@@ -80,6 +80,8 @@ configsFilePullerBranch: "master"
 # User and Password for accessing S3 / git
 configsFilePullerUsername: "filePullerUser"
 configsFilePullerPassword: "filePullerPassword"
+# sleep for 5 minutes
+configsFilePullerSleep: "600"
 # same for themes
 themesFilePullerMode: "s3"
 themesFilePullerUrl: "http://localhost"
@@ -87,6 +89,7 @@ themesFilePullerPath: "/bucket/themes"
 themesFilePullerBranch: "master"
 themesFilePullerUsername: "filePullerUser"
 themesFilePullerPassword: "filePullerPassword"
+themesFilePullerSleep: "600"
 # the name of the custom theme can be configured here. The name will be used as directory here /usr/local/vufind/themes/<name>
 # themesFilePullerName: custom_theme
 

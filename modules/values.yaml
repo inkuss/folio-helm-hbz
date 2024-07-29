@@ -38,7 +38,7 @@ global:
     repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
     folioToolsTag: "v1.1"
     okapicliRepo: okapiclient
-    okapicliTag: "v0.15"
+    okapicliTag: "v0.20"
   backend_modules:
     defaultReplicaCount: "1"
     SELF_INTRODUCE: "true"

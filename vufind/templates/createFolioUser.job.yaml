@@ -13,7 +13,7 @@ spec:
       {{- end }}
       containers:
       - name: {{ $.Release.Name }}-create-foliouser
-        image: "gitlab.bib-bvb.de:5050/folio/okapiclient:v0.19"
+        image: "gitlab.bib-bvb.de:5050/folio/okapiclient:v0.20"
         imagePullPolicy: IfNotPresent
         env:
         - name: FOLIO_ADMIN_PASSWORD

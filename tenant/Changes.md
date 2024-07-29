@@ -1,4 +1,7 @@
 
+Changes in 1.4.1:
+* Updated okapicli version
+
 Changes in 1.4.0:
 * moved values:
   * tenants[].stripes.imageRepository to image.stripesBaseUrl with default image.imageBaseUrl
