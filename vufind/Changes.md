@@ -1,3 +1,9 @@
+Changes in 1.1.10:
+* added permissions for vufinduser for bvb-modules
+* updated vufind image tag
+
+Changes in 1.1.9:
+* added sticky session annotations for replicaCount > 1
 
 Changes in 1.1.8:
 * Updated okapicli version

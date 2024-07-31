@@ -81,7 +81,9 @@ PERMS='
       "proxiesfor.collection.get",
       "inventory-storage.loan-types.collection.get",
       "inventory-storage.loan-types.item.get",
-      "circulation.requests.allowed-service-points.get"
+      "circulation.requests.allowed-service-points.get",
+      "addresstypes.item.get",
+      "addresstypes.collection.get"
       ]'
 
 
