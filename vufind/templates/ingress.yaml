@@ -24,10 +24,14 @@ metadata:
   {{- with .Values.ingress.annotations }}
   annotations:
     {{- toYaml . | nindent 4 }}
-    {{- if $.Values.shibboleth.enabled }}
+  {{- end }}
+    {{- if .Values.shibboleth.enabled }}
     nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     {{- end }}
-  {{- end }}
+    {{- if or (gt (int .Values.replicaCount) 1) .Values.autoscaling.enabled }}
+    nginx.ingress.kubernetes.io/affinity: "cookie"
+    nginx.ingress.kubernetes.io/affinity-mode: "persistent"
+    {{- end }}
 spec:
   {{- if and .Values.ingress.className (semverCompare ">=1.18-0" .Capabilities.KubeVersion.GitVersion) }}
   ingressClassName: {{ .Values.ingress.className }}

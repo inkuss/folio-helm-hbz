@@ -155,6 +155,11 @@ ingress:
   annotations: {}
     # kubernetes.io/ingress.class: nginx
     # kubernetes.io/tls-acme: "true"
+    #
+    # This chart relies on the https://kubernetes.github.io/ingress-nginx/
+    # ingress class and its annotations.
+    # when using shibboleth or a replicaCount > 1, this chart adds special annotations.
+    # If you use another ingress class, you have to add the according annotations here.
   hosts:
     - host: vufind.local
       paths:
