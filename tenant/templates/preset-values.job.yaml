@@ -5,7 +5,7 @@ kind: Job
 metadata:
   name: {{ $.Release.Name }}-preset-values-{{ .tenantId }}
   annotations:
-    "helm.sh/hook": "post-install,post-upgrade"
+    "helm.sh/hook": "post-install"
     "helm.sh/hook-weight": "10" 
 spec:
   template:
