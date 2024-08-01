@@ -1,3 +1,9 @@
+Changes in 1.1.12:
+* Added email settings
+
+Changes in 1.1.11:
+* Updated image tag
+
 Changes in 1.1.10:
 * added permissions for vufinduser for bvb-modules
 * updated vufind image tag

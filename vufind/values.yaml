@@ -49,9 +49,16 @@ database: {}
   #
   # else default values are genereated from the Release name.
 
-#mail:
-#  host: localhost
+# Here you can preset all settings, that vufind accepts under the [Mail]
+# section in the config.ini
+# see https://github.com/vufind-org/vufind/blob/dev/config/vufind/config.ini
+mail: {}
+#  host: "localhost"
 #  port: "25"
+#  username: "mailuser"
+#  password: "securepassw0rD"
+#  require_login: "true"
+
 
 
 # replica count > 1 is not yet supported due to a lack of session synchronisation

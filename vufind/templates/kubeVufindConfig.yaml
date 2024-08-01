@@ -27,15 +27,10 @@ data:
     url = "{{ include "vufind.solrurl" . }}"
     default_core = "{{ (.Values.global).solrcollection |default "biblio" }}"
 
+    {{- with .Values.mail }}
     [Mail]
-    {{- if (.Values.mail).host }}
-    host = "{{ .Values.mail.host }}"
+      {{- toToml . | nindent 4 }}
     {{- end }}
-    {{- if (.Values.mail).port }}
-    port = "{{ .Values.mail.port }}"
-    {{- end }}
-
-    ; Todo: Mail Login auch noch konfigurieren
 
     [Database]
     database = "pgsql://{{ include "vufind.dbusername" . | b64dec }}:{{ $dbpasswd | b64dec }}@{{ include "vufind.dbhostname" . }}/{{ include "vufind.dbname" . }}"
