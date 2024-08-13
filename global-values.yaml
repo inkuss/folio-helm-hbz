@@ -2,7 +2,7 @@
 global:
   db:
     size: "50Gi"
-    storageClass: nfs-storage-class
+    storageClass: local-path
     maxpoolsize: 10
     host: folio-zal-pg 
     port: 5432
