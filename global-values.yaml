@@ -1,7 +1,7 @@
 # Globale Variablen
 global:
   db:
-    size: "50Gi"
+    size: "5Gi"
     storageClass: local-path
     maxpoolsize: 10
     host: folio-zal-pg 
