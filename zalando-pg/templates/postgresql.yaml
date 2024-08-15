@@ -19,11 +19,13 @@ spec:
     - superuser
     - login
     - createdb
-  {{- if and .backup .backup.logicalEnable }}
+  {{- /* if and .Values.backup .Values.backup.logicalEnable  */}}
+  {{- if false }}
   enableLogicalBackup: true
   logicalBackupSchedule: {{ .backup.logicalSchedule | default "30 00 * * *" | quote }}
   {{- end }}
-  {{- if and .Values.backup .Values.backup.wal_s3_bucket }} 
+  {{- /* if and .Values.backup .Values.backup.wal_s3_bucket */}} 
+  {{- if false }} 
   env:
   - name: WAL_S3_BUCKET
     value: {{ .Values.backup.wal_s3_bucket | default "" | quote }}
