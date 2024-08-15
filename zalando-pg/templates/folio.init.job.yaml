@@ -40,6 +40,8 @@ spec:
           mountPath: "/usr/src/app/kube-scripts"
       volumes:
       - name: scriptvolume
+      # persistentVolumeClaim:
+      #      claimName: pvc-folio-scripts
         configMap:
           name: {{ $.Release.Name }}-scripts
           defaultMode: 0555
@@ -47,5 +49,18 @@ spec:
       restartPolicy: Never
   backoffLimit: 10
   ttlSecondsAfterFinished: 3600
+# Der persistentVolumeClaim für das Init Script.
 ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: pvc-folio-scripts
+#   namespace: folio-backend
+# spec:
+#   storageClassName: local-path
+#   accessModes:
+#     - ReadWriteOnce
+#   resources:
+#     requests:
+#       storage: 1Gi
 {{- end }}
