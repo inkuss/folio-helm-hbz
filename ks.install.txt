@@ -1,3 +1,41 @@
+# 19.08.2024
+# Testen
+  helm template -f global-values.yaml zalando-pg
+# Installieren
   helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
   kubectl describe -n folio-backend pods
+# Löschen
   helm delete zal-pg
+
+  Ein Secret liegt in einer privaten Container-Registry
+  Anleitung: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
+  docker login
+  A Kubernetes cluster uses the Secret of kubernetes.io/dockerconfigjson type to authenticate with a container registry to pull a private image.
+  If you already ran docker login, you can copy that credential into Kubernetes:
+  kubectl create secret generic regcred --from-file=.dockerconfigjson=$HOME/.docker/config.json --type=kubernetes.io/dockerconfigjson
+    secret/regcred created
+  To understand the contents of the regcred Secret you created, start by viewing the Secret in YAML format:
+    kubectl get secret regcred --output=yaml
+  To understand what is in the .dockerconfigjson field, convert the secret data to a readable format:
+    kubectl get secret regcred --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
+  Das gleiche Secret habe ich auch noch einmal mit anderem Namen im Namensraum "folio-backend" erzeugt:
+    kubectl get secret -n folio-backend folio-hbz-dockerhub-key --output="jsonpath={.data.\.dockerconfigjson}" | base64 --decode
+
+  To pull the image from the private registry, Kubernetes needs credentials. 
+  The imagePullSecrets field in the configuration file specifies that Kubernetes should get the credentials from a Secret named gitlab-folio-group .
+  The image is: gitlab.bib-bvb.de:5050/folio/folio-tools:debian-v1.3
+  In Job folio.init.job.yaml
+  In turn, the image itself need environment variables from a secret key ref:
+         env:
+        - name: PGPASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres.folio-release-name.credentials.postgresql.acid.zalan.do
+              key: password
+   Weiterlesen hier https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/  "What's next"
+
+  Für den Moment einfach nur postgresql auf das Cluster bringen, ohne die Secrets, User- und Init-Jobs/Scripts; so:
+    kubectl -n folio-backend -f folio-zal-pg.yml apply
+      Warning ...
+      postgresql.acid.zalan.do/folio-zal-pg configured
+
