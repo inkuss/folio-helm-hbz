@@ -1,0 +1,3 @@
+  helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
+  kubectl describe -n folio-backend pods
+  helm delete zal-pg
