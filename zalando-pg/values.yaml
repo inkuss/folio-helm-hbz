@@ -1,12 +1,12 @@
 # provide image pull secret for folio-tools if needed
 imagePullSecrets: 
-- name: gitlab-folio-group
+- name: folio-hbz-dockerhub-key
 
 image:
   folioToolsTag: debian-v1.3
   okapicliRepo: okapiclient
   okapicliTag: v0.17
-  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
   stripesBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
   pullPolicy: IfNotPresent
 
