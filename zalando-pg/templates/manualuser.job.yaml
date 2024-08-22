@@ -43,6 +43,6 @@ spec:
           defaultMode: 0555
           optional: false
       restartPolicy: Never
-  backoffLimit: 15
+  backoffLimit: 3
   ttlSecondsAfterFinished: 300
 ---

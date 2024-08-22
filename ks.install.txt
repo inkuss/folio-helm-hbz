@@ -5,7 +5,7 @@
   helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
   kubectl describe -n folio-backend pods
 # Löschen
-  helm delete zal-pg
+  helm delete -n folio-backend zal-pg
 
   Ein Secret liegt in einer privaten Container-Registry
   Anleitung: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -39,10 +39,10 @@
       Warning ...
       postgresql.acid.zalan.do/folio-zal-pg configured
 
-22.08.
+22.08.2024
   https://kubernetes-io.translate.goog/docs/concepts/containers/images/?_x_tr_sl=auto&_x_tr_tl=de&_x_tr_hl=de#using-a-private-registry
-    Angeben von ImagePullSecrets auf einem Pod 
-  aus folio-public/folio-tools ein Image bauen
+    Lesen: Angeben von ImagePullSecrets auf einem Pod  (bekannt)
+  aus folio-public/folio-tools ein Image bauen  ==> Das brauche ich nur, wenn ich nicht von bvb/folio-public herunter ziehen kann
     docker build https://gitlab.bib-bvb.de/folio-public/folio-tools
        Error response from daemon: dockerfile parse error line 5: unknown instruction: <!DOCTYPE
    anders: Repo klonen nach ~/folio-tools, dann
@@ -51,3 +51,34 @@
       Sending build context to Docker daemon  70.66kB
       Step 1/6 : FROM debian:bookworm-slim
       Get "https://registry-1.docker.io/v2/": dial tcp: lookup registry-1.docker.io on [::1]:53: read udp [::1]:48605->[::1]:53: read: connection refused
+---------------
+   Erneuter Versuch zal-pg Deployment, nachdem Florian K. das images in der values.yml auf "folio-public" geändert hat
+      helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
+         error: INSTALLATION FAILED: failed post-install: timed out waiting for the condition
+   create-pgsuperuser schlägt fehl (FAIL), Log ist dieses (das wird immer wieder versucht):
+   - Waiting for file kube-scripts/create-pgsuperuser.sh...
+    testing if kube-scripts/create-pgsuperuser.sh exists...done
+    Thu Aug 22 17:43:12 UTC 2024 Creating SUPERUSER pgsuperuser ...
+    psql: error: connection to server at "folio-zal-pg" (10.43.166.10), port 5432 failed: Connection refused
+    ********************************************************************************************************
+     Is the server running on that host and accepting TCP/IP connections?
+         kubectl describe -n folio-backend pods
+    Das Herunterziehen von folio-public geht jetzt !
+   Beim Job "create-pgsuperuser" kommen jetzt folgende Events:
+Events:
+  Type    Reason     Age        From                  Message
+  ----    ------     ----       ----                  -------
+  Normal  Scheduled  <unknown>                        Successfully assigned folio-backend/create-pgsuperuser-snk6t to folio-k8s13
+  Normal  Pulled     6m34s      kubelet, folio-k8s13  Container image "gitlab.bib-bvb.de:5050/folio-public/folio-tools:debian-v1.3" already present on machine
+  Normal  Created    6m34s      kubelet, folio-k8s13  Created container create-pg-superuser
+  Normal  Started    6m34s      kubelet, folio-k8s13  Started container create-pg-superuser
+     Das passiert 6x (warum ?)
+    - das Secret postgres.folio-zal-pg.credentials.postgresql.acid.zalan.do mit dem Passwort für den db-user postgres wurde angelegt.
+
+      - "folio-zal-pg" steht auf Status: Pending und Grund: 0/3 nodes are available: 3 Insufficient cpu. preemption: 0/3 nodes are available: 3 No preemption victims found for incoming pod.
+                          - der Pod folio-zal-pg hat VolumeMounts und Volumes, aber sind die richtig definiert ?
+                            die haben weder "name" noch "claimName" => hier weiter
+      - aber auch das PVC "pgdata-folio-zal-pg" steht auf Status: Pending.
+                -- der PVC sieht richtig aus, aber irgendwie gibt es kein Volume und keinen VolumeMount dazu. Siehe Cluster -> Persistent Volumes
+                        die StorageClass local-path hat übrigens den Provisioner rancher.io
+        das (folio-zal-pg und pgdate-folio-zal-pg) sind beides Services und ihre Manifestationen (YAML) sind im Dashboard unter Service - Services einsehbar.
