@@ -3,9 +3,11 @@
   helm template -f global-values.yaml zalando-pg
 # Installieren
   helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
+  # helm install --debug --dry-run -n folio-backend -f global-values.yaml zal-pg ./zalando-pg  -- ähnlich wie helm template, macht nichts, gibt das YAML aus
   kubectl describe -n folio-backend pods
 # Löschen
   helm delete -n folio-backend zal-pg
+  helm uninstall -n folio-backend zal-pg
 
   Ein Secret liegt in einer privaten Container-Registry
   Anleitung: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
@@ -82,3 +84,46 @@ Events:
                 -- der PVC sieht richtig aus, aber irgendwie gibt es kein Volume und keinen VolumeMount dazu. Siehe Cluster -> Persistent Volumes
                         die StorageClass local-path hat übrigens den Provisioner rancher.io
         das (folio-zal-pg und pgdate-folio-zal-pg) sind beides Services und ihre Manifestationen (YAML) sind im Dashboard unter Service - Services einsehbar.
+
+23.08.
+  in folio-zal-pg Pid
+       volumeMounts:
+        - mountPath: /home/postgres/pgdata
+          name: pgdata
+	  volumes:
+    - name: pgdata
+      persistentVolumeClaim:
+        claimName: pgdata-folio-zal-pg-0
+    - volumeName: pvc*   fehlt
+
+    kind: postgres - Custom Resource Definition
+     kubectl get crd
+
+     nach Anpassen der CPUs / RAM, hat Pod folio-zal-pg jetzt den Status "Running" !
+     Im Log kommen aber noch Fehler:
+     Success. You can now start the database server using:
+    /usr/lib/postgresql/13/bin/pg_ctl -D /home/postgres/pgdata/pgroot/data -l logfile start
+2024-08-23 12:48:57.610 GMT [208] LOG:  invalid value for parameter "lc_monetary": "de_DE.UTF-8"
+2024-08-23 12:48:57.610 GMT [208] LOG:  invalid value for parameter "lc_numeric": "de_DE.UTF-8"
+2024-08-23 12:48:57.610 GMT [208] LOG:  invalid value for parameter "lc_time": "de_DE.UTF-8"
+2024-08-23 14:48:57.610 CEST [208] FATAL:  configuration file "/home/postgres/pgdata/pgroot/data/postgresql.conf" contains er
+
+      Nützliche Befehle:
+       helm -n folio-backend list   - eine Liste, was in dem Namespace alles deployed ist.
+       helm list - dasselbe für alle Namespaces
+      mal das Log vom postgres-operator verfolgen:
+       kubectl --namespace=default logs  "postgres-operator-8bc78d9f8-tzhhm"
+      die verwendete Manifestation des Helm-Charts für zalando-pg, angereicherte Version:
+       kubectl get -o yaml postgresqls.acid.zalan.do
+       kubectl get postgresqls.acid.zalan.do   - Basisinformationen; was läuft
+       kubectl get crd - listet Custom Resource Definitionen auf ("postgresql" von Zalando ist z.B. eine solche!)
+
+
+      Florian: Jetzt noch einmal starten:
+ helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
+    - bei Job create-pgsuperuser kommt wieder "connection refused"
+    Error: INSTALLATION FAILED: failed post-install: 1 error occurred:
+        * job create-pgsuperuser failed: BackoffLimitExceeded
+   -> evtl. noch einmal alles löschen und die "lc_monetary" ... Fehler in postgresql.conf beheben
+
+

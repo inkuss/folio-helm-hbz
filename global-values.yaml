@@ -35,7 +35,7 @@ global:
     version: v5.2.0
   image:
     pullsecret: gitlab-folio-group
-    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
     folioToolsTag: "v1.1"
     okapiTag: okapi
     okapiVersion: "v5.2.0"
