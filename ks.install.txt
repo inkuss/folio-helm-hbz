@@ -6,7 +6,7 @@
   # helm install --debug --dry-run -n folio-backend -f global-values.yaml zal-pg ./zalando-pg  -- ähnlich wie helm template, macht nichts, gibt das YAML aus
   kubectl describe -n folio-backend pods
 # Löschen
-  helm delete -n folio-backend zal-pg
+  # helm delete -n folio-backend zal-pg
   helm uninstall -n folio-backend zal-pg
 
   Ein Secret liegt in einer privaten Container-Registry
@@ -126,4 +126,55 @@ Events:
         * job create-pgsuperuser failed: BackoffLimitExceeded
    -> evtl. noch einmal alles löschen und die "lc_monetary" ... Fehler in postgresql.conf beheben
 
+26.08.2024
+  UTF-8 => utf8 in den Parametern lc_monetary etc. (in values.yaml)
+  -- Waiting for file kube-scripts/create-pgsuperuser.sh...
+  testing if kube-scripts/create-pgsuperuser.sh exists...done
+  Mon Aug 26 10:57:52 UTC 2024 Creating SUPERUSER pgsuperuser ...
+  psql: error: connection to server at "folio-zal-pg" (10.43.21.168), port 5432 failed: Connection refused
+   Is the server running on that host and accepting TCP/IP connections?
 
+   Jetzt die Parameter entfernt (lc_monetary, ...)
+   - in Datenbanklog kommen CREATE und EXEC Anweisungen (gut)
+  2024-08-26 11:10:34,381 WARNING: Could not activate Linux watchdog device: Can't open watchdog device: [Errno 2] No such file or directory: '/dev/watchdog'
+  - der Job create-pgsuperuser schlägt weiterhin fehl (Verbindung zur Datenbank kann nicht hergestellt werden)
+  - das persistente Volume für die pg-Datenbank wurde definitiv erfolgreich zur Verfügung gestellt. Die Datenbank wurde hier angelegt:
+    root@folio-k8s13:/var/lib/rancher/k3s/storage/pvc-d016e739-d9db-4634-9182-13b98c9eb19c_folio-backend_pgdata-folio-zal-pg-0/pgroot/
+  Jetzt kommen Warnungen im Postgres Log: 
+  2024-08-26 11:10:36,057 WARNING: Kubernetes RBAC doesn't allow GET access to the 'kubernetes' endpoint in the 'default' namespace. Disabling 'bypass_api_service'.
+  2024-08-26 11:10:36,070 WARNING: postgresql parameter listen_addresses=* failed validation, defaulting to None
+  2024-08-26 11:10:36,071 WARNING: postgresql parameter wal_keep_segments=0 failed validation, defaulting to 8
+  2024-08-26 11:10:36,071 WARNING: postgresql parameter wal_log_hints=off failed validation, defaulting to on
+
+  "uninstall" anstatt "delete" verwenden:
+    helm uninstall -n folio-backend zal-pg
+    release "zal-pg" uninstalled
+Job zal-pg-folio-init-job geht jetzt:
+  -- Waiting for file kube-scripts/folio-db-init.sh...
+testing if kube-scripts/folio-db-init.sh exists...done
+Mon Aug 26 11:44:55 UTC 2024 Creating databases okapi and folio ...
+Mon Aug 26 11:44:55 UTC 2024 Running: psql -w -v ON_ERROR_STOP=1 -h folio-zal-pg -p 5432 -U postgres ...
+CREATE ROLE
+CREATE DATABASE
+CREATE ROLE
+CREATE DATABASE
+Mon Aug 26 11:44:55 UTC 2024 Init script is completed
+
+Job create-pgsuperuser war jetzt auch erfolgreich:
+-- Waiting for file kube-scripts/create-pgsuperuser.sh...
+testing if kube-scripts/create-pgsuperuser.sh exists...done
+Mon Aug 26 11:44:52 UTC 2024 Creating SUPERUSER pgsuperuser ...
+CREATE ROLE
+Mon Aug 26 11:44:52 UTC 2024 User created!
+
+Jetzt war erfolgreich:
+helm install -n folio-backend -f global-values.yaml zal-pg ./zalando-pg
+NAME: zal-pg
+LAST DEPLOYED: Mon Aug 26 13:44:51 2024
+NAMESPACE: folio-backend
+STATUS: deployed
+REVISION: 1
+TEST SUITE: None
+
+Jetzt läuft erfolgeich: Pods folio-zal-pg-0, folio-zal-pg-1 im Namespace folio-backend; mit den 4 Warnungen wie oben genannt.
+Weiter mit Installation Okapi.
