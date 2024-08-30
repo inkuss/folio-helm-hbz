@@ -60,7 +60,7 @@ spec:
               name: {{ .Release.Name }}-discovery
               key: token
         - name: DB_MAXPOOLSIZE
-          value: {{ .Values.global.db.maxpoolsize | default 10 | quote }}
+          value: {{ .Values.global.db.maxpoolsize | default 30 | quote }}
         - name: OKAPI_URL
           {{- $okapiService := .Values.global.okapi.serviceName | default "okapi" }}
           {{- $okapiPort := .Values.global.okapi.port | default 9130 }}

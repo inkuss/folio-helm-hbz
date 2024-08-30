@@ -7,7 +7,7 @@ okapi:
   # - okapiTag
   useCustomRepo: true
   # only used if global.image.okapiVersion is not set
-  imageTag: 5.2.0
+  imageTag: 5.3.0
   # Todo: Use Chart.appVersion as default
   mode: cluster
   replicaCount: 3
@@ -21,12 +21,13 @@ global:
   okapi:
     port: 9130
     repositoryName: okapi
-    secureSupertenant: true
+    secureSupertenant: false
     serviceName: okapi
     version: v5.2.0
   image:
     okapiTag: okapi
     okapiVersion: v5.2.0
-    pullsecret: gitlab-folio-group
-    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    pullsecret: folio-hbz-dockerhub-key
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
+    # repositoryBaseUrl: hub.docker.com/r/folioci/
 

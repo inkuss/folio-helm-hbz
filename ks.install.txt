@@ -178,3 +178,10 @@ TEST SUITE: None
 
 Jetzt läuft erfolgeich: Pods folio-zal-pg-0, folio-zal-pg-1 im Namespace folio-backend; mit den 4 Warnungen wie oben genannt.
 Weiter mit Installation Okapi.
+
+30.08.2024
+Versuche, Okapi zu installieren
+Versuche, offizielles Image von folio-org zu ziehen, dieses hier: https://hub.docker.com/r/folioci/okapi
+  cd ~/folio-helm-hbz
+  helm install -n folio-backend -f global-values.yaml okapi ./okapi
+  helm uninstall -n folio-backend okapi
