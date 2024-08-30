@@ -185,3 +185,20 @@ Versuche, offizielles Image von folio-org zu ziehen, dieses hier: https://hub.do
   cd ~/folio-helm-hbz
   helm install -n folio-backend -f global-values.yaml okapi ./okapi
   helm uninstall -n folio-backend okapi
+ Normal   Pulled     34s                kubelet            Successfully pulled image "folioorg/okapi:latest" in 815ms (815ms including waiting). Image size: 100319551 bytes.
+  Warning  BackOff    6s (x6 over 79s)   kubelet            Back-off restarting failed container okapi in pod okapi-5f79959657-z6tl2_folio-backend(d0e8fd4c-cf0d-49d6-85e7-5ecc7b3d9005)
+  Florian: Besser  Helm-Chart von IndexData verwenden.
+ Uwe 
+   podman pull gitlab.bib-bvb.de:5050/folio-public/okapi:v5.2.0
+   Trying to pull gitlab.bib-bvb.de:5050/folio-public/okapi:v5.2.0...
+   Error: initializing source docker://gitlab.bib-bvb.de:5050/folio-public/okapi:v5.2.0: Requesting bearer token: invalid status code from registry 403 (Forbidden)
+   
+Florian
+https://github.com/indexdata/okapi-helm/tree/main
+  To use this helm chart, first add the repository locally.
+  helm repo add okapi https://indexdata.github.io/okapi-helm/
+  Den Ingress erstmal auf false stellen.
+  Okapi muss aber von außen erreichbar sein. Damit kommen die Überlegungen wie https, Ingress, Zertifikat ...
+  Florian: Let's encrypt; sectigo
+   Florian: kubectl Port forward; ein Kubernetes Service für Okapi
+      https://kubernetes.io/docs/reference/kubectl/generated/kubectl_port-forward/#examples

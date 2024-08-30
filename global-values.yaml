@@ -32,14 +32,16 @@ global:
     secureSupertenant: False
     port: 9130
     repositoryName: okapi
-    version: v5.2.0 # R2-2023 (Poppy) Version
+    # version: v5.2.0 # R2-2023 (Poppy) Version
+    version:
   image: # Okapi Image
     pullsecret: folio-hbz-dockerhub-key
     repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
     # repositoryBaseUrl: hub.docker.com/r/folioci/
     folioToolsTag: "v1.1"
     okapiTag: okapi
-    okapiVersion: "v5.2.0"
+    # okapiVersion: "v5.2.0"
+    okapiVersion: 
     okapicliRepo: okapiclient
     okapicliTag: "v0.17"
   backend_modules:
