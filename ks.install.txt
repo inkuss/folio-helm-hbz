@@ -202,3 +202,65 @@ https://github.com/indexdata/okapi-helm/tree/main
   Florian: Let's encrypt; sectigo
    Florian: kubectl Port forward; ein Kubernetes Service für Okapi
       https://kubernetes.io/docs/reference/kubectl/generated/kubectl_port-forward/#examples
+
+09.09.2024
+  cd ~/folio-helm-hbz
+  git clone https://github.com/indexdata/okapi-helm.git
+  cd okapi-helm
+  edit okapi/values.yaml
+  helm uninstall -n folio-backend okapi
+  helm install -n folio-backend okapi ./okapi
+
+  1. Get the application URL by running these commands:
+  export POD_NAME=$(kubectl get pods --namespace folio-backend -l "app.kubernetes.io/name=okapi,app.kubernetes.io/instance=okapi" -o jsonpath="{.items[0].metadata.name}")
+  export CONTAINER_PORT=$(kubectl get pod --namespace folio-backend $POD_NAME -o jsonpath="{.spec.containers[0].ports[0].containerPort}")
+  echo $POD_NAME
+okapi-6bc7d758cd-hvtrw
+  echo $CONTAINER_PORT
+9130
+  echo "Visit http://127.0.0.1:8080 to use your application"
+  kubectl --namespace folio-backend port-forward $POD_NAME 8080:$CONTAINER_PORT
+Forwarding from 127.0.0.1:8080 -> 9130
+Forwarding from [::1]:8080 -> 9130
+
+  kubectl describe -n folio-backend pods
+  ...
+Events:
+  Type     Reason     Age                   From               Message
+  ----     ------     ----                  ----               -------
+  Normal   Scheduled  6m9s                  default-scheduler  Successfully assigned folio-backend/okapi-6bc7d758cd-hvtrw to folio-k8s12
+  Normal   Pulled     6m6s                  kubelet            Successfully pulled image "folioorg/okapi:5.1.2" in 3.652s (3.652s including waiting). Image size: 104746777 bytes.
+  Normal   Pulled     5m56s                 kubelet            Successfully pulled image "folioorg/okapi:5.1.2" in 805ms (805ms including waiting). Image size: 104746777 bytes.
+  Normal   Pulled     5m26s                 kubelet            Successfully pulled image "folioorg/okapi:5.1.2" in 807ms (807ms including waiting). Image size: 104746777 bytes.
+  Normal   Created    4m56s (x4 over 6m6s)  kubelet            Created container okapi
+  Normal   Started    4m56s (x4 over 6m6s)  kubelet            Started container okapi
+  Normal   Pulled     4m56s                 kubelet            Successfully pulled image "folioorg/okapi:5.1.2" in 911ms (911ms including waiting). Image size: 104746777 bytes.
+  Normal   Pulling    4m1s (x5 over 6m10s)  kubelet            Pulling image "folioorg/okapi:5.1.2"
+  Warning  BackOff    67s (x22 over 5m48s)  kubelet            Back-off restarting failed container okapi in pod okapi-6bc7d758cd-hvtrw_folio-backend(be154412-cf25-4215-82ca-dab6fec04890)
+  und im Log von okapi auf folio-k8s12:
+2024-09-09T13:52:47,357 ERROR ? FATAL: password authentication failed for user "okapi" (28P01) io.vertx.pgclient.PgException: FATAL: password authentication failed for user "okapi" (28P01) | 
+2024-09-09T13:52:47,358 INFO ? shutdown 
+
+  In Dashboard - folio-backend - Services - okapi
+Endpoints 
+Host 		Ports (Name, Port, Protokoll) 		Node 		Bereit
+10.42.1.39 	okapi,9130,TCP hazelcast,5701,TCP 	folio-k8s12
+-
+  Versuche, Okapi anzusprechen:
+  curl -XGET http://folio-k8s12.hbz-nrw.de:9130/_/env
+curl: (7) Failed to connect to folio-k8s12.hbz-nrw.de port 9130 after 1 ms: Couldn't connect to server
+  Das kann aber an "password authentication failure" liegen.
+
+Einen neuen Job und Skript create-pg-okapiuser eingerichtet. => nein, das ist alles schon im Job folio.db.init  geschehen.
+Ich muss nur das richtige Okapi-Passwort verwenden.
+Das Okapi-Passwort steht z.Zt. in values.yaml in folio-helm-hbz/okapi-helm/okapi secret drin.
+
+Es kommt aber weiterhin
+  2024-09-09T16:14:33,188 ERROR ? FATAL: password authentication failed for user "okapi" (28P01) io.vertx.pgclient.PgException: FATAL: password authentication failed for user "okapi" (28P01) | 
+
+Wie wird das Passwort in dem IndexData Helm Chart gezogen, wie verbindet sich Okapi mit der Datenbank ?
+- es gibt eine secret.yaml, die baut aus Values.secret eine okapi-config.json
+- in deployment.yaml wird dann aus dem Secret ein Volume gebaut und dieses im Okapi-Container gemountet.
+  => die Okapi-config.json anders bauen, nicht aus Values.secret sondern aus dem schon vorhandenen Secret folio-db-secret.
+     Dann die anderen Parameter zu der okapi-config.json hinzufügen; nur das $OKAPI_PASSWORD ist geheim.
+     secret.yaml baut einfach ein Secret "okapi" (=okapi.fullname) mit dem Inhalt StringData (=der Inhalt der okapi-config.json).
