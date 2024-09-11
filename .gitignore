@@ -8,3 +8,4 @@ logs/
 kubegres/tmp/
 kubegres/renders/
 tmp/
+*.HIST
