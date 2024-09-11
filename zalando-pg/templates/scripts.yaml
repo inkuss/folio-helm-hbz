@@ -1,3 +1,4 @@
+{{- if not (lookup "v1" "ConfigMap" $.Release.Name "-scripts" ) }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -36,4 +37,4 @@ data:
     log "Init script is completed";
 
     
-
+{{- end }}

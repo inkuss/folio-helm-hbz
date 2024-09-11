@@ -209,7 +209,7 @@ https://github.com/indexdata/okapi-helm/tree/main
   cd okapi-helm
   edit okapi/values.yaml
   helm uninstall -n folio-backend okapi
-  helm install -n folio-backend okapi ./okapi
+  helm install -n folio-backend -f ../global-values.yaml okapi ./okapi
 
   1. Get the application URL by running these commands:
   export POD_NAME=$(kubectl get pods --namespace folio-backend -l "app.kubernetes.io/name=okapi,app.kubernetes.io/instance=okapi" -o jsonpath="{.items[0].metadata.name}")
@@ -237,7 +237,8 @@ Events:
   Normal   Pulled     4m56s                 kubelet            Successfully pulled image "folioorg/okapi:5.1.2" in 911ms (911ms including waiting). Image size: 104746777 bytes.
   Normal   Pulling    4m1s (x5 over 6m10s)  kubelet            Pulling image "folioorg/okapi:5.1.2"
   Warning  BackOff    67s (x22 over 5m48s)  kubelet            Back-off restarting failed container okapi in pod okapi-6bc7d758cd-hvtrw_folio-backend(be154412-cf25-4215-82ca-dab6fec04890)
-  und im Log von okapi auf folio-k8s12:
+
+  und im Log vom Pod okapi auf folio-k8s12:
 2024-09-09T13:52:47,357 ERROR ? FATAL: password authentication failed for user "okapi" (28P01) io.vertx.pgclient.PgException: FATAL: password authentication failed for user "okapi" (28P01) | 
 2024-09-09T13:52:47,358 INFO ? shutdown 
 
@@ -264,3 +265,22 @@ Wie wird das Passwort in dem IndexData Helm Chart gezogen, wie verbindet sich Ok
   => die Okapi-config.json anders bauen, nicht aus Values.secret sondern aus dem schon vorhandenen Secret folio-db-secret.
      Dann die anderen Parameter zu der okapi-config.json hinzufügen; nur das $OKAPI_PASSWORD ist geheim.
      secret.yaml baut einfach ein Secret "okapi" (=okapi.fullname) mit dem Inhalt StringData (=der Inhalt der okapi-config.json).
+
+11.09.2024
+  Quelle: https://stackoverflow.com/questions/59082646/use-kubernetes-secrets-as-environment-variables-inside-a-config-map
+  die config map ist statisch, ich kann in sie keine Platzhalter herein schreiben
+  Ich muss einen Job anlegen, der ein sh-Skript ausführt, welches die config-map schreibt.
+
+   Achtung! YAMLs in templates.HIST/ werden auch ausgeführt, diese löschen !!
+   Secret folio-db-secret geändert, dieses muss explizit gelöscht werden; das über das Dashboard machen.
+   Das Secret wird nicht wieder angelegt, in der Folge wird folio.init.job nicht fertig :-(
+     dann lege ich das Secret eben manuell wieder an: kubectl -n folio-backend -f /tmp/folio-db-secret.yaml apply
+   Jetzt ist Okapi erfolgreich hoch gekommen:
+  Normal  Started    2m    kubelet            Started container okapi
+  Im log vom Pod Okapi:
+  2024-09-11T13:30:54,990 INFO ? 592314/proxy REQ 10.42.1.1:46856 supertenant GET /_/proxy/health okapi-5.1.2 
+  2024-09-11T13:30:54,990 INFO ? 913644/proxy RES 200 1047us okapi-5.1.2 /_/proxy/health 
+
+   Als nächstes das mit dem Ingress ausprobieren;
+   z.Zt. ist ingress: enabled: false !
+   - wie geht das mit dem kubectl port-forward ?
