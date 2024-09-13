@@ -285,15 +285,16 @@ Wie wird das Passwort in dem IndexData Helm Chart gezogen, wie verbindet sich Ok
    z.Zt. ist ingress: enabled: false !
    - wie geht das mit dem kubectl port-forward ?
 
- 
-Ich brauche eine Ingress - Klasse
-  ich brauche Ingress-Controller, ein laufender nginx-Pod, der guckt, gibt es Ingess-Objekte von meiner Klasse.
+13.09. 
+Florian G.: Ich brauche eine Ingress - Klasse
+  ich brauche Ingress-Controller, ein laufender nginx-Pod, der guckt, gibt es Ingress-Objekte von meiner Klasse.
    der Proxy-Server von außen muss auf die IP-Adressen von Kubernetes zugreifen;
       mit Ingress wird es auf k8s-Seite einfacher; Ingress-Controller installieren. Load-Balancer installieren
              (für Sachen von außen)
-   in dem Netzt, in dem die virtiellen Maschinen sind, muss ich mehrere IP-Adressen reserviert bekommen.
+	     https://kubernetes.github.io/ingress-nginx
+   in dem Netz, in dem die virtuellen Maschinen sind, muss ich mehrere IP-Adressen reserviert bekommen.
      Diese kann dann der Load-Balancer genutzen. Dann habe ich eine Load-Balancer IP-Adresse.
-     Auf diese IP-Adresse ... dann der Ingress-Controller
+     Auf diese IP-Adresse setzt dann der Ingress-Controller auf.
        IP-Adresse kann sich ändern, Service-Name nicht.
        Der interen DNS-Server von K8s wird auch über IP-Adresse angepsrochen.
 
