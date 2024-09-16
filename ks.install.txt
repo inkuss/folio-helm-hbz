@@ -300,3 +300,10 @@ Florian G.: Ich brauche eine Ingress - Klasse
 
        Denis: den internern Diensten einen node-Port verpassen.
        Okapi an 3 Nodes...
+
+16.09.
+  Installation des nginx-Ingress-Controller
+  helm upgrade --install ingress-nginx ingress-nginx --repo https://kubernetes.github.io/ingress-nginx --namespace folio-backend
+  kubectl get service ingress-nginx-controller --namespace=folio-backend
+  NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP                     PORT(S)                      AGE
+  ingress-nginx-controller   LoadBalancer   10.43.213.243   10.9.2.91,10.9.2.92,10.9.2.93   80:32702/TCP,443:31664/TCP   3m1s
