@@ -79,7 +79,7 @@ Events:
 
       - "folio-zal-pg" steht auf Status: Pending und Grund: 0/3 nodes are available: 3 Insufficient cpu. preemption: 0/3 nodes are available: 3 No preemption victims found for incoming pod.
                           - der Pod folio-zal-pg hat VolumeMounts und Volumes, aber sind die richtig definiert ?
-                            die haben weder "name" noch "claimName" => hier weiter
+                            die haben weder "name" noch "claimName"
       - aber auch das PVC "pgdata-folio-zal-pg" steht auf Status: Pending.
                 -- der PVC sieht richtig aus, aber irgendwie gibt es kein Volume und keinen VolumeMount dazu. Siehe Cluster -> Persistent Volumes
                         die StorageClass local-path hat übrigens den Provisioner rancher.io
@@ -343,11 +343,14 @@ okapi                                NodePort       10.43.126.141   <none>      
     jetzt geht: curl -XGET folio-k8s11:30935/_/env, mit einem beliebigen Servernamen der Server im Cluster
                                                     (auch einem Server, auf dem Okapi gar nicht läuft!)
     Der Port 30935 bleibt angeblich gleich, zumindest solange man Okapi nur mit "helm upgrade" verändert.
-  wg. okapi-config.json, Datenbank-Passwort für den Okapi-Benutzer. values-Datei vs. Secrets:
+
+  wg. okapi-config.json, Datenbank-Passwort für den Okapi-Benutzer. Aus values-Datei vs. aus Secret:
+    hier weiter
     Florian nutzt keine okapi-config.json, sondern übergibt alle Okapi-Variablen als ENV-Vars !
     Dann kann er das Secret folio-db-secret auch für Okapi benutzen.
     Wie das geht: siehe meine Screenshots von heute:
-      in okapi-deployment.yaml:
+      cd okapi/templates
+      vim deployment.yaml:
       env
       -  name: PG_PASSWORD
          valueFrom:
@@ -355,6 +358,8 @@ okapi                                NodePort       10.43.126.141   <none>      
 	     name: {{ .Values.global.db.folioSecret }} ==> folio-db-secret
 	     key: {{ .Values.global.db.okapiPwKKey }}  ==> OKAPI_PASSOWRD
     Das Secret okapi-config benötigt er nicht (davon ab, dass er sowieso kein Indexdata Helm Chart benutzt).
+    Und auch das Array in der values.conf wird nicht mehr benötigt; bei mir wurde das allerdings auch schon
+    herausgeworfen und durch einen Eintrag in der folio-hbz/global-values.yaml ersetzt: dort auch herauswerfen!
 
     als nächstes Kafka und Elasticsearch als bitnami Helm Chart installieren, s. BVB-Repo
 
