@@ -1,1 +1,8 @@
-folio-hbz/folio-hbz-dockerhub-key.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: folio-hbz-dockerhub-key
+  namespace: folio-backend
+data:
+  .dockerconfigjson: ewoJImF1dGhzIjogewoJCSJodHRwczovL2luZGV4LmRvY2tlci5pby92MS8iOiB7CgkJCSJhdXRoIjogImFHSjZaRzlqYTJWeWIzSm5PbXAxWld4cFkyaGxjakEyIgoJCX0KCX0KfQ==
+type: kubernetes.io/dockerconfigjson
