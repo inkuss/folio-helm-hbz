@@ -307,3 +307,84 @@ Florian G.: Ich brauche eine Ingress - Klasse
   kubectl get service ingress-nginx-controller --namespace=folio-backend
   NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP                     PORT(S)                      AGE
   ingress-nginx-controller   LoadBalancer   10.43.213.243   10.9.2.91,10.9.2.92,10.9.2.93   80:32702/TCP,443:31664/TCP   3m1s
+
+
+20.09.2024 d-sys-ops
+  Okapi mit Service Type "NodePort" installieren
+     cd okapi-helm  (Indexdata Helm Chart)
+     vim okapi/values.yaml
+       chaned one line:
+        service:
+   enabled: true
+   name: okapi
+-  type: ClusterIP
++  type: NodePort
+
+     vim okapi/templates/service.yaml
+       removed three lines:
+        spec:
+-  clusterIP: None
+   type: {{ .Values.service.type }}
+   ports:
+     - port: {{ .Values.service.port }}
+       name: okapi
+-      nodePort: 9130
+     - port: {{ .Values.service.second_port.port }}
+       name: hazelcast
+   selector:
+     {{- include "okapi.selectorLabels" . | nindent 4 }}
+-  type: NodePort
+
+     helm upgrade -n folio-backend  okapi ./okapi
+     kubectl get services -n folio-backend
+     NAME                                 TYPE           CLUSTER-IP      EXTERNAL-IP                     PORT(S)
+     ...
+okapi                                NodePort       10.43.126.141   <none>                          9130:30935/TCP,5701:32127/TCP   148m
+    jetzt geht: curl -XGET folio-k8s11:30935/_/env, mit einem beliebigen Servernamen der Server im Cluster
+                                                    (auch einem Server, auf dem Okapi gar nicht läuft!)
+    Der Port 30935 bleibt angeblich gleich, zumindest solange man Okapi nur mit "helm upgrade" verändert.
+  wg. okapi-config.json, Datenbank-Passwort für den Okapi-Benutzer. values-Datei vs. Secrets:
+    Florian nutzt keine okapi-config.json, sondern übergibt alle Okapi-Variablen als ENV-Vars !
+    Dann kann er das Secret folio-db-secret auch für Okapi benutzen.
+    Wie das geht: siehe meine Screenshots von heute:
+      in okapi-deployment.yaml:
+      env
+      -  name: PG_PASSWORD
+         valueFrom:
+	   secretKeyRef:
+	     name: {{ .Values.global.db.folioSecret }} ==> folio-db-secret
+	     key: {{ .Values.global.db.okapiPwKKey }}  ==> OKAPI_PASSOWRD
+    Das Secret okapi-config benötigt er nicht (davon ab, dass er sowieso kein Indexdata Helm Chart benutzt).
+
+    als nächstes Kafka und Elasticsearch als bitnami Helm Chart installieren, s. BVB-Repo
+
+  alle git-Commits zu einer bestimmten Datei anzeigen:
+    git log -- values.yamlgit log -- values.yaml
+  eine bestimmte git-Version einer Datei anzeigen: 
+    wgit show dd2f3d9f124700a0a0149d00f43bb6a18f5c1773 -- values.yaml
+
+  psql in einem pg-Container aufrufen; Dazu kann man sich einfach wie bei docker in den Container einloggen:
+    kubectl -n folio-backend exec -it folio-zal-pg-0 -- bash
+   oder nicht-interaktiv z.B. so:
+    kubectl -n folio-backend exec folio-zal-pg-0 -- nslookup okapi
+   In dem Container sind dann die Umgebungsvariablen bekannt, z.B. OKAPI_URL, SUPERUSER_PASSWD
+
+   [ Diksussion über den Kubernetes Operator;
+     - Wissen im Operator SDK ist nur während der Entwicklungsarbeiten notwendig, bei der Anwendung des Operators nicht mehr; https://sdk.operatorframework.io/build/
+     - Kubernetes Operator wird die Module auch deployen
+     - Upgrades mitdenken
+     - Migration ist out-of-scope, da DB-Deployment auch nicht dazu gehört
+   ]
+   Ghassen: End-of-Live von Okapi ? 
+     - zunächst ist es im Kubernetes Operator noch drin
+     - auch mgr-application hat ein Feld OKAPI_URL (wird es genutzt ?)
+     - Okapi-Support wird nicht vor Beginn des U-Releases enden.
+
+   Ghassen: wer deployet die Module im Eureka-Context ?
+   Florian: folio-org/mgr-applications ist dafür angedacht, aber es steht dort "optional". EBSCO macht es nicht damit.
+
+    eureka-platform-boot : Eureka mit docker-compose klonen und das Skripgt start-docker-containers.sh ausprobieren,
+      dann an den Fehlermeldungen weiter hangeln.
+      git clone https://github.com/folio-org/eureka-platform-bootstrap.git
+      Julian: Diese Plattform (Eureka ohne Kubernetes) wurde entwickelt, weil die AWS-Kosten für das Hosting
+         (der Development-Plattform(en)) "unter die Decke gingen".
