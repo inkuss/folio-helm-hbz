@@ -308,6 +308,13 @@ Florian G.: Ich brauche eine Ingress - Klasse
   NAME                       TYPE           CLUSTER-IP      EXTERNAL-IP                     PORT(S)                      AGE
   ingress-nginx-controller   LoadBalancer   10.43.213.243   10.9.2.91,10.9.2.92,10.9.2.93   80:32702/TCP,443:31664/TCP   3m1s
 
+19.09.2024
+  hbz gitlab folio Projekt klonen:
+  cd folio/folio-helm-hbz
+  git clone http://quaoar4.hbz-nrw.de:8929/bms/folio.git folio-hbz
+  # Geheime Informationen in quaoar-Repo speichern und nur symbolisch verknüpfen:
+  ln -s folio-hbz/global-values.yaml
+  ln -s folio-hbz/folio-hbz-dockerhub-key.yml
 
 20.09.2024 d-sys-ops
   Okapi mit Service Type "NodePort" installieren
@@ -345,7 +352,6 @@ okapi                                NodePort       10.43.126.141   <none>      
     Der Port 30935 bleibt angeblich gleich, zumindest solange man Okapi nur mit "helm upgrade" verändert.
 
   wg. okapi-config.json, Datenbank-Passwort für den Okapi-Benutzer. Aus values-Datei vs. aus Secret:
-    hier weiter
     Florian nutzt keine okapi-config.json, sondern übergibt alle Okapi-Variablen als ENV-Vars !
     Dann kann er das Secret folio-db-secret auch für Okapi benutzen.
     Wie das geht: siehe meine Screenshots von heute:
@@ -357,12 +363,29 @@ okapi                                NodePort       10.43.126.141   <none>      
 	   secretKeyRef:
 	     name: {{ .Values.global.db.folioSecret }} ==> folio-db-secret
 	     key: {{ .Values.global.db.okapiPwKKey }}  ==> OKAPI_PASSOWRD
+	deployment.yaml entsprechend angepasst.
     Das Secret okapi-config benötigt er nicht (davon ab, dass er sowieso kein Indexdata Helm Chart benutzt).
-    Und auch das Array in der values.conf wird nicht mehr benötigt; bei mir wurde das allerdings auch schon
-    herausgeworfen und durch einen Eintrag in der folio-hbz/global-values.yaml ersetzt: dort auch herauswerfen!
+      => das in zalando_pg/templates/folio.secret.yaml wieder herausgeworfen.
+    Und auch das Array in der .Values.secret wird nicht mehr benötigt; bei mir wurde das allerdings auch schon
+    herausgeworfen und durch einen Eintrag in der folio-hbz/global-values.yaml ersetzt: dort auch herauswerfen. => OK, okapiPassword: okapi25 dort heraus geworfen.
+    Alle anderen Parameter außer OKAPI_PASSWORD versuche ich weiterhin über eine okapi.conf zu laden => das Array .Values.secret wieder aktiviert, allerdings ohne postrges_password.
+     cd okapi-helm
+     helm upgrade -n folio-backend  -f ../global-values.yaml okapi ./okapi
+     Release "okapi" has been upgraded. Happy Helming!
+      NAME: okapi
+      LAST DEPLOYED: Fri Sep 20 21:39:42 2024
+      NAMESPACE: folio-backend
+      STATUS: deployed
+      REVISION: 6
+    ok, hat funktioniert. Den okapi Ingress noch wieder entfernen (in values.yaml auf false setzen).
+    curl -XGET folio-k8s11:30935/_/env []
+    curl -XGET folio-k8s11:30935/_/proxy/health
+      [ ]
 
+    hier weiter
     als nächstes Kafka und Elasticsearch als bitnami Helm Chart installieren, s. BVB-Repo
 
+  nützliche Tipps / git:
   alle git-Commits zu einer bestimmten Datei anzeigen:
     git log -- values.yamlgit log -- values.yaml
   eine bestimmte git-Version einer Datei anzeigen: 
