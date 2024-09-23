@@ -382,8 +382,7 @@ okapi                                NodePort       10.43.126.141   <none>      
     curl -XGET folio-k8s11:30935/_/proxy/health
       [ ]
 
-    hier weiter
-    als nächstes Kafka und Elasticsearch als bitnami Helm Chart installieren, s. BVB-Repo
+    als nächstes Kafka und Elasticsearch als bitnami Helm Chart installieren, s. BVB-Repo / erl.
 
   nützliche Tipps / git:
   alle git-Commits zu einer bestimmten Datei anzeigen:
@@ -421,3 +420,4 @@ okapi                                NodePort       10.43.126.141   <none>      
   Kafka im Namensraum folio-staging-v1-kafka erneut installiert; mit Bitnami Helm Chart;
   Values-Datei kafka-hbz-staging-values.yml angepasst,
      siehe alles in  https://github.com/inkuss/kube.git .
+  Installation Elasticsearch ebenfalls in diesem Repo beschrieben.
