@@ -421,3 +421,5 @@ okapi                                NodePort       10.43.126.141   <none>      
   Values-Datei kafka-hbz-staging-values.yml angepasst,
      siehe alles in  https://github.com/inkuss/kube.git .
   Installation Elasticsearch ebenfalls in diesem Repo beschrieben.
+   
+  weiter mit: Create a new tenant; dann: Install a FOLIO backend.
