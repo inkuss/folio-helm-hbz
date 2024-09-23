@@ -416,3 +416,8 @@ okapi                                NodePort       10.43.126.141   <none>      
       git clone https://github.com/folio-org/eureka-platform-bootstrap.git
       Julian: Diese Plattform (Eureka ohne Kubernetes) wurde entwickelt, weil die AWS-Kosten für das Hosting
          (der Development-Plattform(en)) "unter die Decke gingen".
+
+23.09.2023
+  Kafka im Namensraum folio-staging-v1-kafka erneut installiert; mit Bitnami Helm Chart;
+  Values-Datei kafka-hbz-staging-values.yml angepasst,
+     siehe alles in  https://github.com/inkuss/kube.git .
