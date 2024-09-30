@@ -426,11 +426,28 @@ okapi                                NodePort       10.43.126.141   <none>      
 
 30.09.2024
   Einen Mandanten (diku) installieren:
-  helm template tenant ./tenant
+  helm template tenant ./tenant > /tmp/hik2
   helm -n folio-backend install tenant ./tenant
   helm -n folio-backend uninstall  tenant
 
-container "tenant-register-diku" in pod "tenant-register-diku-88z2t" is waiting to start: trying and failing to pull image
- Failed to pull image "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to pull and unpack image "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to resolve reference "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to authorize: failed to fetch anonymous token: unexpected status from GET request to https://gitlab.bib-bvb.de/jwt/auth?scope=repository%3Afolio%2Ffolio-tools%3Apull&service=container_registry: 403 Forbidden 
-Error: INSTALLATION FAILED: failed post-install: 1 error occurred:
+container "tenant-register-diku" in pod "tenant-register-diku-sj6d4" is waiting to start: CreateContainerConfigError
+tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-secret" not found
+
+  -> Benötigt wird  env:
+        - name: SUPERUSER_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: supertenant-secret
+              key: password
+  -> in files/regsiter-tenant.sh benötigt, um ein Superuser-Token zu holen.
+    bei "bootstrap-superuser.pl" muss man das Token mitgeben: "If supertenant is secure, use the "st_token" argument to pass a token for the supertenant superuser."
+
+   Das mal ohne Secure Superuser gemacht (auskommentiert)
+    Creating tenant ... ()
+     läuft auf Error
+       Pod register-diku, Skript register-tenant.sh
+
+    Fehler beim Deaktivieren von authtoken für tenant diku: Modul authtoken nicht gefunden.
+
+    Error: INSTALLATION FAILED: failed post-install: 1 error occurred:
         * timed out waiting for the condition

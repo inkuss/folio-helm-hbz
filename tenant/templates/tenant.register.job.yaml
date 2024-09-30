@@ -26,11 +26,11 @@ spec:
         - configMapRef:
             name: {{ $.Release.Name }}-register-{{ .tenantId }}-env
         env:
-        - name: SUPERUSER_PASSWORD
-          valueFrom:
-            secretKeyRef:
-              name: supertenant-secret
-              key: password
+          # - name: SUPERUSER_PASSWORD
+          # valueFrom:
+          #   secretKeyRef:
+          #     name: supertenant-secret
+          #     key: password
         - name: ADMIN_PASSWORD
           valueFrom:
             secretKeyRef:

@@ -16,7 +16,7 @@ image:
   folioToolsTag: v1.3
   okapicliRepo: okapiclient
   okapicliTag: v0.21
-  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+  repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
   stripesBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
   pullPolicy: IfNotPresent
   # here you can overwrite the stripes image tag
@@ -26,7 +26,7 @@ image:
 #
 # List of Folio Tenants to install
 tenants:
-- description: My Folio tenant
+- description: Danish Library Technology Institute diku
   # add extra frontend modules
   frontendmodulesExtras: []
   # ingress definition
@@ -60,8 +60,8 @@ tenants:
   # wether to load reference and sample data
   loadReference: true
   loadSample: false
-  name: MyTenant
-  tenantId: mytenant
+  name: Datalogisk Institut diku
+  tenantId: diku
   # register tenant in Okapi
   register: true
   # email configuration

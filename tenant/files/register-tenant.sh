@@ -131,11 +131,11 @@ wait_for_okapi() {
   while [ true ]; do
     if [ $TRY_COUNT = 0 ]; then break; fi
 
+      # -H "X-Okapi-Tenant:supertenant" \
+      # -H "X-Okapi-Token: ${superusertoken}" \
     result=`curl \
       -s \
       -w "%{http_code}" \
-      -H "X-Okapi-Tenant:supertenant" \
-      -H "X-Okapi-Token: ${superusertoken}" \
       -o /dev/null \
       ${OKAPI_URL}/_/discovery/modules`
 
@@ -155,6 +155,7 @@ wait_for_okapi() {
 }
 
 wait_for_backend_modules() {
+  echo "Waiting for backend modules..."
   for module in $@; do
     wait_for_backend_module $module || return $?
   done
@@ -168,11 +169,11 @@ wait_for_backend_module() {
   while [ true ]; do
     echo -ne " $TRY_COUNT tries left ... "
     if [ $TRY_COUNT = 0 ]; then break; fi
+        # -H "X-Okapi-Tenant:supertenant" \
+        # -H "X-Okapi-Token: ${superusertoken}" \
       result=`curl \
         -s \
         -w "%{http_code}" \
-        -H "X-Okapi-Tenant:supertenant" \
-        -H "X-Okapi-Token: ${superusertoken}" \
         -o /dev/null \
         "${OKAPI_URL}/_/discovery/modules/${module}"`;
   case "${result}" in
@@ -197,11 +198,11 @@ wait_for_backend_module() {
 is_module_registered() {
   local module=$1
   echo -ne "testing whether module ${module} is already registered to ${OKAPI_URL} ...";
+    # -H "X-Okapi-Tenant:supertenant" \
+    # -H "X-Okapi-Token: ${superusertoken}" \
   result=`curl \
     -s \
     -w "%{http_code}" \
-    -H "X-Okapi-Tenant:supertenant" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     -o /dev/null \
     "${OKAPI_URL}/_/proxy/modules/${module}"`;
 
@@ -233,12 +234,12 @@ register_module() {
   local TRY_COUNT=3
   while [ true ]; do
     if [ $TRY_COUNT = 0 ]; then break; fi
+      # -H "X-Okapi-Tenant:supertenant" \
+      # -H "X-Okapi-Token: ${superusertoken}" \
     result=`echo $module_descriptor | curl \
       -s \
       -w '|%{http_code}' -X POST \
       -H "Content-type: application/json" \
-      -H "X-Okapi-Tenant:supertenant" \
-      -H "X-Okapi-Token: ${superusertoken}" \
       "${OKAPI_URL}/_/proxy/modules" \
       -d @- 2>&1`
 
@@ -260,12 +261,12 @@ register_module() {
 tenant_exists() {
   echo -ne "Checking whether tenant ${tenant_id} already exists ...";
 
+    # -H "X-Okapi-Tenant:supertenant" \
+    # -H "X-Okapi-Token: ${superusertoken}" \
   result=`curl \
     -w '|%{http_code}' \
     -s \
     -H 'Content-type: application/json' \
-    -H "X-Okapi-Tenant:supertenant" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     $OKAPI_URL/_/proxy/tenants/${tenant_id}`
 
   case "${result##*|}" in
@@ -296,13 +297,13 @@ create_tenant() {
 }
 EOF
 
+  # -H "X-Okapi-Tenant:supertenant" \
+  # -H "X-Okapi-Token: ${superusertoken}" \
   result=`echo $payload | curl \
     -s \
     -w '|%{http_code}' \
     -X POST \
     -H 'Content-type: application/json' \
-    -H "X-Okapi-Tenant:supertenant" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     "${OKAPI_URL}/_/proxy/tenants" -d @-  2>&1`
 
   case "${result##*|}" in
@@ -342,13 +343,13 @@ EOF
   while true; do
     echo "Installing modules --- $TRY_COUNT tries left ...."
     if [ $TRY_COUNT = 0 ]; then break; fi
+      # -H "X-Okapi-Tenant:supertenant" \
+      # -H "X-Okapi-Token: ${superusertoken}" \
     result=`echo "$payload" | curl \
       -s \
       -X POST \
       -w "|%{http_code}" \
       -H 'Content-type: application/json' \
-      -H "X-Okapi-Tenant:supertenant" \
-      -H "X-Okapi-Token: ${superusertoken}" \
       "${OKAPI_URL}/_/proxy/tenants/${tenant_id}/install?tenantParameters=loadSample=${loadSample},loadReference=${loadReference}" \
       -d @- 2>&1`
 
@@ -373,12 +374,12 @@ EOF
 find_module_authtoken() {
   echo -ne "Find module authtoken for tenant..."
 
+    # -H "X-Okapi-Tenant:supertenant" \
+    # -H "X-Okapi-Token: ${superusertoken}" \
   result=`curl \
     -s \
     -w "|%{http_code}" \
     -H 'Content-type: application/json' \
-    -H "X-Okapi-Tenant:supertenant" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     "${OKAPI_URL}/_/proxy/tenants/${tenant_id}/interfaces/authtoken" 2>&1`
 
   case "${result##*|}" in
@@ -400,13 +401,13 @@ disable_module_for_tenant() {
   local TRY_COUNT=3
   while [ true ]; do
     if [ $TRY_COUNT = 0 ]; then break; fi
+      # -H "X-Okapi-Tenant:supertenant" \
+      # -H "X-Okapi-Token: ${superusertoken}" \
     result=`echo "[{\"id\" : \"${module}\", \"action\": \"disable\"}]" | curl \
       -s \
       -X POST \
       -w "|%{http_code}" \
       -H 'Content-type: application/json' \
-      -H "X-Okapi-Tenant:supertenant" \
-      -H "X-Okapi-Token: ${superusertoken}" \
       "${OKAPI_URL}/_/proxy/tenants/${tenant_id}/install" \
       -d @- 2>&1`
 
@@ -712,8 +713,9 @@ EOF
       ;;
   esac
 
-  echo "${result##*|} ("${result%|*}")"
-  return 17
+  # echo "${result##*|} ("${result%|*}")"
+  # return 17
+  return 0
 }
 
 create_admin_workflow() {
