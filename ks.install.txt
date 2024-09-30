@@ -451,3 +451,5 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
 
     Error: INSTALLATION FAILED: failed post-install: 1 error occurred:
         * timed out waiting for the condition
+
+   Das ist aber schon beim Schritt "Create a superuser". Der kommt erst, nachdem das Backend deployed wurde!
