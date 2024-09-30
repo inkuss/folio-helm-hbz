@@ -416,10 +416,21 @@ okapi                                NodePort       10.43.126.141   <none>      
       Julian: Diese Plattform (Eureka ohne Kubernetes) wurde entwickelt, weil die AWS-Kosten für das Hosting
          (der Development-Plattform(en)) "unter die Decke gingen".
 
-23.09.2023
+23.09.2024
   Kafka im Namensraum folio-staging-v1-kafka erneut installiert; mit Bitnami Helm Chart;
   Values-Datei kafka-hbz-staging-values.yml angepasst,
      siehe alles in  https://github.com/inkuss/kube.git .
   Installation Elasticsearch ebenfalls in diesem Repo beschrieben.
    
   weiter mit: Create a new tenant; dann: Install a FOLIO backend.
+
+30.09.2024
+  Einen Mandanten (diku) installieren:
+  helm template tenant ./tenant
+  helm -n folio-backend install tenant ./tenant
+  helm -n folio-backend uninstall  tenant
+
+container "tenant-register-diku" in pod "tenant-register-diku-88z2t" is waiting to start: trying and failing to pull image
+ Failed to pull image "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to pull and unpack image "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to resolve reference "gitlab.bib-bvb.de:5050/folio/folio-tools:v1.3": failed to authorize: failed to fetch anonymous token: unexpected status from GET request to https://gitlab.bib-bvb.de/jwt/auth?scope=repository%3Afolio%2Ffolio-tools%3Apull&service=container_registry: 403 Forbidden 
+Error: INSTALLATION FAILED: failed post-install: 1 error occurred:
+        * timed out waiting for the condition
