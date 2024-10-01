@@ -453,3 +453,27 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
         * timed out waiting for the condition
 
    Das ist aber schon beim Schritt "Create a superuser". Der kommt erst, nachdem das Backend deployed wurde!
+
+01.10.2024
+  # Helm chart folio-helm-hbz/modules - das muss man zuerst machen. Erst dann Neuanlage eines Mandanten.
+  # supertenant-secret wird dort auch angelegt
+  helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+  NAME: mods-auth
+  LAST DEPLOYED: Tue Oct  1 14:08:55 2024
+  NAMESPACE: default
+  STATUS: deployed
+  REVISION: 1
+  TEST SUITE: None
+      das deployed mod-authtoken, mod-permissions, mod-login, mod-users
+    helm -n folio-backend uninstall  mods-auth
+
+  helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+    - das löscht die Jobs nicht ab
+
+    container "init-mod-authtoken-2-14-1-2023r2csp2" in pod "init-mod-authtoken-2-14-1-2023r2csp2-2qddr" is waiting to start: trying and failing to pull image
+  helm template mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml > /tmp/hik2
+    folio-tools:v1.1 -> v1.3
+
+    Job init-mod-authtoken:
+      /usr/src/app/docker-entrypoint.sh: line 14: /usr/src/app/kube-scripts/init-module.sh: cannot execute: required file not found
+

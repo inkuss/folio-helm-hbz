@@ -35,7 +35,7 @@ global:
     repositoryName: okapi
   image:
     pullsecret: gitlab-folio-group
-    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio/
+    repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
     folioToolsTag: "v1.1"
     okapicliRepo: okapiclient
     okapicliTag: "v0.21"
