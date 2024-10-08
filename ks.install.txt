@@ -455,6 +455,7 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
    Das ist aber schon beim Schritt "Create a superuser". Der kommt erst, nachdem das Backend deployed wurde!
 
 01.10.2024
+  # Module installieren
   # Helm chart folio-helm-hbz/modules - das muss man zuerst machen. Erst dann Neuanlage eines Mandanten.
   # supertenant-secret wird dort auch angelegt
   helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
@@ -470,10 +471,46 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
   helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
     - das löscht die Jobs nicht ab
 
-    container "init-mod-authtoken-2-14-1-2023r2csp2" in pod "init-mod-authtoken-2-14-1-2023r2csp2-2qddr" is waiting to start: trying and failing to pull image
   helm template mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml > /tmp/hik2
     folio-tools:v1.1 -> v1.3
 
     Job init-mod-authtoken:
       /usr/src/app/docker-entrypoint.sh: line 14: /usr/src/app/kube-scripts/init-module.sh: cannot execute: required file not found
 
+09.10.2024
+  FOLIO Helm Charts bei https://github.com/folio-org/folio-helm-v2/tree/master/charts 
+  helm repo add folio-helm-v2 https://repository.folio.org/repository/folio-helm-v2/
+      "folio-helm-v2" has been added to your repositories
+  helm install -n folio-backend mod-authtoken folio-helm-v2/mod-authtoken --version 2.14.24 -f global-values.yaml
+  helm install -n folio-backend mod-login folio-helm-v2/mod-login -f global-values.yaml
+  helm install -n folio-backend mod-users folio-helm-v2/mod-users -f global-values.yaml
+  helm install -n folio-backend mod-permissions folio-helm-v2/mod-permissions -f global-values.yaml
+  Die Module sind installiert ("running"), sie können aber nicht richtig konfiguriert sein.
+  Z.B. ist die Anbindung an die Datenbank bei mod-users so konfiguriert (s. values.yml):
+integrations:
+  db:
+    enabled: true
+    host: postgresql               => folio-zal-pg
+    hostReader: ""
+    port: 5432
+    database: folio
+    username: admin                => folio (in folio-helm-hbz/zalando-pg/templates/scripts.yaml festgelegt)
+    password: password             => FOLIO_PASSWORD aus folio-db-secret
+  Es muss aber so sein (s. global-values.yaml):
+  # Globale Variablen
+global:
+  db:
+    size: "5Gi"
+    storageClass: local-path
+    maxpoolsize: 10
+    host: folio-zal-pg
+    port: 5432
+    folioSecret: folio-db-secret      => FOLIO_PASSWORD, OKAPI_PASSWORD
+    adminSecret: pg-superuser-secret  => PGSU_PASSWORD
+    okapiPwKey: OKAPI_PASSWORD
+    # okapiPassword: okapi25
+    folioPwKey: FOLIO_PASSWORD
+    allModuleAccess: true
+    initDb: true
+
+evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.db.secret, folio-common.okapi.secret, folio-common.kafka.secret ... an ?
