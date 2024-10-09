@@ -477,7 +477,7 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
     Job init-mod-authtoken:
       /usr/src/app/docker-entrypoint.sh: line 14: /usr/src/app/kube-scripts/init-module.sh: cannot execute: required file not found
 
-09.10.2024
+8.10.2024
   FOLIO Helm Charts bei https://github.com/folio-org/folio-helm-v2/tree/master/charts 
   helm repo add folio-helm-v2 https://repository.folio.org/repository/folio-helm-v2/
       "folio-helm-v2" has been added to your repositories
@@ -514,3 +514,20 @@ global:
     initDb: true
 
 evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.db.secret, folio-common.okapi.secret, folio-common.kafka.secret ... an ?
+
+09.10.
+   cd folio-helm-hbz/folio-helm-v2/charts/mod-users
+   helm dependency build    (dadurch wird folio-common bekannt oder aktualisiert)
+      ...Successfully got an update from the "folio-helm-v2" chart repository
+      ...Successfully got an update from the "bitnami" chart repository
+      Update Complete. ⎈Happy Helming!⎈
+      Saving 1 charts
+      Deleting outdated charts
+   cd folio-helm-hbz/
+   helm template mod-users folio-helm-v2/mod-users -f global-values.yaml > /tmp/hik2
+   legt 2 Secrets an:  mod-users-db und  mod-users-kafka
+   Ich will aber folio-db-secret aus zalando-pg benutzen, dort definiert in folio.secret.yaml , dort isbd. FOLIO_PASSWORD anstatt DB_PASSWORD .
+    => _secret.tpl in folio-common abwandeln; DB_PASSWORD und DB_HOST aus Zalando-Secret holen und aus Values.integrations.db herauswerfen
+    Florian / Jason : Helm zieht die Charts nicht von lokal, sondern aus dem Repo. In Dependecies ist das angegeben.
+       Entweder ein lokales Repo mit den Änderungen benutzen, oder versuchen, die Änderungen von lokal zu ziehen
+       (helm --help etc. studieren)
