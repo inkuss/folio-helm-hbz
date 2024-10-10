@@ -530,4 +530,47 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
     => _secret.tpl in folio-common abwandeln; DB_PASSWORD und DB_HOST aus Zalando-Secret holen und aus Values.integrations.db herauswerfen
     Florian / Jason : Helm zieht die Charts nicht von lokal, sondern aus dem Repo. In Dependecies ist das angegeben.
        Entweder ein lokales Repo mit den Änderungen benutzen, oder versuchen, die Änderungen von lokal zu ziehen
-       (helm --help etc. studieren)
+       (helm --help etc. studieren) => ./ verwenden
+
+10.10.
+   cd folio-helm-hbz/
+   helm template mod-users ./folio-helm-v2/charts/mod-users -f global-values.yaml > /tmp/hik2
+   gelernt:
+     - in folio-commons _secret.tpl einfach ein DB_PASSWORD hinzufügen funktionert nicht: Syntax Fehler bei Konversion von YAML nach JSON
+     geplante Vorgehensweise:
+     - erzeuge zuert ein eigenes Datenbankgeheimnis folio-db-secret, oder besser db-connect-folio
+     - Erzeuge es mit kubectl apply (es muss nicht Teil eines Helm-Charts sein). Es enthält folgende Werte:
+     db-connect Secret key-value pairs:
+      DB_CHARSET = UTF-8
+      DB_DATABASE = folio
+      DB_HOST = folio-zal-pg
+      DB_MAXPOOLSIZE = 20
+      DB_PASSWORD = folio123   = FOLIO_PASSWORD
+      DB_PORT = 5432
+      DB_QUERYTIMEOUT = 120000
+      DB_USERNAME = folio
+      - diese Werte vielleicht in ein 2. Secret db-connect-okapi
+     db-connect-okapi Secret key-value pairs:
+      PG_DATABASE = okapi
+      PG_HOST = folio-zal-pg
+      PG_PASSWORD = okapi25    = OKAPI_PASSWORD
+      PG_PORT = 5432
+      PG_USERNAME = okapi
+     - Die Werte für die Passwörter müssen automatisch generiert werden, so
+         OKAPI_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
+         FOLIO_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
+       evtl. ein eigenes Helm-Chart folio-secrets dafür erzeugen
+     - benutze dieses Geheimnis dann bei Aufsetzen von postgres, okapi und den Modulen
+     - die einzelnen Module erhalten ihr Secret dann über integrations.db.exsitingSecret in der global-values.yaml,
+       folio-common legt dann keine weiteren db-Secrets an.
+     - das Template folio.secret.yaml wird nicht mehr benötigt, ich lege folio-db-secret selber an.
+     - um unterschiedliche Variablennamen beim Initialisieren der PG-Datenbank und bei den Modulen zuzulassen,
+       holt sich das template zalando-pg:folio.init.job.yaml nicht über "secretRef" sondern über "secretKeyRef", so:
+        env:
+        - name: FOLIO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: folio-db-secret
+              key: DB_PASSWORD
+        und genau so für OKAPI_PASSWORD. Auch das Repo okapi-helm wird es so machen (dort heißt es intern sogar schon PG_PASSWORD).
+     - das Secret okapi kann bleiben, es erhält gar kein Passwort sondern nur eine okapi-config.json ohne Passwort. Das Okapi-Passwort - sowie alle anderen Parameter der okapi-config.json auch noch einmal - werden dem Okapi-Container direkt als ENV-Variable übergeben.
