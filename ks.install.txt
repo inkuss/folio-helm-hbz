@@ -468,6 +468,7 @@ tenant-register-diku-sj6d4.17fa0d309880ad4f Failed Error: secret "supertenant-se
       das deployed mod-authtoken, mod-permissions, mod-login, mod-users
     helm -n folio-backend uninstall  mods-auth
 
+  cd  ~/folio/folio-helm-hbz
   helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
     - das löscht die Jobs nicht ab
 
@@ -538,7 +539,7 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
    gelernt:
      - in folio-commons _secret.tpl einfach ein DB_PASSWORD hinzufügen funktionert nicht: Syntax Fehler bei Konversion von YAML nach JSON
      geplante Vorgehensweise:
-     - erzeuge zuert ein eigenes Datenbankgeheimnis folio-db-secret, oder besser db-connect-folio
+     - erzeuge zuert ein eigenes Datenbankgeheimnis folio-db-secret, oder besser db-connect-folio  erl.
      - Erzeuge es mit kubectl apply (es muss nicht Teil eines Helm-Charts sein). Es enthält folgende Werte:
      db-connect Secret key-value pairs:
       DB_CHARSET = UTF-8
@@ -548,7 +549,7 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
       DB_PASSWORD = folio123   = FOLIO_PASSWORD
       DB_PORT = 5432
       DB_QUERYTIMEOUT = 120000
-      DB_USERNAME = folio
+      DB_USERNAME = folio  erl.
       - diese Werte vielleicht in ein 2. Secret db-connect-okapi
      db-connect-okapi Secret key-value pairs:
       PG_DATABASE = okapi
@@ -558,19 +559,33 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
       PG_USERNAME = okapi
      - Die Werte für die Passwörter müssen automatisch generiert werden, so
          OKAPI_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
-         FOLIO_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
+         FOLIO_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }} erl.
        evtl. ein eigenes Helm-Chart folio-secrets dafür erzeugen
      - benutze dieses Geheimnis dann bei Aufsetzen von postgres, okapi und den Modulen
      - die einzelnen Module erhalten ihr Secret dann über integrations.db.exsitingSecret in der global-values.yaml,
        folio-common legt dann keine weiteren db-Secrets an.
-     - das Template folio.secret.yaml wird nicht mehr benötigt, ich lege folio-db-secret selber an.
+     - das Template folio.secret.yaml in zalando_pg wird nicht mehr benötigt, ich lege folio-db-secret der äquivalent selber an.
      - um unterschiedliche Variablennamen beim Initialisieren der PG-Datenbank und bei den Modulen zuzulassen,
        holt sich das template zalando-pg:folio.init.job.yaml nicht über "secretRef" sondern über "secretKeyRef", so:
         env:
         - name: FOLIO_PASSWORD
           valueFrom:
             secretKeyRef:
-              name: folio-db-secret
+              name: db-connect-folio
               key: DB_PASSWORD
         und genau so für OKAPI_PASSWORD. Auch das Repo okapi-helm wird es so machen (dort heißt es intern sogar schon PG_PASSWORD).
      - das Secret okapi kann bleiben, es erhält gar kein Passwort sondern nur eine okapi-config.json ohne Passwort. Das Okapi-Passwort - sowie alle anderen Parameter der okapi-config.json auch noch einmal - werden dem Okapi-Container direkt als ENV-Variable übergeben.
+
+11.10.24
+  Neues Helm-Chart folio-secrets angelegt, darin ein Secret db-connect-folio angelegt:
+   helm template folio-secrets ./folio-secrets > /tmp/hik3
+   helm install -n folio-backend folio-secrets ./folio-secrets
+
+   Meeting d-sys-ops:
+   Florian K. : BVB-Modules Deployment hat EIN Template für alle Module. folio-helm-v2 braucht viel mehr Änderungen
+                bei Release-Wechsel; alle Modul-Templates müssen geändert werden. Probleme bei Release-Wechsel.
+		Die BVB-Charts sind außerdem optimiert für den Anwendungsfall: hunderte von Mandanten. 
+		 Jsons YAMLs haben diesen Anwendungsfall nicht.
+		Z.Zt. hat BVB-Modules noch keinen Eureka-Support. Florian und Tobias gehen aber davon aus, dass das
+           nur 2 zusätzliche Charts werden und leicht integrierbar ist. In diesem Jahr kommt Florian nicht mehr dazu.
+	         Uwe: Durch Beschäftigung mit folio-helm-v2 baust du auf jeden Fall das richtige Knowledge auf.
