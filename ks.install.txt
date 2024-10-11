@@ -561,7 +561,7 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
          OKAPI_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
          FOLIO_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }} erl.
        evtl. ein eigenes Helm-Chart folio-secrets dafür erzeugen
-     - benutze dieses Geheimnis dann bei Aufsetzen von postgres, okapi und den Modulen
+     - benutze diese Geheimnisse dann bei Aufsetzen von postgres, okapi, elasticsearch ?, kafka ? und den Modulen
      - die einzelnen Module erhalten ihr Secret dann über integrations.db.exsitingSecret in der global-values.yaml,
        folio-common legt dann keine weiteren db-Secrets an.
      - das Template folio.secret.yaml in zalando_pg wird nicht mehr benötigt, ich lege folio-db-secret der äquivalent selber an.
@@ -589,3 +589,5 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
 		Z.Zt. hat BVB-Modules noch keinen Eureka-Support. Florian und Tobias gehen aber davon aus, dass das
            nur 2 zusätzliche Charts werden und leicht integrierbar ist. In diesem Jahr kommt Florian nicht mehr dazu.
 	         Uwe: Durch Beschäftigung mit folio-helm-v2 baust du auf jeden Fall das richtige Knowledge auf.
+
+   weiter mit Einrichtung eines 2. Secrets db-connect-okapi
