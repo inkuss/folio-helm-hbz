@@ -540,7 +540,7 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
      - in folio-commons _secret.tpl einfach ein DB_PASSWORD hinzufügen funktionert nicht: Syntax Fehler bei Konversion von YAML nach JSON
      geplante Vorgehensweise:
      - erzeuge zuert ein eigenes Datenbankgeheimnis folio-db-secret, oder besser db-connect-folio  erl.
-     - Erzeuge es mit kubectl apply (es muss nicht Teil eines Helm-Charts sein). Es enthält folgende Werte:
+     - Erzeuge es mit kubectl apply (es muss nicht Teil eines Helm-Charts sein => doch, neues Chart folio-secrets). Es enthält folgende Werte:
      db-connect Secret key-value pairs:
       DB_CHARSET = UTF-8
       DB_DATABASE = folio
@@ -556,24 +556,24 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
       PG_HOST = folio-zal-pg
       PG_PASSWORD = okapi25    = OKAPI_PASSWORD
       PG_PORT = 5432
-      PG_USERNAME = okapi
+      PG_USERNAME = okapi   erl.
      - Die Werte für die Passwörter müssen automatisch generiert werden, so
-         OKAPI_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }}
+         OKAPI_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }} erl.
          FOLIO_PASSWORD: {{ randAlphaNum 32 | b64enc | quote }} erl.
-       evtl. ein eigenes Helm-Chart folio-secrets dafür erzeugen
+       evtl. ein eigenes Helm-Chart folio-secrets dafür erzeugen erl.
      - benutze diese Geheimnisse dann bei Aufsetzen von postgres, okapi, elasticsearch ?, kafka ? und den Modulen
      - die einzelnen Module erhalten ihr Secret dann über integrations.db.exsitingSecret in der global-values.yaml,
        folio-common legt dann keine weiteren db-Secrets an.
-     - das Template folio.secret.yaml in zalando_pg wird nicht mehr benötigt, ich lege folio-db-secret der äquivalent selber an.
+     - das Template folio.secret.yaml in zalando_pg wird nicht mehr benötigt, ich lege folio-db-secret oder äquivalent selber an. erl.
      - um unterschiedliche Variablennamen beim Initialisieren der PG-Datenbank und bei den Modulen zuzulassen,
-       holt sich das template zalando-pg:folio.init.job.yaml nicht über "secretRef" sondern über "secretKeyRef", so:
+       holt sich das template zalando-pg:folio.init.job.yaml nicht über "secretRef" sondern über "secretKeyRef", so: erl.
         env:
         - name: FOLIO_PASSWORD
           valueFrom:
             secretKeyRef:
               name: db-connect-folio
               key: DB_PASSWORD
-        und genau so für OKAPI_PASSWORD. Auch das Repo okapi-helm wird es so machen (dort heißt es intern sogar schon PG_PASSWORD).
+        und genau so für OKAPI_PASSWORD. erl. Auch das Repo okapi-helm wird es so machen (dort heißt es intern sogar schon PG_PASSWORD).
      - das Secret okapi kann bleiben, es erhält gar kein Passwort sondern nur eine okapi-config.json ohne Passwort. Das Okapi-Passwort - sowie alle anderen Parameter der okapi-config.json auch noch einmal - werden dem Okapi-Container direkt als ENV-Variable übergeben.
 
 11.10.24
@@ -590,4 +590,53 @@ evtl. muss erst folio-common ausgeführt werden ? Das legt Secrets folio-common.
            nur 2 zusätzliche Charts werden und leicht integrierbar ist. In diesem Jahr kommt Florian nicht mehr dazu.
 	         Uwe: Durch Beschäftigung mit folio-helm-v2 baust du auf jeden Fall das richtige Knowledge auf.
 
-   weiter mit Einrichtung eines 2. Secrets db-connect-okapi
+   weiter mit Einrichtung eines 2. Secrets db-connect-okapi erl.
+
+14.10.2024
+  Neuen PC zu GitLab-Repo hinzufügen: Gehe nach http://quaoar4.hbz-nrw.de:8929/-/user_settings/ssh_keys/
+  Neues Secret db-connect-okapi erstellt, installieren mit
+    helm upgrade -n folio-backend folio-secrets ./folio-secrets
+    kubectl delete secret folio-db-secret
+        secret "folio-db-secret" deleted (es ist aber noch da)
+    helm upgrade -n folio-backend zal-pg ./zalando-pg -f global-values.yaml
+   Mon Oct 14 18:21:59 UTC 2024 Creating SUPERUSER pgsuperuser ...
+ERROR:  role "pgsuperuser" already exists
+
+    helm uninstall -n folio-backend zal-pg ./zalando-pg
+    helm install -n folio-backend zal-pg ./zalando-pg -f global-values.yaml
+        container "create-pg-superuser" in pod "create-pgsuperuser-9xnr7" is waiting to start: CreateContainerConfigError
+        Error: secret "postgres.folio-zal-pg.credentials.postgresql.acid.zalan.do" not found 
+    Problem mit Service-Namen vs. Hostnamen ; Name: postgresql, Host: folio-zal-pg
+       jetzt kommt Creating SUPERUSER pgsuperuser ...
+               psql: error: could not translate host name "folio-zal-pg" to address: Name or service not known
+       => den Service wieder umbenannt in folio-zal-pg
+     Mon Oct 14 18:56:53 UTC 2024 Creating SUPERUSER pgsuperuser ...
+    CREATE ROLE
+     Mon Oct 14 18:56:53 UTC 2024 User created!
+       von folio-init-job aber:
+     ERROR:  role "okapi" already exists
+     - mal mit initDb = false starten
+   helm install -n folio-backend zal-pg ./zalando-pg -f global-values.yaml
+    NAME: zal-pg
+    LAST DEPLOYED: Mon Oct 14 21:06:29 2024
+    NAMESPACE: folio-backend
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
+      und
+    Mon Oct 14 19:07:26 UTC 2024 Creating databases okapi and folio ...   ??? Hatte ich das jetzt nicht deaktiviert ??
+    Mon Oct 14 19:07:26 UTC 2024 Running: psql -w -v ON_ERROR_STOP=1 -h folio-zal-pg -p 5432 -U postgres ...
+    CREATE ROLE
+    CREATE DATABASE
+    CREATE ROLE
+    CREATE DATABASE
+    Mon Oct 14 19:07:26 UTC 2024 Init script is completed
+      und
+    Mon Oct 14 19:07:41 UTC 2024 Creating SUPERUSER pgsuperuser ...
+    CREATE ROLE
+    Mon Oct 14 19:07:41 UTC 2024 User created!
+
+   OK, postrges ist efolgreich re-deployed mit eigenen DB-Secrets.
+   Elasticsearch und Kafka sind noch deployed, letzteres im Namensraum folio-staging-v1-kafka. Bei denen muss man nichts ändern.
+      Deren Konfigurationen sind in ~/folio-hbz, ohne Datenbankbezug.
+   Jetzt weiter mit Okapi. Dann die Module, zuerst nur mods-auth. Dann Anlage eines Mandanten (tenant register).

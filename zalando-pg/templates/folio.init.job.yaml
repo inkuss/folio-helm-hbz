@@ -18,9 +18,15 @@ spec:
         imagePullPolicy:  "IfNotPresent"
         env:
         - name: PG_HOST
-          value: {{ $.Values.global.db.host | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_HOST
         - name: PG_PORT
-          value: {{ $.Values.global.db.port | default "5432" | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_PORT
         - name: PG_USER
           value: postgres
         - name: PGPASSWORD
@@ -28,12 +34,39 @@ spec:
             secretKeyRef:
               name: postgres.{{ .Values.teamId }}-{{ .Release.Name }}.credentials.postgresql.acid.zalan.do 
               key: password
+        - name: FOLIO_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_DATABASE
+        - name: FOLIO_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_USERNAME
+        - name: FOLIO_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_PASSWORD
+        - name: OKAPI_DATABASE
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-okapi
+              key: PG_DATABASE
+        - name: OKAPI_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-okapi
+              key: PG_USERNAME
+        - name: OKAPI_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-okapi
+              key: PG_PASSWORD
         envFrom:
         - secretRef:
             name: pg-superuser-secret
-        envFrom:
-        - secretRef:
-            name: folio-db-secret
         args: ["kube-scripts/folio-db-init.sh"]
         volumeMounts:
         - name: scriptvolume

@@ -17,11 +17,20 @@ spec:
         imagePullPolicy:  "IfNotPresent"
         env:
         - name: PG_HOST
-          value: {{ $.Values.global.db.host | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_HOST
         - name: PG_DB
-          value: {{ $.Values.global.db.dbname | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_DATABASE
         - name: PG_PORT
-          value: {{ $.Values.global.db.port | default "5432" | quote }}
+          valueFrom:
+            secretKeyRef:
+              name: db-connect-folio
+              key: DB_PORT
         - name: PG_USER
           value: postgres
         - name: PGPASSWORD
