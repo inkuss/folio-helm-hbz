@@ -640,3 +640,14 @@ ERROR:  role "pgsuperuser" already exists
    Elasticsearch und Kafka sind noch deployed, letzteres im Namensraum folio-staging-v1-kafka. Bei denen muss man nichts ändern.
       Deren Konfigurationen sind in ~/folio-hbz, ohne Datenbankbezug.
    Jetzt weiter mit Okapi. Dann die Module, zuerst nur mods-auth. Dann Anlage eines Mandanten (tenant register).
+
+17.10.2024
+    Indexdata Okapi Helm Chart auf meine DB-Secrtes angepasst. Okapi liest aus dem vorhandenen Secret db-connect-okapi.
+    Neu-Deployment von Okapi (Versuch):
+     cd okapi-helm
+     helm upgrade -n folio-backend  -f ../global-values.yaml okapi ./okapi
+     W1017 20:03:41.774269   18796 warnings.go:70] unknown field "spec.template.spec.containers[0].envFrom[0].name"
+Error: UPGRADE FAILED: cannot patch "okapi" with kind Deployment: Deployment.apps "okapi" is invalid: spec.template.spec.containers[0].envFrom: Invalid value: "": must specify one of: `configMapRef` or `secretRef`
+
+     ??? Was hat der für'n Problem ??? Is doch :
+      helm template -f ../global-values.yaml okapi ./okapi > /tmp/hik2
