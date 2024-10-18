@@ -15,6 +15,8 @@ type: application
 # This is the chart version. This version number should be incremented each time you make changes
 # to the chart and its templates, including the app version.
 # Versions are expected to follow Semantic Versioning (https://semver.org/)
+# sobald ich auch pushe, muss ich hier gar nichts ändern.
+# wenn ich nur lokal entwickle, muss ich hier nichts ändern.
 version: 1.1.10
 
 # This is the version number of the application being deployed. This version number should be
@@ -23,4 +25,6 @@ version: 1.1.10
 # It is recommended to use it with quotes.
 # App version represents the last module list in valuesd.
 # Todo: select modules based on a new variable folioVersion which will by default be Chart.appVersion
+# das ist die maximale App-Version, die unterstützt wird.
+# sobald ich auch pushe, muss ich hier gar nichts ändern.
 appVersion: "quesnelia-ga"

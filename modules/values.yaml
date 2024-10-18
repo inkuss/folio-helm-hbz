@@ -14,10 +14,9 @@ global:
   db:
     host: folio-zal-pg 
     port: 5432
-    folioSecret: folio-db-secret
+    folioSecret: db-connect-folio
+    okapiSecret: db-connect-okapi
     adminSecret: pg-superuser-secret
-    okapiPwKey: OKAPI_PASSWORD
-    folioPwKey: FOLIO_PASSWORD 
     allModuleAccess: true
   kafka:
     serviceName: kafka
@@ -36,7 +35,7 @@ global:
   image:
     pullsecret: gitlab-folio-group
     repositoryBaseUrl: gitlab.bib-bvb.de:5050/folio-public/
-    folioToolsTag: "v1.1"
+    folioToolsTag: "debian-v1.3-debug2"
     okapicliRepo: okapiclient
     okapicliTag: "v0.21"
   backend_modules:

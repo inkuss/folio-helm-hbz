@@ -643,11 +643,71 @@ ERROR:  role "pgsuperuser" already exists
 
 17.10.2024
     Indexdata Okapi Helm Chart auf meine DB-Secrtes angepasst. Okapi liest aus dem vorhandenen Secret db-connect-okapi.
-    Neu-Deployment von Okapi (Versuch):
-     cd okapi-helm
-     helm upgrade -n folio-backend  -f ../global-values.yaml okapi ./okapi
-     W1017 20:03:41.774269   18796 warnings.go:70] unknown field "spec.template.spec.containers[0].envFrom[0].name"
-Error: UPGRADE FAILED: cannot patch "okapi" with kind Deployment: Deployment.apps "okapi" is invalid: spec.template.spec.containers[0].envFrom: Invalid value: "": must specify one of: `configMapRef` or `secretRef`
+    Neu-Deployment von Okapi:
+    cd okapi-helm
+    helm template -f ../global-values.yaml okapi ./okapi > /tmp/hik2
+    helm upgrade -n folio-backend  -f ../global-values.yaml okapi ./okapi
+      Release "okapi" has been upgraded. Happy Helming!
+      NAME: okapi
+      LAST DEPLOYED: Fri Oct 18 11:13:15 2024
+      NAMESPACE: folio-backend
+      STATUS: deployed
+      REVISION: 17
+      NOTES:
+      1. Get the application URL by running these commands:
+        export NODE_PORT=$(kubectl get --namespace folio-backend -o jsonpath="{.spec.ports[0].nodePort}" services okapi)
+        export NODE_IP=$(kubectl get nodes --namespace folio-backend -o jsonpath="{.items[0].status.addresses[0].address}")
+        echo http://$NODE_IP:$NODE_PORT
 
-     ??? Was hat der für'n Problem ??? Is doch :
-      helm template -f ../global-values.yaml okapi ./okapi > /tmp/hik2
+18.10.2024
+  mods-auth wieder zum Laufen kriegen
+  Umstellung der Secrets von "folio-db-secret" auf meine DB-Secrets (db-connect-folio, db-connect-okapi)
+  cd ~/folio/folio-helm-hbz
+  # Achtung: helm upgrade funktioniert nicht; vom init Job kommt Meldung "field is immutable"; man MUSS zunächst De-installieren:
+  helm uninstall -n folio-backend mods-auth
+  helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+    NAME: mods-auth
+    LAST DEPLOYED: Fri Oct 18 11:25:17 2024
+    NAMESPACE: folio-backend
+    STATUS: deployed
+    REVISION: 1
+    TEST SUITE: None
+    
+  Es kommt die alte Meldung, von Job init-mod-authtoken
+    -- Waiting for file kube-scripts/init-module.sh...
+    testing if kube-scripts/init-module.sh exists...done
+    lrwxrwxrwx 1 root root 21 Oct 18 13:09 kube-scripts/init-module.sh -> ..data/init-module.sh
+    /usr/src/app/docker-entrypoint.sh: line 15: ./kube-scripts/init-module.sh: cannot execute: required file not found
+    
+    Florian hat das Skript editiert; neues Tag 
+    Florian Kreft vor 25 Minuten     debian-v1.3-debug2
+    bei Florian wird das Skript aber ausgeführt:
+
+Florian Kreft vor 3 Minuten
+-- Waiting for file kube-scripts/init-module.sh...
+15:08 Uhr
+-- Waiting for file kube-scripts/init-module.sh...
+testing if kube-scripts/init-module.sh exists...done
+lrwxrwxrwx 1 root root 21 Oct 18 13:08 kube-scripts/init-module.sh -> ..data/init-module.sh
+ping okapi....
+PING okapi.folio-clone-03.svc.foliotest.local (10.237.64.190) 56(84) bytes of data.
+From okapi.folio-clone-03.svc.foliotest.local (10.237.64.190) icmp_seq=1 Destination Port Unreachable
+--- okapi.folio-clone-03.svc.foliotest.local ping statistics ---
+1 packets transmitted, 0 received, +1 errors, 100% packet loss, time 0ms
+-- Getting superuser token...done.
+-- Checking if okapi is ready...done
+--- deploying module mod-agreements-6.1.4 to http://okapi:9130 ...
+-- testing whether module mod-agreements-6.1.4 is already introduced to http://okapi:9130 ...already introduced.
+--- enabling module mod-agreements-6.1.4 to http://okapi:9130 ...
+-- testing whether module mod-agreements-6.1.4 is already enabled in http://okapi:9130 ...already enabled.
+-- removing module mod-agreements-6.1.4 from http://okapi:9130 ...done.
+-- enabling module mod-agreements-6.1.4 to http://okapi:9130 ...{"srvcId":"mod-agreements-6.1.4","instId":"mod-agreements-6.1.4","url":"http://mod-agreements-6-1-4-2023r2csp1:8080"}
+500 (recvAddress(..) failed: Connection reset by peer)
+  (andere Fehlermeldung; aber das Skript wird ausgeführt.)
+
+   Zur Kubernetes-Struktur: 
+   -----------------------
+   das Deployment geht nur auf grün, wenn der init Job erfolgreich war.
+   das Deployment starte die Pods (falls es "grün" ist).
+   Stateful Sets werden - zumindest bei okapi-helm - nur im Cluster Modus angelegt. Okapi starte ich aber derzeit noch nicht im Cluster Modus (das wäre Hazelcast).
+   Außerdem gibt es Services. Die Module haben einen. Die postgres, Okapi und elasticsearch auch.
