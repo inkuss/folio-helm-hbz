@@ -16,7 +16,6 @@ spec:
         envFrom:
         - configMapRef:
             name: {{ template "folio.backend.fullname" . }}-env
-        envFrom:
         - secretRef:
             name: {{ $.Values.global.db.folioSecret }}
         {{- if $.Values.global.okapi.secureSupertenant }}

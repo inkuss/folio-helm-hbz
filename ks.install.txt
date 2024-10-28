@@ -703,7 +703,7 @@ From okapi.folio-clone-03.svc.foliotest.local (10.237.64.190) icmp_seq=1 Destina
 -- removing module mod-agreements-6.1.4 from http://okapi:9130 ...done.
 -- enabling module mod-agreements-6.1.4 to http://okapi:9130 ...{"srvcId":"mod-agreements-6.1.4","instId":"mod-agreements-6.1.4","url":"http://mod-agreements-6-1-4-2023r2csp1:8080"}
 500 (recvAddress(..) failed: Connection reset by peer)
-  (andere Fehlermeldung; aber das Skript wird ausgeführt.)
+  (er bekommt andere Fehlermeldung; aber das Skript wird ausgeführt.)
 
    Zur Kubernetes-Struktur: 
    -----------------------
@@ -711,3 +711,39 @@ From okapi.folio-clone-03.svc.foliotest.local (10.237.64.190) icmp_seq=1 Destina
    das Deployment starte die Pods (falls es "grün" ist).
    Stateful Sets werden - zumindest bei okapi-helm - nur im Cluster Modus angelegt. Okapi starte ich aber derzeit noch nicht im Cluster Modus (das wäre Hazelcast).
    Außerdem gibt es Services. Die Module haben einen. Die postgres, Okapi und elasticsearch auch.
+
+18.10.2024
+  helm uninstall -n folio-backend mods-auth
+  helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+    -- Waiting for file kube-scripts/init-module.sh...
+    testing if kube-scripts/init-module.sh exists...done
+    lrwxrwxrwx 1 root root 21 Oct 28 11:50 kube-scripts/init-module.sh -> ..data/init-module.sh
+    ping okapi....
+    PING okapi.folio-backend.svc.cluster.local (10.43.126.141) 56(84) bytes of data.
+    --- okapi.folio-backend.svc.cluster.local ping statistics ---
+    1 packets transmitted, 0 received, 100% packet loss, time 0ms
+    -- Getting superuser token...failed: 000 ()
+    okapi still unsecured?
+    continuing with empty superusertoken...
+    -- Checking if okapi is ready...ERROR, returncode 000
+       Analyse: der init-Job hat die configMapRef nicht erhalten.
+       die configMap mod-authtoken-2-14-1-2023r2csp2-env mal nicht löschen.
+       Warten bis die Jobs von selber verschwunden sind.
+       Dann die Deployments: mod-permissions, mod-users, mod-login, mod-authtoken, mal löschen. Die dazu gehörenden Services ebenfalls löschen.
+       (muss man nicht)
+  helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+     => envFrom Syntax in init.job.yaml geändert: envFrom darf nicht 2x erscheinen, das zweite Vorkommen überschreibt das erste !!
+     Returnwert des okapi ready check ist jetzt: "000"[ ]"200" => Zerifikatsproblem ?
+     Versuche mit okapi.secureSuperTenant: True in global-values.yaml (das ist egal, ich habe ja Okapi von IndexData deployed).
+     Hole supertenant: superuser und Passwort aus den Secrets. (das Secret secure-supertenant unter modules/templates wird nicht benötigt).
+     Das IndexData Okapi ist nicht abgesichert.
+     Entferne alle Header "X-Okapi-Tenant" aus dem init.sh Skript
+     Noch Probleme mit Gänsefüßchen: "200" vs. 200
+     Jetzt geht:
+       enabling module mod-permissions-6.4.0 to http://okapi:9130 ...{"srvcId":"mod-permissions-6.4.0","instId":"mod-permissions-6.4.0","url":"http://mod-permissions-6-4-0-2023r2csp2:8081"}
+done
+      enabling module mod-users-19.2.2 to http://okapi:9130 ...{"srvcId":"mod-users-19.2.2","instId":"mod-users-19.2.2","url":"http://mod-users-19-2-2-2023r2csp2:8081"}
+done
+    jedoch
+      400 (Missing dependency: mod-login-7.10.1 requires users: 15.4 16.0 Missing dependency: mod-login-7.10.1 requires user-tenants: 1.0)
+      400 (Missing dependency: mod-authtoken-2.14.1 requires permissions: 5.3 Missing dependency: mod-authtoken-2.14.1 requires users: 15.0 16.0)

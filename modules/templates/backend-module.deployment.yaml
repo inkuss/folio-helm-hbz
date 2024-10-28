@@ -73,11 +73,6 @@ spec:
           - mountPath: {{ .propertiesMountPath | default "/usr/vertices" }}
             name: properties-secret
           {{- end }}
-          {{- if or ( eq .dbAccess  true ) ( eq $.Values.global.db.allModuleAccess true ) }} 
-          envFrom:
-          - secretRef:
-            name: {{ $.Values.global.db.folioSecret }}
-          {{- end }}
           env:
           {{- if .elasticsearchAccess }}
           {{- if $.Values.global.elasticsearch.secretName }}
@@ -89,6 +84,10 @@ spec:
           {{- end }}
           {{- end }}
           envFrom:
+          {{- if or ( eq .dbAccess  true ) ( eq $.Values.global.db.allModuleAccess true ) }} 
+          - secretRef:
+              name: {{ $.Values.global.db.folioSecret }}
+          {{- end }}
           {{- if .customEnvSecret }}
           - secretRef:
               name: {{ .name }}-env-{{ $.Release.Name }}

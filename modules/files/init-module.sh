@@ -7,12 +7,14 @@ set -o pipefail -o noclobber
 module_descriptor_file='/tmp/module-descriptor.json'
 superusertoken=""
 
+#    -H \"X-Okapi-Token: ${superusertoken}\" \
 okapi_ready_check() {
-  echo -ne "-- Checking if okapi is ready..."
-  local returncode=`curl -s -w "%{http_code}" \
-    -H "X-Okapi-Token: ${superusertoken}" \
+  local okapi_ready_check="curl -s -w %{http_code} \
     -o /dev/null \
-    ${OKAPI_URL}/_/discovery/modules`;
+    ${OKAPI_URL}/_/discovery/modules"
+  echo "Performing okapi ready check : " $okapi_ready_check
+  echo -ne "-- Checking if okapi is ready..."
+  local returncode=`$okapi_ready_check`;
   case "${returncode}" in
     200|201)
       echo "done"
@@ -23,10 +25,10 @@ okapi_ready_check() {
   return 1
 }
 
+#    -H "X-Okapi-Token: ${superusertoken}" \
 is_module_introduced() {
   echo -ne "-- testing whether module ${SERVICE_ID} is already introduced to ${OKAPI_URL} ...";
   result=`curl -s -w "|%{http_code}" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     -o /dev/null \
     "${OKAPI_URL}/_/proxy/modules/${SERVICE_ID}"`;
 
@@ -68,6 +70,7 @@ fetch_module_descriptor() {
 }
 
 # introduces the module in okapi
+#    -H "X-Okapi-Token: ${superusertoken}" \
 introduce_module() {
   echo -ne "-- introducing module ${SERVICE_ID} to ${OKAPI_URL} ..."
 
@@ -79,7 +82,6 @@ introduce_module() {
   cat $module_descriptor_file 
   result=`curl -s -w "|%{http_code}" \
     -X POST \
-    -H "X-Okapi-Token: ${superusertoken}" \
     -H "Content-type: application/json" \
     "${OKAPI_URL}/_/proxy/modules" \
     -d @${module_descriptor_file} 2>&1`
@@ -95,10 +97,10 @@ introduce_module() {
   return 127
 }
 
+#    -H "X-Okapi-Token: ${superusertoken}" \
 is_service_registered() {
   echo -ne "-- testing whether module ${SERVICE_ID} is already enabled in ${OKAPI_URL} ...";
   result=`curl -s -w "%{http_code}" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     -o /dev/null \
     "${OKAPI_URL}/_/discovery/modules/${SERVICE_ID}"`;
 
@@ -116,13 +118,13 @@ is_service_registered() {
   return 127
 }
 
+#    -H "X-Okapi-Token: ${superusertoken}" \
 deregister_service() {
   echo -ne "-- removing module ${SERVICE_ID} from ${OKAPI_URL} ...";
   result=`curl \
     -s \
     -X DELETE \
     -w "%{http_code}" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     -o /dev/null \
     "${OKAPI_URL}/_/discovery/modules/${SERVICE_ID}"`;
 
@@ -139,6 +141,7 @@ deregister_service() {
 }
 
 
+#    -H "X-Okapi-Token: ${superusertoken}" \
 register_service() {
   echo -ne "-- enabling module ${SERVICE_ID} to ${OKAPI_URL} ..."
 
@@ -147,7 +150,6 @@ register_service() {
   result=`echo $enable_descriptor | curl -s -w "|%{http_code}" \
     -X POST \
     -H "Content-type: application/json" \
-    -H "X-Okapi-Token: ${superusertoken}" \
     "$OKAPI_URL/_/discovery/modules" \
     -d @- 2>&1`
 
@@ -206,7 +208,7 @@ EOF
 
   echo "failed: ${result##*|} (${result%|*})"
   echo "okapi still unsecured?"
-  echo "continuing with empty superusertoken..."
+  echo "continuing without a superusertoken..."
   return 17
 }
 
