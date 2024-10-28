@@ -747,3 +747,30 @@ done
     jedoch
       400 (Missing dependency: mod-login-7.10.1 requires users: 15.4 16.0 Missing dependency: mod-login-7.10.1 requires user-tenants: 1.0)
       400 (Missing dependency: mod-authtoken-2.14.1 requires permissions: 5.3 Missing dependency: mod-authtoken-2.14.1 requires users: 15.0 16.0)
+   im 2. Versuch, ohne etwas verändert zu haben:
+      enabling module mod-login-7.10.1 to http://okapi:9130 ...{"srvcId":"mod-login-7.10.1","instId":"mod-login-7.10.1","url":"http://mod-login-7-10-1-2023r2csp2:8081"}
+done
+      enabling module mod-authtoken-2.14.1 to http://okapi:9130 ...{"srvcId":"mod-authtoken-2.14.1","instId":"mod-authtoken-2.14.1","url":"http://mod-authtoken-2-14-1-2023r2csp2:8081"}
+done
+    Die init Jobs sind jetzt "completed", aber die Deployments sind rot und die Pods bleiben auf "Pending"
+  helm uninstall -n folio-backend mods-auth
+  helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+  Die Deployments bleiben rot. Statusmeldungen sind:
+      status:
+  conditions:
+    - lastTransitionTime: '2024-10-28T16:52:04Z'
+      lastUpdateTime: '2024-10-28T16:52:04Z'
+      message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: 'False'
+      type: Available
+    - lastTransitionTime: '2024-10-28T16:52:04Z'
+      lastUpdateTime: '2024-10-28T16:52:04Z'
+      message: ReplicaSet "mod-authtoken-2-14-1-2023r2csp2-66c8598d9b" is progressing.
+      reason: ReplicaSetUpdated
+      status: 'True'
+      type: Progressing
+  observedGeneration: 1
+  replicas: 1
+  unavailableReplicas: 1
+  updatedReplicas: 1
