@@ -27,13 +27,6 @@ replicaCount: "3"
 socketReceiveBufferBytes: "102400"
 socketRequestMaxBytes: "104857600"
 socketSendBufferBytes: "102400"
-affinity:
-  nodeAffinity:
-    requiredDuringSchedulingIgnoredDuringExecution:
-      nodeSelectorTerms:
-      - matchExpressions:
-        - key:  node-role.kubernetes.io/control-plane
-          operator: DoesNotExist
 livenessProbe:
   enabled: true
   initialDelaySeconds: 120

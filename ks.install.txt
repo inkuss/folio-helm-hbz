@@ -774,3 +774,12 @@ done
   replicas: 1
   unavailableReplicas: 1
   updatedReplicas: 1
+
+SysOps 06.11.24
+  don't start on control planes
+  "Taints" and tolerations for the control planes
+  system components have tolerations on the taints
+  most control planes have those taints automatically
+  most pods only run on worker nodes
+  "taint ands tolerate" those worker nodes
+  node-role.kubernetes.io/control-plane=NoSchedule

@@ -143,17 +143,10 @@ spec:
       nodeSelector:
 {{ toYaml . | indent 8 }}
     {{- end }}
+   {{- with .affinity }}
       affinity:
-        nodeAffinity:
-          requiredDuringSchedulingIgnoredDuringExecution:
-            nodeSelectorTerms:
-            - matchExpressions:
-              - key:  node-role.kubernetes.io/control-plane
-                operator: DoesNotExist
-#    {{- with .affinity }}
-#      affinity:
-#{{ toYaml . | indent 8 }}
-#    {{- end }}
+   {{ toYaml . | indent 8 }}
+    {{- end }}
     {{- with .tolerations }}
       tolerations:
 {{ toYaml . | indent 8 }}
