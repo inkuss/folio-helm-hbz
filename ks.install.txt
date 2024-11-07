@@ -781,5 +781,47 @@ SysOps 06.11.24
   system components have tolerations on the taints
   most control planes have those taints automatically
   most pods only run on worker nodes
-  "taint ands tolerate" those worker nodes
+  "taint and tolerate" those worker nodes
   node-role.kubernetes.io/control-plane=NoSchedule
+  Ingolf: gitlab.bib-bvb.de kann ich weder forken noch klonen, dazu benötigt man ein Konto bei diesem gitlab.
+          Daher kann ich Änderungen weder pullen noch pushen.
+          Bei https://gitlab.bib-bvb.de/folio-public/folio-tools habe ich den Container direkt herunter gezogen 
+          (das Template macht das), da ich keine Änderungen an diesem Container benötige.
+          Bei folio-helm geht das aber nicht, da ich zahlreiche Änderungen vorgenommen habe, um meine Infrastruktur zu integrieren
+          (anderes Okapi verwendet [von Index Data], eigene Secrets/Passwortverwaltung, andere Konfiguration von postgres [values.yaml]).
+
+07.11.2024
+  helm uninstall -n folio-backend mods-auth
+  helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+  Die Jobs sind jetzt erfolgreich (enabling module mod-authtoken-2.14.1 to http://okapi:9130 ...).
+  Die Deployments sind grün:
+    message: >-
+        ReplicaSet "mod-permissions-6-4-0-2023r2csp2-6c8dcf4df5" has
+        successfully progressed.
+      reason: NewReplicaSetAvailable
+      status: 'True'
+    Ausnahme: mod-users:
+       message: Deployment does not have minimum availability.
+      reason: MinimumReplicasUnavailable
+      status: 'False'
+  Die Pods sind auf grün und loggen nur INFO-Meldungen.
+    INFO Succeeded in deploying verticle 
+    Ausnahme: mod-users:
+      15:45:13 WARN  ClientUtils          Couldn't resolve server kafka:9092 from bootstrap.servers as DNS resolution failed for kafka
+      15:46:48 ERROR RestVerticle         Failed to construct kafka consumer
+org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
+ at org.apache.kafka.clients.consumer.KafkaConsumer.<init>(KafkaConsumer.java:830) ~[mod-users-fat.jar:?]
+     ...
+      15:46:48 ERROR ?                    Failed in deploying verticle
+
+   Der Container mod-users braucht KAFKA_HOST, KAFKA_PORT und bekommt es aus der ConfigMap mod-users-*-env .
+   Diese ConfigMap wird durch das Template backend-module.configmap.yaml erzeugt. Dieses wiederum holt sich die Werte aus
+   global-values.yaml : Values.global.kafka.serviceName, Values.global.kafka.port.
+   Aber was muss da bei mir drin stehen ? Warum nicht kafka:9092 ?
+   s. meine Installationsnotizen in kube/
+   "Kafka can be accessed by consumers via port 9092 on the following DNS name from within your cluster:
+    kafka.folio-staging-v1-kafka.svc.cluster.local"
+
+   Kafka auch im Namespace folio-backend installiert, siehe in kube/ks.install.txt .
+     helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+   => Deployment und Pods für mod-users sind jetzt grün.
