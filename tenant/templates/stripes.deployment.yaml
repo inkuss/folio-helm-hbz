@@ -1,6 +1,3 @@
-{{- if (((.Values.global).image).pullsecret) }}
-{{- fail "Upgrade breaking change: Remove Imagepullsecrets from global.image.pullsecrets and move them to imagePullSecrets" -}}
-{{- end }}
 {{ range .Values.tenants}}
 {{- if .stripes.enable }}
 {{- if  (((.stripes).image).pullsecret) }}

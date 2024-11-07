@@ -825,3 +825,59 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
    Kafka auch im Namespace folio-backend installiert, siehe in kube/ks.install.txt .
      helm upgrade -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
    => Deployment und Pods für mod-users sind jetzt grün.
+
+   Weiter mit "secure supertenant", hier https://gitlab.bib-bvb.de/folio-public/folio-helm/#secure-supertenant => erst mal nicht gemacht
+     helm install -n folio-backend secure-st secure-supertenant/ -f global-values.yaml
+
+   Installation der restlichen Module: https://gitlab.bib-bvb.de/folio-public/folio-helm/#other-modules
+     helm install -n folio-backend mods modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-no-auth.yaml
+   NAME: mods
+   LAST DEPLOYED: Thu Nov  7 19:05:04 2024
+   NAMESPACE: folio-backend
+   STATUS: deployed
+   REVISION: 1
+   TEST SUITE: None
+
+   Mandant und Frontend
+   ====================
+   Weiter hier: https://gitlab.bib-bvb.de/folio-public/folio-helm/#create-tenant-and-stripes-deployment
+   Siehe https://gitlab.bib-bvb.de/folio-public/stripes-build (ein eigenes Repo für Stripes)
+    - passendes Tag dieses Repos wählen: poppy-csp2-complete-2  => auch eingetragen in tenant/values.yaml image.stripesTag
+    - Umgebungsvariablen setzen (werden verwendet in strips.config.js):
+     $OKAPI_URL_INGRESS The Okapi URL as seen from the end-user
+     $TENANT Tenant ID
+     $LOG_PREFIX Log Prefix for Stripes
+     $WELCOME_MESSAGE  Welcome Message
+     $PLATFORM_NAME  Platform Name
+     $LOGO_ALT_TXT Alternative Text for the logo
+     $LOGIN_BACKGROUND_COLOR Background color of the login screen
+     $NAV_BACKGROUND_COLOR Background Color of navigation bar
+     $LOGO_URL
+     $FAVICON_URL
+          ==> siehe in tenant/templates/stripes.configmap.yaml
+     "create new stripes branch in gitlab ( https://gitlab.bib-bvb.de/folio/platform-complete ) from branch with correct version (e.g. lotus-base) and adjust values" => das kann ich nicht machen / keine Berechtigung
+   - Copy and adapt tenant/values.yaml   erl. / folioToolsTag angepasst
+   - Installiere Mandanten (?)
+      helm install -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml 
+      .. verschiedene Skripte im files-Verzeichnis; diese müssen kennen:
+         OKAPI_URL (http://okapi.%s:9130), FOLIO_ADMIN_USERNAME (diku_admin), FOLIO_ADMIN_PASSWORD (admin), FOLIO_TENANTID (diku) u.a.
+                                      =          ADMIN_USERNAME                     ADMIN_PASSWORD                TENANT
+                                 %s = <Namespace>
+         zur Kommunikation mit OKAPI wird der OKAPI-CommandLineInterface (CLI) benutzt --- nicht curl.
+
+     die Templates unter tenant/ mal durchgehen:
+       - wo ist Values.tenants.clientAdminAccount ? -> hinzugefügt "admin"
+       - erst einmal ohne Ingress (ingress: false, ist auch der Default)
+       - erst einmal ohne EMAIL-Konfiguration (ist auskommentiert in tenant/values.yaml)
+
+    helm install -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml 
+    Logs von Job  folio-r2-2023-csp2-register-diku 
+   Starting to register tenant diku with okapi at http://okapi:9130...
+   Getting superuser token...testing whether module folio_oa-2.0.0 is already registered to http://okapi:9130 ...not found.
+   fetching module-descriptor from http://folio-registry.aws.indexdata.com for folio_oa-2.0.0 ...done
+   registering module folio_oa-2.0.0 to http://okapi:9130 ...done
+   testing whether module folio_acquisition-units-5.0.0 is already registered to http://okapi:9130 ...not found.
+   fetching module-descriptor from http://folio-registry.aws.indexdata.com for folio_acquisition-units-5.0.0 ...done
+   registering module folio_acquisition-units-5.0.0 to http://okapi:9130 ...400 (Missing dependency: folio_acquisition-units-5.0.0 requires acquisitions-units: 1.1)
+      - Pods bleiben rot
+         - außerdem Fehlermeldung von mod-data-import: storageclass.storage.k8s.io "longhorn-tworep" not found (!)
