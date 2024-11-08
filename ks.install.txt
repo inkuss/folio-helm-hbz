@@ -886,3 +886,4 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
 08.11.24
   Uwe: wg. der fehlenden Dependencies: Einfach mehrfach probieren; das könnten Race Conditions sein. 
   Uwe: Nur mit dem Ingress kommst du von außen ans Okapi dran, sonst nur intern in Kubernetes. Ich würde auch den Ingress installieren.
+   helm uninstall -n folio-backend folio-r2-2023-csp2
