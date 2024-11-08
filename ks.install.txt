@@ -842,7 +842,7 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
    ====================
    Weiter hier: https://gitlab.bib-bvb.de/folio-public/folio-helm/#create-tenant-and-stripes-deployment
    Siehe https://gitlab.bib-bvb.de/folio-public/stripes-build (ein eigenes Repo für Stripes)
-    - passendes Tag dieses Repos wählen: poppy-csp2-complete-2  => auch eingetragen in tenant/values.yaml image.stripesTag
+    - passendes Tag dieses Repos wählen: poppy-csp2-complete-2  => eingetragen in tenant/values.yaml image.stripesTag
     - Umgebungsvariablen setzen (werden verwendet in strips.config.js):
      $OKAPI_URL_INGRESS The Okapi URL as seen from the end-user
      $TENANT Tenant ID
@@ -856,6 +856,7 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
      $FAVICON_URL
           ==> siehe in tenant/templates/stripes.configmap.yaml
      "create new stripes branch in gitlab ( https://gitlab.bib-bvb.de/folio/platform-complete ) from branch with correct version (e.g. lotus-base) and adjust values" => das kann ich nicht machen / keine Berechtigung
+     - gezogen wird aber das hier, und das ist öffentlich: https://gitlab.bib-bvb.de/folio-public/stripes-build; davon das Tag "stripesTag"
    - Copy and adapt tenant/values.yaml   erl. / folioToolsTag angepasst
    - Installiere Mandanten (?)
       helm install -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml 
@@ -881,3 +882,6 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
    registering module folio_acquisition-units-5.0.0 to http://okapi:9130 ...400 (Missing dependency: folio_acquisition-units-5.0.0 requires acquisitions-units: 1.1)
       - Pods bleiben rot
          - außerdem Fehlermeldung von mod-data-import: storageclass.storage.k8s.io "longhorn-tworep" not found (!)
+
+08.11.24
+  Uwe: Nur mit dem Ingress kommst du von außen ans Okapi dran, sonst nur intern in Kubernetes. Ich würde auch den Ingress installieren.
