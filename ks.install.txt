@@ -830,6 +830,7 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
      helm install -n folio-backend secure-st secure-supertenant/ -f global-values.yaml
 
    Installation der restlichen Module: https://gitlab.bib-bvb.de/folio-public/folio-helm/#other-modules
+   **********************************
      helm install -n folio-backend mods modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-no-auth.yaml
    NAME: mods
    LAST DEPLOYED: Thu Nov  7 19:05:04 2024
@@ -887,3 +888,50 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
   Uwe: wg. der fehlenden Dependencies: Einfach mehrfach probieren; das könnten Race Conditions sein. 
   Uwe: Nur mit dem Ingress kommst du von außen ans Okapi dran, sonst nur intern in Kubernetes. Ich würde auch den Ingress installieren.
    helm uninstall -n folio-backend folio-r2-2023-csp2
+
+13.11.24
+  IK: Das Interface acquisitions-units: 1.1  wird von mod-orders bereit gestellt ("provides").
+  Zuerst die Backend-Module anmelden, dann die Frontend-Module.
+  Probleme bei Anmeldung (POST an /_/discovery) von mod-inventory-update-3.2.1
+  Bei "ReplicaSets" gucken, was das Problem ist:
+    ERROR StatusLogger Log4j2 could not find a logging implementation. Please add log4j-core to the classpath. Using SimpleLogger to log to the console...
+  Die Module noch einmal installieren;
+    helm upgrade -n folio-backend mods modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-no-auth.yaml
+  mod-inventory-update läuft fehlerfrei durch:
+   bei "Jobs", dann das log angucken (init-mod-..):
+   -- enabling module mod-inventory-update-3.2.1 to http://okapi:9130 ...{"srvcId":"mod-inventory-update-3.2.1","instId":"mod-inventory-update-3.2.1","url":"http://mod-inventory-update-3-2-1-2023r2csp2:8080"}
+done
+
+    Nun erneut beim Mandanten anmelden:
+    ***********************************
+    helm upgrade -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml 
+     Bei Jobs das Log angucken
+      ==> mod-inventory-update-3.2.1 konnte jetzt erfolgreich angemeldet werden, jetzt Problem bei mod-patron-blocks-1.9.0
+       Wieder Module "upgraden":
+     ... -- enabling module mod-patron-blocks-1.9.0 to http://okapi:9130 ...{"srvcId":"mod-patron-blocks-1.9.0","instId":"mod-patron-blocks-1.9.0","url":"http://mod-patron-blocks-1-9-0-2023r2csp2:8081"}
+done
+     und jetzt wieder der Mandant (Job "...-upgrade-diku"): Succeeded waiting for backend modules
+     bei den Frontend-Modulen fällt der Job dann ganz am Ende auf die Nase:
+    testing whether module folio_users-10.0.5 is already registered to http://okapi:9130 ...already registered.
+
+    helm upgrade -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml
+  Jetzt wird "install_modules()" ausgeführt. POST an Okapi's endpoint /install .
+Installing modules for tenant ...Installing modules --- 3 tries left ....
+400
+Installing modules --- 2 tries left ....
+400
+Installing modules --- 1 tries left ....
+400
+Installing modules --- 0 tries left ....
+400 (POST request for mod-permissions-6.4.0 /_/tenant failed with 400: FATAL: sorry, too many clients already (53300))
+  Analyse: Postgres-Fehler ! "Your code opened up more than the allowed limit of connections to the postgresql database."
+
+   Der Stripes-Container läuft auch nicht:
+   lastTransitionTime: '2024-11-08T18:41:50Z'
+      message: 'containers with unready status: [folio-r2-2023-csp2-stripes-diku]'
+      reason: ContainersNotReady
+      status: 'False'
+   Das ist Teil von tenant/templates/stripes.deployment.yaml
+      container "folio-r2-2023-csp2-stripes-diku" in pod "folio-r2-2023-csp2-stripes-diku-668f4ff7bb-7dqt8" is waiting to start: trying and failing to pull image
+    dieses Image: gitlab.bib-bvb.de:5050/folio-public/stripes-build:poppy-csp2-complete-2
+    Ist da etwas der Build fehlgeschlagen ? s. hier: https://gitlab.bib-bvb.de/folio-public/stripes-build/-/commits/poppy-csp2-complete-2 (rotes Kruez)

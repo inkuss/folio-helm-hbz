@@ -115,6 +115,7 @@ fetch_module_descriptor() {
   case "${result##*|}" in
     200|201)
       module_descriptor="${result%|*}"
+      echo "Modul-Deskriptor: $module_descriptor"
       echo "done"
       return 0
       ;;
@@ -733,9 +734,9 @@ main() {
   parse_cmdline_parameters $@ \
   && echo "Starting to register tenant ${tenant_id} with okapi at ${OKAPI_URL}..." \
   && get_superuser_token \
-  && register_frontend_modules $frontend_modules \
   && (tenant_exists || create_tenant) \
-  && wait_for_backend_modules $backend_modules && install_modules $modules \
+  && wait_for_backend_modules $backend_modules \
+  && register_frontend_modules $frontend_modules && install_modules $modules \
   && create_admin_workflow \
   && login \
   && get_permissions \
