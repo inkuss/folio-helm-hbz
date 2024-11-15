@@ -976,3 +976,4 @@ D-Sys-Ops 15.11.2024
    Florian: Einfacher dem Reverse Proxy sagen, diese drei Nodes sind gültig.
    Tobias: Metal-LB; dann benötige ich keinen Reverse Proxy.
 
+   Wo setzt man globale ENV-Variablen ?
