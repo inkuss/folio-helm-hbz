@@ -33,7 +33,7 @@ numberOfInstances: 2
 # postgresql parameters
 parameters:
   listen_addresses: "*"
-  max_connections: "100"
+  max_connections: "1200"
   password_encryption: "md5"
   db_user_namespace: "off"
   shared_buffers: "128MB"

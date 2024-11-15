@@ -897,6 +897,10 @@ org.apache.kafka.common.KafkaException: Failed to construct kafka consumer
     ERROR StatusLogger Log4j2 could not find a logging implementation. Please add log4j-core to the classpath. Using SimpleLogger to log to the console...
   Die Module noch einmal installieren;
     helm upgrade -n folio-backend mods modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-no-auth.yaml
+    # das erledigt das Deployment der Module. Die Images der Module werden nacheinander an Kubernetes übergeben und Kubernetes macht 
+      je ein Deployment und einen Pod daraus (außerdem noch ein Replica Set). Die Namen der Images stehen in valuesd/2023r2csp2-all.yaml .
+      Das Deployment macht das Template modules/template/backend-module.deployment.yaml .
+      In modules/files/init-module.sh wird das Modul am Okapi-Discovery angemeldet.
   mod-inventory-update läuft fehlerfrei durch:
    bei "Jobs", dann das log angucken (init-mod-..):
    -- enabling module mod-inventory-update-3.2.1 to http://okapi:9130 ...{"srvcId":"mod-inventory-update-3.2.1","instId":"mod-inventory-update-3.2.1","url":"http://mod-inventory-update-3-2-1-2023r2csp2:8080"}
@@ -935,3 +939,40 @@ Installing modules --- 0 tries left ....
       container "folio-r2-2023-csp2-stripes-diku" in pod "folio-r2-2023-csp2-stripes-diku-668f4ff7bb-7dqt8" is waiting to start: trying and failing to pull image
     dieses Image: gitlab.bib-bvb.de:5050/folio-public/stripes-build:poppy-csp2-complete-2
     Ist da etwas der Build fehlgeschlagen ? s. hier: https://gitlab.bib-bvb.de/folio-public/stripes-build/-/commits/poppy-csp2-complete-2 (rotes Kruez)
+
+D-Sys-Ops 15.11.2024
+   Der Stripes-Container ist schon gebaut (bzw. das Bauen ist fehlgeschlagen auf Florian's Seite). Man muss den Stripes-Container nur 1x bauen.
+   Die Informationen über den Mandanten (URL, Namen), werden dann injiziert.
+
+   max_connections bei der postgres hochsetzen:
+   1. in ~/folio-helm-hbz/zalando-pg/values.yaml eintragen: max_connections: "1200"
+   2. helm upgrade -n folio-backend -f global-values.yaml -f zalando-pg/values.yaml zal-pg ./zalando-pg
+      - das schlägt zwar fehl, macht aber nichts, ist ein "Post-Upgrade-Job".
+
+   In einen postgres-Container gehen, um zu gucken, ob der Parameter hoch gesetzt wurde:
+     Pods -> folio-zal-pg-1 ; dann Klick auf den Pfeil -> Konsole öffnet sich: root@folio-zal-pg-1:/home/postgres
+     psql -U folio; SELECT * FROM pg_settings WHERE name = 'max_connections';
+           name       | setting | unit |                       category                       |                     short_desc                     | extra_desc |  context   | vartype |    source    | min_val | max_val | enumvals | boot_val | reset_val | sourcefile | sourceline | pending_restart 
+-----------------+---------+------+------------------------------------------------------+----------------------------------------------------+------------+------------+---------+--------------+---------+---------+----------+----------+-----------+------------+------------+-----------------
+ max_connections | 1200    |      | Connections and Authentication / Connection Settings | Sets the maximum number of concurrent connections. |            | postmaster | integer | command line | 1       | 262143  |          | 100      | 1200      |            |            | f
+(1 row)
+
+   Anders: Gucken, mit Welchen Werten zal-pg deployed wurde; das zeigt aber nur die global-values.yaml:
+     helm -n folio-backend get values zal-pg
+   3. Jetzt den Mandanten aktualisieren:
+    helm upgrade -n folio-backend folio-r2-2023-csp2 tenant/ -f global-values.yaml -f tenant/values.yaml -f modules/valuesd/2023r2csp2-all.yaml
+    => install_modules() wird jetzt ohne Fehler ausgeführt.
+
+   Gucken, was ich in dem Namensraum alles deployed habe: helm -n folio-backend list
+
+   Wenn der Stripes-Container läuft:
+   Okapi und Stripes als Node Port Service einrichten.
+   ***************************************************
+   Okapi und Stripes als Node Port Service. Dann sucht sich das System automatisch einen Service und Port (< 32.000).
+   Das ist dann von außen zugänglich. Und zwar über den Node. Ich gebe dann den Namen von mindestens einem der Nodes an.
+   Optimalerweise sind alle 3 Nodes gültig, den Reverse Proxy so konfigurieren.
+   Intern auf einen http Node Port Service weiterleiten.
+   Uwe: Ein Load Balancer mit automatischem Fail over (ist komplizerter)
+   Florian: Einfacher dem Reverse Proxy sagen, diese drei Nodes sind gültig.
+   Tobias: Metal-LB; dann benötige ich keinen Reverse Proxy.
+
