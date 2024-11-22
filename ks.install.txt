@@ -977,3 +977,13 @@ D-Sys-Ops 15.11.2024
    Tobias: Metal-LB; dann benötige ich keinen Reverse Proxy.
 
    Wo setzt man globale ENV-Variablen ?
+
+22.11.2024
+  d-sys-ops
+  meine Frage:
+- ENV-Vars in Kubernetes
+  backend-module.configmap.yaml,
+     wird in backend-module.deployment.yaml geladen, über configMapRef.
+      s3StorageAccess = true geht anders, mit einem Secret, über secretRef.
+     wird auch in backend-module.deployment.yaml geladen.
+   die configmap.yaml erhält ihre Werte letzenendes über eine Values-Datei.
