@@ -9,6 +9,7 @@
   # helm delete -n folio-backend zal-pg
   helm uninstall -n folio-backend zal-pg
 
+  # Hier weiter Demo 28.02.2025
   Ein Secret liegt in einer privaten Container-Registry
   Anleitung: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   docker login
