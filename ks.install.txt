@@ -995,8 +995,21 @@ D-Sys-Ops 15.11.2024
     Es wird nur in den templates okapi-helm/okapi/templates/deployment.yaml und statefulset.yaml benötigt.
   -> gelöst durch einen einfachen "git pull" in folio-secrets ! Nun wird auch db-connect-okapi von folio-secrets angelegt:
      helm upgrade -n folio-backend folio-secrets ./folio-secrets  ==> das Secret db-connect-okapi wurde wieder angelegt
+     Da sich die Passwörter (für folio, okapi) geändert haben, musste nun auch zal-pg neu deployed werden, mit initDb=true
      # Damit Neu-Deployment von Okapi:
      cd okapi-helm/
      helm uninstall -n folio-backend okapi
      helm install -n folio-backend  -f ../global-values.yaml okapi ./okapi
        Pod und Deployment von Okapi bleiben jetzt grün.
+
+     Jetzt die Module noch einmal deployen, da sich auch das Passwort für folio (Datenbank-User) geändert hat:
+     helm uninstall -n folio-backend mods-auth
+     helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
+     => die Jobs werden alle nicht fertig, gleiche Fehlermeldung in den Pods:
+     -- Waiting for file kube-scripts/init-module.sh...
+     testing if kube-scripts/init-module.sh exists...done
+     lrwxrwxrwx 1 root root 21 Mar  7 15:44 kube-scripts/init-module.sh -> ..data/init-module.sh
+     /usr/src/app/docker-entrypoint.sh: line 15: ./kube-scripts/init-module.sh: cannot execute: required file not found
+     => Das Problem hatten wir schon mal, damals gelöst durch neues folioToolsTag "debian-v1.3-debug2"
+     Komisch, vor 2 Stunden scheint das noch funktioniert zu haben. Die Deployments und Pods wurden vor 2 Stunden aktualisiert und sind auch noch jetzt grün. Warum funktioniert das jetzt nicht mehr ?
+
