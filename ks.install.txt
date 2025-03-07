@@ -9,7 +9,6 @@
   # helm delete -n folio-backend zal-pg
   helm uninstall -n folio-backend zal-pg
 
-  # Hier weiter Demo 28.02.2025
   Ein Secret liegt in einer privaten Container-Registry
   Anleitung: https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/
   docker login
@@ -791,6 +790,7 @@ SysOps 06.11.24
           Bei folio-helm geht das aber nicht, da ich zahlreiche Änderungen vorgenommen habe, um meine Infrastruktur zu integrieren
           (anderes Okapi verwendet [von Index Data], eigene Secrets/Passwortverwaltung, andere Konfiguration von postgres [values.yaml]).
 
+  hier weiter 07.03.2025
 07.11.2024
   helm uninstall -n folio-backend mods-auth
   helm install -n folio-backend mods-auth modules/ -f global-values.yaml -f modules/valuesd/2023r2csp2-auth.yaml
