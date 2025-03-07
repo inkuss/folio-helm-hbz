@@ -988,3 +988,15 @@ D-Sys-Ops 15.11.2024
       s3StorageAccess = true geht anders, mit einem Secret, über secretRef.
      wird auch in backend-module.deployment.yaml geladen.
    die configmap.yaml erhält ihre Werte letzenendes über eine Values-Datei.
+
+07.03.2025
+  Rekonstruktion des Secrets db-connect-okapi. - Das Secret ist heute irgendwie abhanden gekommen, weil ich es heute gelöscht habe. Von meinem Chart folio-secrets wurde nur das Secret db-connect-folio wieder angelegt....
+    Das Secret db-connect-okapi wird nur von Okapi benötigt, damit sich Okapi mit der Datenbank verbinden kann.
+    Es wird nur in den templates okapi-helm/okapi/templates/deployment.yaml und statefulset.yaml benötigt.
+  -> gelöst durch einen einfachen "git pull" in folio-secrets ! Nun wird auch db-connect-okapi von folio-secrets angelegt:
+     helm upgrade -n folio-backend folio-secrets ./folio-secrets  ==> das Secret db-connect-okapi wurde wieder angelegt
+     # Damit Neu-Deployment von Okapi:
+     cd okapi-helm/
+     helm uninstall -n folio-backend okapi
+     helm install -n folio-backend  -f ../global-values.yaml okapi ./okapi
+       Pod und Deployment von Okapi bleiben jetzt grün.
