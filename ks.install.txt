@@ -1013,3 +1013,34 @@ D-Sys-Ops 15.11.2024
      => Das Problem hatten wir schon mal, damals gelöst durch neues folioToolsTag "debian-v1.3-debug2"
      Komisch, vor 2 Stunden scheint das noch funktioniert zu haben. Die Deployments und Pods wurden vor 2 Stunden aktualisiert und sind auch noch jetzt grün. Warum funktioniert das jetzt nicht mehr ?
 
+07.05.2025
+ kubectl-Spickzettel: https://kubeops.net/de/blog-de/kubernetes-spickzettel
+
+  Zur Anleitung: https://folio-org.atlassian.net/wiki/spaces/FOLIJET/pages/442269739/Kubernetes+Example+Deployment
+  Das ist auch die Anleitung an der sich die anderen Early Adopter gerade die Zähne ausbeißen
+  Die Verrät aber leider viele Dinge nicht, zusätzlich gibt einem EBSCO:
+    https://github.com/folio-org/pipelines-shared-library
+    https://github.com/folio-org/folio-helm-v2/tree/master
+  Da durften wir dann Terraform Scripte interpretieren und umbauen was nicht sehr erbaulich war:)
+  EBSCO ist sehr eingeschossen auf AWS und das spiegelt sich in vielen Defaults.
+
+  Erhöhung auf 3*40 GB RAM im Cluster.
+  Beginn Eureka-Deployment.
+  *************************
+  kubectl create namespace folio-eureka
+
+  Installation der Voraussetzungen für FOLIO.
+  1. Vault
+  helm repo add bitnami https://charts.bitnami.com/bitnami
+  "bitnami" has been added to your repositories
+  helm repo update
+    ...Successfully got an update from the "bitnami" chart repository
+    Update Complete. ⎈Happy Helming!⎈
+  cd folio/folio-helm-hbz
+  helm show values bitnami/vault > vault-default-values.yaml
+  cp vault-default-values.yaml vault-hbz-values.yml
+  helm -n folio-eureka install vault -f vault-hbz-values.yml bitnami/vault
+     IMPORTANT: The chart is deploying a sealed Vault instance. The service will not be ready until the instance is unsealed.
+    This is a manual process that must be performed with maximum precaution.
+    Read the upstream vault documentation for unsealing and initializing the instance:
+    https://developer.hashicorp.com/vault/docs/platform/k8s/helm/run#initialize-and-unseal-vault
